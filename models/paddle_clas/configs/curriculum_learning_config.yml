@@ -1,0 +1,401 @@
+# Curriculum Learning Training Configuration
+# AI舌诊智能诊断系统 - 课程学习训练配置
+# Integrates curriculum learning, dynamic weighting, and gradient accumulation
+
+# ============================================================
+# Curriculum Learning Strategy
+# ============================================================
+curriculum_learning:
+  enabled: true
+
+  # Phase 1: Warmup - Train only main task
+  warmup_epochs: 20
+  main_task: "tongue_color"  # Primary diagnostic dimension
+
+  # Phase 2: Joint training - All tasks together
+  joint_epochs: 40  # Remaining epochs after warmup
+  total_epochs: 60
+
+  # Task weights during warmup (only main task active)
+  warmup_task_weights:
+    tongue_color: 1.0
+    coating_color: 0.0
+    tongue_shape: 0.0
+    coating_quality: 0.0
+    features: 0.0
+    health: 0.0
+
+  # Task weights during joint training
+  joint_task_weights:
+    tongue_color: 0.25
+    coating_color: 0.20
+    tongue_shape: 0.15
+    coating_quality: 0.15
+    features: 0.15
+    health: 0.10
+
+  # Phase transition settings
+  transition_mode: "hard"  # Options: "hard" (instant), "soft" (gradual)
+  soft_transition_epochs: 5  # For soft mode only
+
+# ============================================================
+# Dynamic Class Weighting
+# ============================================================
+dynamic_class_weighting:
+  enabled: true
+
+  # Weight adjustment strategy
+  strategy: "linear_decay"  # Options: "linear_decay", "performance_based", "loss_based"
+
+  # Source of initial class weights
+  initial_weights_path: "datasets/processed/clas_v1/class_weights.json"
+
+  # Target weights (uniform - all classes equally important)
+  target_weights: "uniform"  # Options: "uniform", "frequency_based", or custom path
+
+  # Weight adjustment schedule
+  warmup_epochs: 10  # Keep initial weights for first N epochs
+  decay_epochs: 50   # Decay from initial to target over N epochs after warmup
+
+  # Update frequency
+  update_frequency: 5  # Update weights every N epochs (for performance/loss-based strategies)
+
+  # Minimum weight values (prevent weights from going too low)
+  min_weight_threshold: 0.1
+  max_weight_threshold: 10.0
+
+# ============================================================
+# Gradient Accumulation
+# ============================================================
+gradient_accumulation:
+  enabled: true
+  accumulate_steps: 2  # Simulate 2x batch size
+
+  # Effective batch size calculation
+  base_batch_size: 16  # Actual dataloader batch size
+  effective_batch_size: 32  # base_batch_size * accumulate_steps
+
+  # Gradient clipping (applied after accumulation)
+  grad_clip:
+    enabled: true
+    max_norm: 1.0
+
+  # BN layer behavior with accumulation
+  bn_stabilization:
+    enabled: true
+    # Track running stats during accumulation
+    track_running_stats: true
+    # Use momentum for updating stats
+    momentum: 0.1
+
+# ============================================================
+# Training Schedule
+# ============================================================
+training:
+  # Total epochs (should match curriculum total_epochs)
+  num_epochs: 60
+
+  # Base batch size (actual dataloader batch size)
+  batch_size: 16
+
+  # Validation frequency
+  val_freq: 1  # Validate every epoch
+
+  # Checkpoint frequency
+  save_freq: 5  # Save checkpoint every N epochs
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+    monitor: "val_macro_f1"
+    mode: "max"
+
+  # Resume from checkpoint
+  resume:
+    enabled: false
+    checkpoint_path: null
+
+# ============================================================
+# Optimizer Configuration
+# ============================================================
+optimizer:
+  type: "Momentum"
+  lr: 0.01
+  momentum: 0.9
+  weight_decay: 0.0005
+
+  # Learning rate scheduler
+  scheduler:
+    type: "CosineAnnealingWarmRestarts"
+    warmup_epochs: 5
+    warmup_start_lr: 0.0001
+    min_lr: 0.000001
+    T_0: 10  # Restart period
+    T_mult: 2  # Multiply period by this after each restart
+
+  # Gradient scaling for mixed precision
+  amp:
+    enabled: true
+    level: "O1"
+    init_loss_scaling: 65536.0
+    incr_ratio: 2.0
+    decr_ratio: 0.5
+
+# ============================================================
+# Data Configuration
+# ============================================================
+data:
+  # Dataset paths
+  train:
+    images: "datasets/processed/seg_v1/train/images"
+    labels: "datasets/processed/clas_v1/train/labels.txt"
+
+  val:
+    images: "datasets/processed/seg_v1/val/images"
+    labels: "datasets/processed/clas_v1/val/labels.txt"
+
+  test:
+    images: "datasets/processed/seg_v1/test/images"
+    labels: "datasets/processed/clas_v1/test/labels.txt"
+
+  # Image configuration
+  image_size: [224, 224]
+  interpolation: "bilinear"
+
+  # Normalization (ImageNet stats)
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+  # DataLoader settings
+  num_workers: 0  # Windows compatibility
+  pin_memory: false
+  drop_last: true  # Drop last incomplete batch for stable accumulation
+
+# ============================================================
+# Data Augmentation
+# ============================================================
+augmentation:
+  # Training augmentations
+  train:
+    - RandomResizedCrop:
+        size: [224, 224]
+        scale: [0.8, 1.0]
+        ratio: [0.9, 1.1]
+
+    - RandomHorizontalFlip:
+        prob: 0.5
+
+    - RandomVerticalFlip:
+        prob: 0.1
+
+    - RandomRotation:
+        degrees: 15
+
+    - ColorJitter:
+        brightness: 0.2
+        contrast: 0.2
+        saturation: 0.1
+        hue: 0.05
+
+    - Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+
+  # Validation augmentations
+  val:
+    - Resize:
+        size: [256, 256]
+
+    - CenterCrop:
+        size: [224, 224]
+
+    - Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+
+# ============================================================
+# Model Configuration
+# ============================================================
+model:
+  name: "PP-HGNetV2_B4_MultiHead"
+  backbone: "PP_HGNetV2_B4"
+  feature_dim: 864
+
+  # Multi-head setup
+  multi_head:
+    tongue_color:
+      num_classes: 4
+      loss_weight: 0.25
+    coating_color:
+      num_classes: 4
+      loss_weight: 0.20
+    tongue_shape:
+      num_classes: 3
+      loss_weight: 0.15
+    coating_quality:
+      num_classes: 3
+      loss_weight: 0.15
+    features:
+      num_classes: 4
+      loss_weight: 0.15
+      multi_label: true
+    health:
+      num_classes: 2
+      loss_weight: 0.10
+
+  # Dropout
+  dropout: 0.2
+
+  # Pretrained weights
+  pretrained:
+    backbone_url: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph_v2.0/PPHGNetV2_B4_pretrained.pdparams"
+    load_strategy: "backbone_only"
+    strict: false
+
+# ============================================================
+# Loss Configuration
+# ============================================================
+loss:
+  # Focal Loss for single-label tasks
+  focal_loss:
+    alpha: 0.25
+    gamma: 2.0
+
+  # Asymmetric Loss for multi-label tasks
+  asymmetric_loss:
+    gamma_pos: 0.0
+    gamma_neg: 4.0
+    clip: 0.05
+
+  # Multi-task aggregation
+  aggregation: "weighted_sum"
+
+# ============================================================
+# Evaluation Metrics
+# ============================================================
+evaluation:
+  metrics:
+    - "macro_f1"
+    - "micro_f1"
+    - "mAP"
+    - "per_class_accuracy"
+    - "per_class_recall"
+
+  # Per-head targets
+  head_targets:
+    tongue_color:
+      macro_f1: 0.70
+    coating_color:
+      macro_f1: 0.65
+    tongue_shape:
+      macro_f1: 0.65
+    coating_quality:
+      macro_f1: 0.60
+    features:
+      mAP: 0.60
+    health:
+      accuracy: 0.85
+
+  # Class imbalance monitoring
+  monitor_imbalance:
+    enabled: true
+    threshold: 0.15  # Max allowed std between class F1s
+    alert_on_violation: true
+
+# ============================================================
+# Output Configuration
+# ============================================================
+output:
+  checkpoint_dir: "models/paddle_clas/output/checkpoints"
+  best_model_dir: "models/paddle_clas/output/best_model"
+  log_dir: "models/paddle_clas/logs"
+
+  # Curriculum state checkpoint
+  curriculum_checkpoint_dir: "models/paddle_clas/output/curriculum_state"
+
+  # Keep settings
+  keep_best: true
+  keep_last_n: 3
+  save_freq: 5
+
+# ============================================================
+# Logging Configuration
+# ============================================================
+logging:
+  # Print frequency
+  print_freq: 50  # Print every N batches
+
+  # TensorBoard
+  tensorboard:
+    enabled: true
+    log_dir: "models/paddle_clas/logs/tensorboard"
+
+  # MLflow
+  mlflow:
+    enabled: true
+    tracking_uri: "file:///C:/Users/Administrator/Desktop/AI_shezhen/mlruns"
+    experiment_name: "paddle_clas_curriculum_learning"
+    run_name: null  # Auto-generate
+
+  # Curriculum-specific logging
+  log_curriculum_state: true  # Log phase transitions
+  log_class_weights: true  # Log class weight changes
+  log_gradient_stats: false  # Log gradient norms (expensive)
+
+# ============================================================
+# Training Stability Monitoring
+# ============================================================
+stability:
+  # Loss monitoring
+  loss_monitor:
+    enabled: true
+    window_size: 10  # Moving average window
+    spike_threshold: 2.0  # Alert if loss spikes by this factor
+
+  # Gradient monitoring
+  grad_monitor:
+    enabled: false  # Expensive, disable by default
+    log_freq: 100
+    clip_threshold: 10.0
+
+  # Batch norm monitoring
+  bn_monitor:
+    enabled: true
+    log_running_stats: true  # Log mean/var of BN layers
+    alert_on_instability: true
+
+# ============================================================
+# Acceptance Criteria
+# ============================================================
+acceptance_criteria:
+  # Curriculum learning
+  curriculum_strategy:
+    enabled: true
+    warmup_epochs: 20
+    joint_epochs: 40
+
+  # Dynamic class weighting
+  dynamic_weights:
+    enabled: true
+    strategy: "linear_decay"
+    min_epochs: 10
+
+  # Gradient accumulation
+  gradient_accumulation:
+    enabled: true
+    accumulate_steps: 2
+
+  # Training stability
+  training_stability:
+    no_loss_explosion: true
+    no_nan_gradients: true
+    bn_stable: true
+
+  # Performance targets
+  targets:
+    macro_f1: 0.65
+    mAP: 0.70
+    per_class_f1_std: 0.15

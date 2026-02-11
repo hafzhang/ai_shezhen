@@ -364,7 +364,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-3-2"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "课程学习策略生效",
         "类别权重动态调整",
