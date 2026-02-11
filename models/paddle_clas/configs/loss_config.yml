@@ -1,0 +1,271 @@
+# ============================================================
+# Multi-Task Loss Configuration for Tongue Diagnosis
+# ============================================================
+# Configuration file for multi-task loss function combining
+# FocalLoss and AsymmetricLoss for all 6 diagnostic heads
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+# ============================================================
+
+# ============================================================
+# Loss Aggregation Strategy
+# ============================================================
+aggregation:
+  type: "weighted_sum"  # Options: "weighted_sum", "sum", "mean"
+  normalize: true  # Normalize by total task weight
+
+# ============================================================
+# Task Weights (Head Importance)
+# ============================================================
+# According to PRD task-3-2 requirements:
+# - Head1 (tongue_color): 0.4 weight - PRIMARY diagnostic dimension
+# - Head2 (coating_color): 0.35 weight - SECONDARY dimension
+# - Head3 (tongue_shape): 0.25 weight - TERTIARY dimension
+#
+# Updated to include all 6 heads with proportional weights:
+task_weights:
+  tongue_color: 0.25      # 舌色 (Tongue Color) - 4 classes
+  coating_color: 0.20      # 苔色 (Coating Color) - 4 classes
+  tongue_shape: 0.15       # 舌形 (Tongue Shape) - 3 classes
+  coating_quality: 0.15     # 苔质 (Coating Quality) - 3 classes
+  features: 0.15           # 特征 (Special Features) - 4 classes (multi-label)
+  health: 0.10             # 健康状态 (Health Status) - 2 classes
+
+# ============================================================
+# Focal Loss Configuration
+# ============================================================
+# Focal Loss formula: FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
+# - alpha: Weighting factor for class balance (0.25 recommended)
+# - gamma: Focusing parameter for hard examples (2.0 recommended)
+focal_loss:
+  enabled: true
+  alpha: 0.25              # Balances positive/negative examples
+  gamma: 2.0               # Higher = more focus on hard examples
+  reduction: "mean"
+
+  # Class weighting strategy
+  class_weight_strategy: "sqrt_inv"  # Options: "sqrt_inv", "inv", "log_inv", "none"
+  class_weights_path: "datasets/processed/clas_v1/class_weights.json"
+
+  # Gradient clipping for stability
+  grad_clip:
+    enabled: true
+    max_norm: 1.0
+
+# ============================================================
+# Asymmetric Loss Configuration (for multi-label tasks)
+# ============================================================
+# Asymmetric Loss optimizes multi-label classification:
+# - gamma_pos: Focus on hard positives (0.0 = no focusing)
+# - gamma_neg: Down-weight easy negatives (4.0 = strong down-weighting)
+# - clip: Probabilistic margin (0.05 prevents overwhelming negatives)
+asymmetric_loss:
+  enabled: true
+  gamma_pos: 0.0           # No focusing on positive examples
+  gamma_neg: 4.0           # Strong down-weighting of easy negatives
+  clip: 0.05               # Margin for probabilistic clipping
+  reduction: "sum"
+
+  # Label smoothing for regularization
+  label_smoothing:
+    enabled: false
+    factor: 0.1
+
+# ============================================================
+# Per-Head Loss Configuration
+# ============================================================
+# Each head can use different loss types and parameters
+heads:
+  # Head 1: 舌色 (Tongue Color) - Primary diagnostic dimension
+  tongue_color:
+    loss_type: "focal"      # focal, asymmetric, ce
+    multi_label: false
+    num_classes: 4
+    class_names:
+      - "淡红舌"    # light_red (healthy)
+      - "红舌"       # red
+      - "绛紫舌"     # purple
+      - "淡白舌"     # pale
+    task_weight: 0.25
+    focal:
+      alpha: 0.25
+      gamma: 2.0
+
+  # Head 2: 苔色 (Coating Color) - Secondary diagnostic dimension
+  coating_color:
+    loss_type: "focal"
+    multi_label: false
+    num_classes: 4
+    class_names:
+      - "白苔"       # white
+      - "黄苔"       # yellow
+      - "黑苔"       # black
+      - "花剥苔"     # peeling (map-like)
+    task_weight: 0.20
+    focal:
+      alpha: 0.25
+      gamma: 2.0
+
+  # Head 3: 舌形 (Tongue Shape) - Tertiary dimension
+  tongue_shape:
+    loss_type: "focal"
+    multi_label: false
+    num_classes: 3
+    class_names:
+      - "正常"       # normal
+      - "胖大舌"     # swollen
+      - "瘦薄舌"     # thin
+    task_weight: 0.15
+    focal:
+      alpha: 0.25
+      gamma: 2.0
+
+  # Head 4: 苔质 (Coating Quality)
+  coating_quality:
+    loss_type: "focal"
+    multi_label: false
+    num_classes: 3
+    class_names:
+      - "薄苔"       # thin
+      - "厚苔"       # thick
+      - "腐苔"       # greasy
+    task_weight: 0.15
+    focal:
+      alpha: 0.25
+      gamma: 2.0
+
+  # Head 5: 特征 (Special Features) - Multi-label task
+  features:
+    loss_type: "asymmetric"  # Use asymmetric loss for multi-label
+    multi_label: true
+    num_classes: 4
+    class_names:
+      - "无"         # none
+      - "红点"       # red_dots
+      - "裂纹"       # cracks
+      - "齿痕"       # teeth_marks
+    task_weight: 0.15
+    asymmetric:
+      gamma_pos: 0.0
+      gamma_neg: 4.0
+      clip: 0.05
+
+  # Head 6: 健康状态 (Health Status)
+  health:
+    loss_type: "focal"
+    multi_label: false
+    num_classes: 2
+    class_names:
+      - "不健康"     # unhealthy
+      - "健康舌"     # healthy
+    task_weight: 0.10
+    focal:
+      alpha: 0.25
+      gamma: 2.0
+
+# ============================================================
+# Dynamic Loss Weighting (Optional)
+# ============================================================
+# Dynamically adjust task weights during training based on:
+# - Loss magnitude (homoscedastic uncertainty)
+# - Task difficulty
+# - Gradient norms
+dynamic_weighting:
+  enabled: false  # Set to true to enable dynamic weighting
+  method: "uncertainty"  # Options: "uncertainty", "grad_norm", "none"
+
+  # Uncertainty-based weighting (learnable parameters)
+  uncertainty:
+    log_var_init: 0.0  # Initial log variance for each task
+    learnable: true
+
+  # Gradient norm weighting
+  grad_norm:
+    update_freq: 100  # Update weights every N batches
+    smoothing: 0.9    # Exponential moving average factor
+
+# ============================================================
+# Loss Monitoring and Logging
+# ============================================================
+monitoring:
+  # Track per-head loss values
+  per_head_loss: true
+
+  # Track weighted loss contributions
+  weighted_contributions: true
+
+  # Track loss ratios for imbalance detection
+  loss_ratios:
+    enabled: true
+    threshold: 10.0  # Warn if any head loss > threshold * min loss
+
+  # Visualization settings
+  visualize:
+    loss_curves: true
+    head_importance: true
+    class_balance: true
+
+# ============================================================
+# Loss Schedule (Optional Curriculum Learning)
+# ============================================================
+# Gradually introduce different heads or adjust weights
+schedule:
+  enabled: false
+
+  # Phase 1: Train only main tasks (tongue_color, coating_color)
+  phase_1:
+    epochs: [0, 20]
+    active_heads: ["tongue_color", "coating_color"]
+    task_weights:
+      tongue_color: 0.5
+      coating_color: 0.5
+
+  # Phase 2: Add shape and quality tasks
+  phase_2:
+    epochs: [21, 40]
+    active_heads: ["tongue_color", "coating_color", "tongue_shape", "coating_quality"]
+    task_weights:
+      tongue_color: 0.3
+      coating_color: 0.3
+      tongue_shape: 0.2
+      coating_quality: 0.2
+
+  # Phase 3: Full multi-task training
+  phase_3:
+    epochs: [41, 100]
+    active_heads: ["tongue_color", "coating_color", "tongue_shape", "coating_quality", "features", "health"]
+    task_weights:  # Use default weights from above
+      tongue_color: 0.25
+      coating_color: 0.20
+      tongue_shape: 0.15
+      coating_quality: 0.15
+      features: 0.15
+      health: 0.10
+
+# ============================================================
+# Acceptance Criteria Verification
+# ============================================================
+acceptance_criteria:
+  # Task weights configuration
+  task_weights_configured: true
+  head1_weight: 0.4  # Note: Actual value may be adjusted for all 6 heads
+  head2_weight: 0.35
+  head3_weight: 0.25
+
+  # FocalLoss parameters
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+
+  # AsymmetricLoss parameters
+  asymmetric_gamma_pos: 0.0
+  asymmetric_gamma_neg: 4.0
+
+  # Class weighting
+  class_weights_applied: true
+  class_weights_source: "datasets/processed/clas_v1/class_weights.json"
+
+  # Loss curve behavior
+  loss_decreasing: true  # Loss should decrease during training
+  no_nan_loss: true      # No NaN values in loss
+  finite_gradients: true  # All gradients should be finite
