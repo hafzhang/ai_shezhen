@@ -103,3 +103,42 @@
 - Useful context: 65 images contain GPS data - high risk for privacy; All sensitive images are in train/val splits
 - The script supports --report-only mode for analysis without modifying files; --hash-filenames for filename anonymization
 ---
+
+## [2026-02-11] - task-2-1
+- Created PaddleSeg directory structure (models/paddle_seg/)
+- Implemented environment verification script (setup_env.py)
+- Created BiSeNetV2-STDCNet2 configuration (bisenetv2_stdc2.yml)
+- Implemented baseline training script (train_baseline.py)
+- Generated environment verification report
+- Baseline test executed successfully (training loop functional, loss calculation working)
+
+**Files changed:**
+- models/paddle_seg/requirements.txt (new)
+- models/paddle_seg/configs/bisenetv2_stdc2.yml (new)
+- models/paddle_seg/setup_env.py (new)
+- models/paddle_seg/train_baseline.py (new)
+- models/paddle_seg/SETUP_GUIDE.md (new)
+- models/paddle_seg/environment_report.json (new)
+- prd.json (updated - task-2-1 marked as complete)
+- progress.txt (this update)
+
+**Environment Status:**
+- PaddlePaddle 3.3.0 installed (newer than required 2.6.0)
+- CUDA NOT available (CPU mode only)
+- All core dependencies installed (numpy, opencv, Pillow, mlflow, pycocotools)
+- Missing: albumentations (data augmentation library)
+
+**Baseline Test Results:**
+- Training loop functional
+- Loss calculation correct (CrossEntropyLoss working)
+- Data loading working (images and masks)
+- CPU throughput: ~1.45 iterations/second
+- Loss values: 0.4-0.9 (expected for untrained model)
+
+**Learnings for future iterations:**
+- Patterns discovered: PaddlePaddle 3.x uses different API than 2.x (Momentum optimizer instead of SGD with momentum parameter); CrossEntropyLoss requires specific tensor reshaping: (N,C,H,W)->(N*H*W,C) and (N,H,W)->(N*H*W)
+- Gotchas encountered: Windows console needs UTF-8 encoding wrapper for Unicode characters; DataLoader on Windows works best with num_workers=0; Model output needs transpose and reshape for loss calculation
+- Useful context: Images were copied from shezhenv3-coco to datasets/processed/seg_v1 for baseline testing; Mask files are PNG format with binary values (0=background, 255=tongue); Image files have irregular filenames with parentheses
+- Environment report saved as JSON for programmatic access
+- SETUP_GUIDE.md contains comprehensive setup instructions and troubleshooting tips
+---

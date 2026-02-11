@@ -175,7 +175,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-1-2"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "PaddleSeg成功导入，版本正确",
         "GPU可用性验证（nvidia-smi）",
