@@ -1,0 +1,26 @@
+## Codebase Patterns
+- The dataset uses COCO format with train/val/test splits
+- Image files have irregular filenames (with parentheses like 'F (1).jpg')
+- Categories are defined in classes.txt files with Chinese names
+- Category IDs start from 0 (jiankangshe) to 20 (xinfeitu)
+- The annotation file may reference category_id 21 which is not defined in categories
+
+---
+
+## [2026-02-11] - task-1-1
+- Implemented comprehensive dataset validation script (datasets/tools/validate_dataset.py)
+- Generated quality reports for all splits (train/val/test) in datasets/raw/quality_report.json
+- Validated 5,594 training images, 572 validation images, 553 test images
+- All images are valid (no corrupted files)
+- Identified 5,587 files with irregular filenames in training set
+- Category distribution shows severe imbalance: 4253:1 ratio (baitaishe: 4253 samples vs gandantu/shenqutu: 1 sample each)
+- Minority classes identified: jiankangshe, heitaishe, gandantu, shenqutu, xinfeitu
+- Majority classes identified: baitaishe, chihenshe, pangdashe, hongdianshe, huangtaishe, hongshe, liewenshe, botaishe
+- Multi-label statistics: avg 2.27 labels per image
+
+**Learnings for future iterations:**
+- Patterns discovered: The dataset uses COCO format but with Chinese category names and irregular filenames
+- Gotchas encountered: Windows console encoding issues with Unicode characters - needed to wrap stdout/stderr with UTF-8 encoding; Category ID 21 exists in annotations but not in categories definition
+- Useful context: The validation script uses both PIL and cv2 to verify image readability; pycocotools.COCO class is used for loading annotations
+
+---
