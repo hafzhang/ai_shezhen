@@ -1,0 +1,412 @@
+# AI舌诊智能诊断系统 - 实验配置文件
+# ML Engineer Agent
+# 2026-02-11
+
+# ============================================================
+# 项目配置
+# ============================================================
+project:
+  name: "shezhen_diagnosis_system"
+  version: "1.0.0"
+  description: "基于PaddlePaddle的AI舌诊智能诊断系统"
+
+# ============================================================
+# 数据集配置
+# ============================================================
+dataset:
+  # 基础路径
+  base_path: "C:/Users/Administrator/Desktop/AI_shezhen/shezhenv3-coco"
+
+  # 数据划分
+  train:
+    annotations: "train/annotations/train.json"
+    images: "train/images"  # 如果图像在单独目录
+
+  val:
+    annotations: "val/annotations/val.json"
+    images: "val/images"
+
+  test:
+    annotations: "test/annotations/test.json"
+    images: "test/images"
+
+  # 图像配置
+  image_size: [512, 512]
+  num_classes: 21  # 原始类别数
+
+  # 类别映射：21类 → 6维度18类
+  category_mapping:
+    # 舌色维度 (4类)
+    tongue_color:
+      jiankangshe: "light_red"    # 淡红（健康）
+      hongshe: "red"               # 红
+      zishe: "purple"             # 绛紫
+      dianbaishe: "pale"          # 淡白
+
+    # 苔色维度 (4类)
+    coating_color:
+      baitaishe: "white"          # 白苔
+      huangtaishe: "yellow"       # 黄苔
+      heitaishede: "black"        # 黑苔
+      huabotaishede: "peeling"    # 花剥苔
+
+    # 舌形维度 (3类)
+    tongue_shape:
+      pangdashe: "swollen"        # 胖大
+      shoushe: "thin"             # 瘦薄
+      # "正常" 由健康舌隐含
+
+    # 苔质维度 (3类)
+    coating_quality:
+      botaishe: "thin"            # 薄苔
+      houtaishe: "thick"          # 厚苔
+      nitaishe: "greasy"          # 腻苔
+
+    # 特征维度 (3类)
+    features:
+      hongdianshe: "red_dots"     # 红点
+      liewenshe: "cracks"         # 裂纹
+      chihenshe: "teeth_marks"    # 齿痕
+
+    # 综合维度 (1类)
+    health:
+      jiankangshe: "healthy"      # 健康舌
+
+  # 统计信息（从分析中获取）
+  statistics:
+    train_samples: 5594
+    val_samples: 572
+    test_samples: 553
+    avg_labels_per_image: 2.3
+    imbalance_ratio: 76.0  # 最大类/最小类
+
+  # 少数类识别
+  minority_classes:
+    - "zishe"           # 绛紫舌
+    - "heitaishede"     # 黑苔
+    - "huabotaishede"   # 花剥苔
+    - "shenquao"        # 肾虚
+
+# ============================================================
+# 分割模型配置 (PaddleSeg - BiSeNetV2)
+# ============================================================
+segmentation:
+  model:
+    name: "BiSeNetV2"
+    backbone: "STDCNet2"
+    pretrained: "CITYSCAPES"
+
+  # 输入输出
+  in_channels: 3
+  num_classes: 2  # tongue / background
+
+  # 损失函数
+  loss:
+    ce_loss:
+      weight: 0.5
+      ignore_index: 255
+
+    dice_loss:
+      weight: 0.3
+      smooth: 1.0e-5
+
+    boundary_loss:
+      weight: 0.2
+      theta0: 3
+      theta: 5
+
+  # 训练参数
+  training:
+    batch_size: 16
+    num_epochs: 80
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 5.0e-4
+
+    # 学习率调度
+    warmup_epochs: 2
+    lr_scheduler: "poly"
+    lr_power: 0.9
+    min_lr: 1.0e-6
+
+    # 早停
+    early_stopping:
+      patience: 10
+      min_delta: 1.0e-4
+      monitor: "miou"
+      mode: "max"
+
+  # 评估目标
+  targets:
+    miou: 0.92
+    dice: 0.95
+    inference_time_ms: 33  # CPU推理时间
+
+# ============================================================
+# 分类模型配置 (PaddleClas - PP-HGNetV2-B4)
+# ============================================================
+classification:
+  model:
+    name: "PP-HGNetV2_B4"
+    pretrained: "ImageNet22k"
+    dropout: 0.2
+
+  # 多头分类配置
+  multi_head:
+    tongue_color:
+      num_classes: 4
+      names: ["pale", "light_red", "red", "purple"]
+
+    coating_color:
+      num_classes: 4
+      names: ["white", "yellow", "black", "peeling"]
+
+    tongue_shape:
+      num_classes: 3
+      names: ["normal", "swollen", "thin"]
+
+    coating_quality:
+      num_classes: 3
+      names: ["thin", "thick", "greasy"]
+
+    features:
+      num_classes: 4  # 多选
+      names: ["none", "red_dots", "cracks", "teeth_marks"]
+
+    health:
+      num_classes: 2
+      names: ["unhealthy", "healthy"]
+
+  # 损失函数
+  loss:
+    # Focal Loss配置
+    focal_loss:
+      enabled: true
+      alpha: 0.25
+      gamma: 2.0
+
+    # Asymmetric Loss配置
+    asymmetric_loss:
+      enabled: true
+      gamma_pos: 0.0
+      gamma_neg: 4.0
+      clip: 0.05
+
+    # 类别权重策略
+    class_weight_strategy: "sqrt_inv"  # "sqrt_inv" / "inv" / "log_inv" / None
+
+  # 采样策略
+  sampling:
+    strategy: "stratified"  # "stratified" / "balance" / "oversample"
+    majority_ratio: 0.8     # 多数类保留比例
+    target_imbalance_ratio: 10.0  # 目标类别比例
+    hard_example_mining: true
+    hard_mining_ratio: 0.1  # 难例比例
+
+  # 训练参数
+  training:
+    batch_size: 16
+    num_epochs: 60
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 5.0e-4
+
+    # 学习率调度
+    warmup_epochs: 2
+    lr_scheduler: "cosine"
+    min_lr: 1.0e-6
+
+    # 早停
+    early_stopping:
+      patience: 10
+      min_delta: 1.0e-4
+      monitor: "macro_f1"
+      mode: "max"
+
+  # 评估目标
+  targets:
+    macro_f1: 0.65
+    mAP: 0.70
+    minority_recall: 0.60
+    majority_recall: 0.85
+
+# ============================================================
+# 数据增强配置
+# ============================================================
+augmentation:
+  # 训练时增强
+  train:
+    - name: "RandomResizedCrop"
+      size: [512, 512]
+      scale: [0.8, 1.0]
+
+    - name: "RandomHorizontalFlip"
+      prob: 0.5
+
+    - name: "RandomRotation"
+      degrees: 15
+
+    - name: "ColorJitter"
+      brightness: 0.2
+      contrast: 0.2
+      saturation: 0.2
+      hue: 0.1
+
+    - name: "RandomGaussianBlur"
+      prob: 0.3
+      kernel_size: 5
+
+    - name: "Normalize"
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+  # 验证时增强
+  val:
+    - name: "Resize"
+      size: [512, 512]
+
+    - name: "CenterCrop"
+      size: [512, 512]
+
+    - name: "Normalize"
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+  # 针对少数类的增强
+  minority_augmentation:
+    - name: "RandomResizedCrop"
+      size: [512, 512]
+      scale: [0.6, 1.0]  # 更大范围
+
+    - name: "RandomRotation"
+      degrees: 30  # 更大旋转
+
+    - name: "RandomVerticalFlip"
+      prob: 0.2
+
+    - name: "RandomPerspective"
+      prob: 0.3
+      distortion_scale: 0.2
+
+# ============================================================
+# 训练配置
+# ============================================================
+training:
+  # 基础设置
+  num_workers: 4
+  pin_memory: true
+  persistent_workers: true
+
+  # 混合精度训练
+  amp:
+    enabled: true
+    level: "O1"  # "O1" / "O2"
+
+  # 梯度累积
+  gradient_accumulation_steps: 1
+
+  # 检查点
+  checkpoint:
+    save_dir: "checkpoints"
+    save_freq: 5  # 每N个epoch保存
+    keep_last_n: 3
+
+  # 日志
+  logging:
+    log_freq: 50
+    tensorboard: true
+    wandb: false
+
+  # 随机种子
+  seed: 42
+
+# ============================================================
+# 评估配置
+# ============================================================
+evaluation:
+  # 评估频率
+  eval_freq: 1  # 每N个epoch评估
+
+  # 指标配置
+  metrics:
+    segmentation:
+      - "miou"
+      - "dice"
+      - "pixel_accuracy"
+      - "boundary_iou"
+
+    classification:
+      - "macro_f1"
+      - "mAP"
+      - "precision"
+      - "recall"
+      - "confusion_matrix"
+
+    imbalance:
+      - "minority_recall"
+      - "recall_balance_ratio"
+      - "recall_variance"
+
+  # 推理性能
+  performance:
+    num_warmup: 10
+    num_runs: 100
+    batch_size: 1
+
+# ============================================================
+# 实验跟踪配置 (MLflow)
+# ============================================================
+mlflow:
+  enabled: true
+  tracking_uri: "file:///C:/Users/Administrator/Desktop/AI_shezhen/mlruns"
+  experiment_name: "shezhen_diagnosis_system"
+
+  # 自动记录
+  autolog:
+    enabled: true
+    log_datasets: false
+    log_models: true
+
+# ============================================================
+# 输出配置
+# ============================================================
+output:
+  # 输出目录
+  base_dir: "outputs"
+
+  # 子目录
+  checkpoints: "checkpoints"
+  logs: "logs"
+  visualizations: "outputs/visualizations"
+  reports: "outputs/reports"
+  predictions: "outputs/predictions"
+
+  # 可视化
+  visualize_predictions: true
+  num_visualize_samples: 10
+
+# ============================================================
+# 部署配置
+# ============================================================
+deployment:
+  # 模型导出
+  export:
+    format: "paddle"  # "paddle" / "onnx" / "tensorrt"
+    input_shape: [1, 3, 512, 512]
+
+  # 量化
+  quantization:
+    enabled: true
+    method: "PTQ"  # "PTQ" / "QAT"
+    accuracy_loss: 1.0  # 可接受的精度损失(%)
+
+  # 优化
+  optimization:
+    remove_normalize: false
+    fuse_ops: true
+
+  # 目标平台
+  target:
+    platform: "CPU"  # "CPU" / "GPU"
+    inference_time_ms: 33
+    model_size_mb: 50

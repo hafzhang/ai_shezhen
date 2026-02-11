@@ -1,0 +1,152 @@
+# Hard Example Mining Configuration for Tongue Segmentation
+# AI舌诊智能诊断系统 - 难例挖掘配置
+# task-2-4: 难例挖掘与重训练
+
+# ============================================================
+# Hard Example Mining Settings
+# ============================================================
+hard_example_mining:
+  # Percentage of samples to select as hard examples
+  top_k_percent: 0.1          # Select top 10% samples with highest loss
+
+  # Minimum/maximum number of hard samples to select
+  min_hard_samples: 50           # At least 50 hard samples
+  max_hard_samples: 500          # At most 500 hard samples
+
+  # Augmentation for hard examples
+  augment_factor: 3              # Create 3 augmented copies per hard example
+  hard_sample_weight: 2.0         # Sampling weight for hard examples
+
+  # When to start mining
+  start_epoch: 5                 # Start hard example mining from epoch 5
+  visualization_freq: 10         # Visualize hard examples every N epochs
+
+  # Loss smoothing for selection
+  smoothing_window: 3            # Moving average window for sample losses
+
+# ============================================================
+# Progressive Training Strategy
+# ============================================================
+progressive_training:
+  # Train detail branch first, then joint training
+  detail_epochs: 30              # First 30 epochs: detail branch only
+  total_epochs: 80               # Total training epochs
+
+  # Detail branch modules (frozen during joint training)
+  detail_modules:
+    - detail_path
+    - detail_head
+    - conv1
+    - conv2
+    - conv3
+
+  # Learning rate multipliers
+  detail_lr_multiplier: 0.5     # Lower LR for detail training
+  joint_lr_multiplier: 1.0       # Normal LR for joint training
+
+# ============================================================
+# Hard Example Analysis
+# ============================================================
+hard_example_analysis:
+  # Analysis thresholds
+  persistent_threshold: 3          # Minimum times selected to be "persistent"
+  trending_window: 5               # Window for trend analysis
+
+  # Visualization settings
+  visualization_samples: 50        # Number of hard examples to visualize
+  visualization_layout: "grid"     # Layout: grid or list
+
+  # Export settings
+  export_format: "csv"             # Export format: csv or json
+  include_metadata: true            # Include loss history in export
+
+# ============================================================
+# Retraining Strategy
+# ============================================================
+retraining:
+  # Retraining settings after hard example identification
+  enabled: true
+
+  # How to incorporate hard examples
+  strategy: "augment"            # Options: augment, oversample, focal
+
+  # Augmentation strategy (if strategy=augment)
+  augmentation:
+    # Geometric transforms
+    rotation_range: 30             # Rotation range in degrees
+    scale_range: [0.8, 1.2]      # Scale range
+    flip_probability: 0.5          # Probability of horizontal flip
+    elastic_alpha: 10              # Elastic distortion alpha
+    elastic_sigma: 3               # Elastic distortion sigma
+
+    # Color transforms (for images only)
+    brightness_range: 0.3          # Brightness jitter
+    contrast_range: 0.3            # Contrast jitter
+    saturation_range: 0.2           # Saturation jitter
+    hue_range: 0.1                 # Hue jitter
+
+    # Noise and blur
+    gaussian_noise_std: 0.02        # Gaussian noise std
+    gaussian_blur_kernel: 3          # Gaussian blur kernel size
+    motion_blur_kernel: 5            # Motion blur kernel size
+
+  # Oversampling strategy (if strategy=oversample)
+  oversample_factor: 3            # How many times to repeat hard examples
+
+  # Focal loss parameters (if strategy=focal)
+  focal_loss:
+    alpha: 0.25                   # Alpha parameter
+    gamma: 2.0                    # Gamma parameter
+    apply_to_hard_only: false       # Apply focal loss only to hard examples
+
+# ============================================================
+# Monitoring and Logging
+# ============================================================
+monitoring:
+  # Track per-sample losses
+  track_sample_losses: true
+
+  # Export frequency
+  export_hard_examples_every: 5     # Export hard examples every N epochs
+  generate_report_every: 10         # Generate analysis report every N epochs
+
+  # Metrics to track for hard examples
+  hard_metrics:
+    - loss                         # Per-sample loss
+    - accuracy                     # Pixel accuracy
+    - iou                         # Intersection over Union
+    - boundary_iou                 # Boundary IoU (edge precision)
+
+# ============================================================
+# Acceptance Criteria
+# ============================================================
+acceptance_criteria:
+  # Hard example identification
+  min_hard_samples_identified: 100   # At least 100 hard samples identified
+  max_persistent_hard_samples: 200   # At most 200 persistent hard samples
+
+  # Retraining improvement
+  min_miou_improvement: 0.01        # At least 1% mIoU improvement
+  boundary_improvement_threshold: 0.02 # Boundary improvement threshold
+
+  # Quality checks
+  max_overfitting_indicator: 0.1    # Max difference between train/val loss
+  min_loss_convergence_epochs: 10     # Minimum epochs for loss convergence
+
+# ============================================================
+# Output Configuration
+# ============================================================
+output:
+  # Directories
+  hard_mining_dir: "models/paddle_seg/output/hard_mining"
+  hard_examples_dir: "models/paddle_seg/output/hard_mining_samples"
+  analysis_dir: "models/paddle_seg/output/hard_mining/analysis"
+
+  # File naming patterns
+  hard_examples_pattern: "hard_examples_epoch_{epoch}.json"
+  visualization_pattern: "hard_examples_visualization_epoch_{epoch}.png"
+  report_pattern: "mining_report.txt"
+
+  # Keep settings
+  keep_all_epoch_files: true        # Keep hard examples for all epochs
+  keep_visualizations: true          # Keep visualization images

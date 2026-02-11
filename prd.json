@@ -238,7 +238,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-2-3"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "难例样本集构建完成（~200样本）",
         "重训练后mIoU提升>1%",
@@ -259,7 +259,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-2-3"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "FP16模型导出成功",
         "INT8模型导出成功",

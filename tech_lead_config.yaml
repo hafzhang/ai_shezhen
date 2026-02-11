@@ -1,0 +1,345 @@
+# TechLead Agent 配置文件
+# AI舌诊智能诊断系统 - 技术领导代理配置
+
+# 项目元数据
+project:
+  name: "AI舌诊智能诊断系统"
+  version: "v1.0"
+  code_name: "ShezhenAI"
+  start_date: "2026-02-11"
+  tech_lead: "TechLead Agent"
+
+# 技术栈配置
+tech_stack:
+  deep_learning:
+    framework: "PaddlePaddle"
+    version: "2.6.0"
+    components:
+      - "PaddleSeg"
+      - "PaddleClas"
+      - "FastDeploy"
+
+  api:
+    framework: "FastAPI"
+    version: "0.104.0"
+    server: "Uvicorn"
+
+  llm:
+    provider: "百度文心"
+    model: "ERNIE-4.5"
+    api_version: "ERNIE-Speed"
+
+  deployment:
+    containerization: "Docker"
+    orchestration: "Docker Compose"
+    caching: "Redis"
+    queue: "Celery"
+
+# 数据集配置
+dataset:
+  name: "shezhenv3-coco"
+  version: "v3"
+  splits:
+    train: 5594
+    val: 572
+    test: 553
+    total: 6719
+
+  imbalance_handling:
+    enabled: true
+    majority_class: "淡白舌"
+    majority_ratio: 0.809
+    strategy: "focal_loss + stratified_sampling"
+
+  categories:
+    original: 21
+    reconstructed: 18
+    dimensions: 6
+
+# 模型配置
+models:
+  segmentation:
+    name: "BiSeNetV2"
+    backbone: "STDCNet2"
+    input_size: [512, 512]
+    output_classes: 2
+
+    training:
+      epochs: 80
+      batch_size: 24
+      learning_rate: 0.01
+      optimizer: "SGD"
+      momentum: 0.9
+      weight_decay: 0.0005
+
+    loss:
+      cross_entropy: 0.5
+      dice: 0.3
+      boundary: 0.2
+
+    targets:
+      miou: 0.92
+      dice: 0.95
+      fps: 30
+
+  classification:
+    name: "PP-HGNetV2-B4"
+    pretrained: "ImageNet22k"
+    input_size: [512, 512]
+
+    multi_head:
+      head1:
+        name: "color_features"
+        classes: ["tongue_color", "coating_color"]
+        dims: [4, 4]
+      head2:
+        name: "shape_features"
+        classes: ["tongue_shape", "coating_quality"]
+        dims: [3, 3]
+      head3:
+        name: "special_features"
+        classes: ["marks"]
+        dims: 3
+
+    training:
+      epochs: 60
+      batch_size: 32
+      learning_rate: 0.0003
+      optimizer: "AdamW"
+      weight_decay: 0.0005
+
+    loss:
+      bce: 0.4
+      focal:
+        alpha: 0.25
+        gamma: 2
+        weight: 0.4
+      asymmetric: 0.2
+
+    sampling:
+      type: "stratified"
+      minority_ratio: 0.5
+
+    targets:
+      macro_f1: 0.65
+      minority_recall: 0.60
+      map: 0.70
+      latency_ms: 120
+
+# 部署配置
+deployment:
+  environment: "production"  # development | staging | production
+
+  hardware:
+    type: "cpu"  # cpu | gpu
+    cpu_cores: 8
+    memory_gb: 16
+    gpu:
+      enabled: false
+      type: "T4"
+      memory_gb: 16
+
+  optimization:
+    quantization: "INT8"
+    acceleration: "OpenMKLDNN"
+    mixed_precision: false
+
+  performance:
+    target_e2e_latency_ms: 2000
+    target_qps: 50
+
+# API配置
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+
+  endpoints:
+    - path: "/api/v1/segment"
+      method: "POST"
+      description: "舌体分割"
+    - path: "/api/v1/classify"
+      method: "POST"
+      description: "舌象分类"
+    - path: "/api/v1/diagnosis"
+      method: "POST"
+      description: "完整诊断"
+    - path: "/api/v1/health"
+      method: "GET"
+      description: "健康检查"
+
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+
+# 缓存配置
+cache:
+  provider: "redis"
+  host: "localhost"
+  port: 6379
+  db: 0
+
+  ttl:
+    features: 86400  # 24小时
+    diagnosis: 3600  # 1小时
+    image_cache: 604800  # 7天
+
+  max_memory: "2GB"
+  eviction: "allkeys-lru"
+
+# 文心API配置
+wenxin:
+  api_key_env: "WENXIN_API_KEY"
+  secret_key_env: "WENXIN_API_SECRET"
+
+  model: "ERNIE-Speed"
+  max_tokens: 2000
+  temperature: 0.7
+
+  timeout:
+    connect: 5
+    read: 10
+
+  fallback:
+    enabled: true
+    timeout: 10
+    local_rules: true
+
+# 监控配置
+monitoring:
+  enabled: true
+
+  metrics:
+    p0:
+      - name: "api_availability"
+        threshold: 0.95
+        operator: "less_than"
+      - name: "error_rate"
+        threshold: 0.10
+        operator: "greater_than"
+    p1:
+      - name: "response_p99"
+        threshold: 5.0
+        unit: "seconds"
+      - name: "gpu_memory"
+        threshold: 0.90
+        operator: "greater_than"
+    p2:
+      - name: "api_volume_anomaly"
+        threshold: 0.5
+        unit: "ratio"
+      - name: "cost_over_budget"
+        threshold: 0.8
+
+  alerts:
+    channels:
+      - type: "dingtalk"
+        enabled: true
+      - type: "sms"
+        enabled: true
+        for_levels: ["P0", "P1"]
+      - type: "phone"
+        enabled: true
+        for_levels: ["P0"]
+
+    escalation:
+      p0_response: "15min"
+      p1_response: "30min"
+      p2_response: "2h"
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  format: "json"
+
+  files:
+    main: "logs/app.log"
+    error: "logs/error.log"
+    access: "logs/access.log"
+
+  rotation:
+    max_size_mb: 100
+    backup_count: 10
+
+# 合规配置
+compliance:
+  data_privacy:
+    enabled: true
+    anonymization: true
+    exif_removal: true
+
+  medical_disclaimer: |
+    本系统提供的舌诊分析结果仅供参考，不能替代专业医生的诊断。
+    如身体不适，请及时就医。
+
+  audit_log:
+    enabled: true
+    retention_days: 180
+
+# 成本配置
+cost:
+  budget:
+    monthly_cny: 5000
+
+  tracking:
+    api_calls: true
+    storage: true
+    compute: true
+
+  alerts:
+    threshold_percent: 80
+
+# 风险管理配置
+risk_management:
+  enabled: true
+
+  assessment_schedule: "weekly"
+  review_meeting: "biweekly"
+
+  risk_categories:
+    - name: "技术风险"
+      owner: "技术负责人"
+    - name: "数据风险"
+      owner: "数据负责人"
+    - name: "合规风险"
+      owner: "法务负责人"
+    - name: "运营风险"
+      owner: "运营负责人"
+
+# 团队配置
+team:
+  roles:
+    - title: "Tech Lead"
+      responsibilities:
+        - "架构决策"
+        - "技术选型"
+        - "代码审查"
+        - "风险评估"
+    - title: "算法工程师"
+      responsibilities:
+        - "模型训练"
+        - "算法优化"
+    - title: "后端工程师"
+      responsibilities:
+        - "API开发"
+        - "服务部署"
+    - title: "数据工程师"
+      responsibilities:
+        - "数据处理"
+        - "标注管理"
+
+# 开发流程配置
+workflow:
+  version_control: "git"
+  code_review:
+    required: true
+    min_approvers: 1
+
+  ci_cd:
+    enabled: true
+    auto_test: true
+    auto_deploy: false
+
+  documentation:
+    required: true
+    format: "markdown"
