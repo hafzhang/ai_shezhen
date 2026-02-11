@@ -9,6 +9,10 @@
 - Multiple annotations per image are merged using bitwise OR operation
 - Class mapping: 21 original classes map to 6 dimensions (tongue_color:4, coating_color:4, tongue_shape:3, coating_quality:3, features:3, health:1)
 - Syndrome classes (13-20) are excluded from classification training and reserved for LLM few-shot prompts
+- Label files use TAB-separated format: filename<TAB>label1,label2,...,label19 (one-hot vector)
+- Class weights formula: weight_i = total / (num_classes × count_i) - higher weights for minority classes
+- For stratified sampling with no minority/majority classes, use fallback to random sampling from all classes
+- torch.utils.data.Sampler requires __iter__ and __len__ methods; BatchSampler yields lists of indices
 
 ---
 
@@ -62,4 +66,19 @@
 - Useful context: One-hot vector structure: [0:4]=tongue_color, [4:8]=coating_color, [8:11]=tongue_shape, [11:14]=coating_quality, [14:17]=features, [17]=reserved, [18]=health_flag
 - Label file format: filename<TAB>label1,label2,...,label19 (comma-separated one-hot vector)
 
+---
+
+## [2026-02-11] - task-1-4
+- Implemented stratified sampler class (datasets/tools/stratified_sampler.py)
+- ClassWeights: Calculates weights for 17 categories using balanced/sqrt/log methods
+- StratifiedBatchSampler: Ensures 50% majority + 50% minority classes per batch
+- Generated class weights JSON (datasets/processed/clas_v1/sampler_class_weights.json)
+- Minority classes have higher weights: 黑苔(13.58) > 白苔(0.34)
+- 175 batches for training set (5594 samples, batch_size=32)
+- Unit tests: 20 tests all pass (TestClassWeights, TestStratifiedBatchSampler, TestStratifiedSampler, TestDimensionIndices, TestIntegration)
+
+**Learnings for future iterations:**
+- Patterns discovered: random.sample() requires a list, cannot be used directly in extend(); Must create temporary variable when oversampling
+- Gotchas encountered: When minority_indices or majority_indices is empty, random.sample() raises ValueError; Need fallback to random sampling from all classes
+- Useful context: Dominant class is determined by first positive label in feature dimensions; Class weights range from ~0.34 (白苔) to ~13.58 (黑苔); 10.0 is used for unseen classes
 ---

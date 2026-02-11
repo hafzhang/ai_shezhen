@@ -91,7 +91,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-1-3"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "生成18个类别权重字典（少数类权重>多数类）",
         "分层采样器每个batch类别比例均衡（50%多数类+50%少数类）",
