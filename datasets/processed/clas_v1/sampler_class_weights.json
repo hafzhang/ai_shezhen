@@ -1,0 +1,50 @@
+{
+  "method": "balanced",
+  "total_samples": 5594,
+  "dimension_sizes": {
+    "tongue_color": 4,
+    "coating_color": 4,
+    "tongue_shape": 3,
+    "coating_quality": 3,
+    "features": 3
+  },
+  "weights": {
+    "tongue_color_0": 10.0,
+    "tongue_color_1": 10.0,
+    "tongue_color_2": 1.1953,
+    "tongue_color_3": 7.4786,
+    "coating_color_0": 0.3383,
+    "coating_color_1": 1.5038,
+    "coating_color_2": 13.5777,
+    "coating_color_3": 6.3858,
+    "tongue_shape_0": 10.0,
+    "tongue_shape_1": 3.0923,
+    "tongue_shape_2": 8.5535,
+    "coating_quality_0": 5.3737,
+    "coating_quality_1": 10.0,
+    "coating_quality_2": 10.0,
+    "features_0": 1.7793,
+    "features_1": 1.4126,
+    "features_2": 2.065
+  },
+  "counts": {
+    "tongue_color_0": 0,
+    "tongue_color_1": 0,
+    "tongue_color_2": 1170,
+    "tongue_color_3": 187,
+    "coating_color_0": 4134,
+    "coating_color_1": 930,
+    "coating_color_2": 103,
+    "coating_color_3": 219,
+    "tongue_shape_0": 0,
+    "tongue_shape_1": 603,
+    "tongue_shape_2": 218,
+    "coating_quality_0": 347,
+    "coating_quality_1": 0,
+    "coating_quality_2": 0,
+    "features_0": 1048,
+    "features_1": 1320,
+    "features_2": 903
+  },
+  "weight_formula": "weight_i = total / (num_classes × count_i)"
+}
