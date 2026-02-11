@@ -1,0 +1,157 @@
+# Combined Loss Configuration for Tongue Segmentation
+# AI舌诊智能诊断系统 - 分割损失函数配置
+# task-2-2: 分割损失函数配置与优化
+
+# ============================================================
+# Loss Function Configuration
+# ============================================================
+loss:
+  type: CombinedLoss
+
+  # Combined loss weights (sum should be 1.0)
+  # Loss = ce_weight * CE + dice_weight * Dice + boundary_weight * Boundary
+  ce_weight: 0.5        # CrossEntropy loss weight (pixel-wise classification)
+  dice_weight: 0.3       # Dice loss weight (overlap-based)
+  boundary_weight: 0.2    # Boundary loss weight (edge-aware)
+
+  # ============================================================
+  # CrossEntropy Loss Configuration
+  # ============================================================
+  ce_loss:
+    type: CrossEntropy
+    ignore_index: 255    # Index to ignore in loss calculation
+
+    # Class weights for handling imbalance
+    # Calculated from dataset statistics (task-2-2)
+    # Formula: w_i = total / (num_classes × count_i)
+    class_weights:
+      background: 0.699   # Background class weight
+      tongue: 1.756       # Tongue (foreground) class weight
+
+    # Note: Tongue pixels are minority class (~28% of pixels)
+    # Higher weight for tongue class improves foreground detection
+
+  # ============================================================
+  # Dice Loss Configuration
+  # ============================================================
+  dice_loss:
+    type: Dice
+    weight: 0.3
+    ignore_index: 255
+    smooth: 1e-5         # Smoothing constant for numerical stability
+
+    # Dice loss is robust to class imbalance
+    # Loss = 1 - (2 * intersection + smooth) / (sum1 + sum2 + smooth)
+    # Reference: Sudre et al. MICCAI 2017
+
+  # ============================================================
+  # Boundary Loss Configuration
+  # ============================================================
+  boundary_loss:
+    type: Boundary
+    weight: 0.2
+    ignore_index: 255
+    theta: 3             # Distance decay parameter
+    smooth: 1e-5
+
+    # Boundary loss focuses on edge regions
+    # Uses Sobel filters to detect boundaries
+    # Higher theta = wider boundary focus region
+
+    # Sobel kernels for edge detection
+    sobel_x: [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
+    sobel_y: [[-1, -2, -1], [0, 0, 0], [1, 2, 1]]
+
+# ============================================================
+# Loss Monitoring
+# ============================================================
+monitoring:
+  # Individual loss components to track
+  track_components:
+    - total_loss
+    - ce_loss
+    - dice_loss
+    - boundary_loss
+
+  # Loss monitoring strategy
+  log_frequency: 10     # Log every N iterations
+  visualize_curves: true  # Generate loss curves after training
+
+  # Expected loss ranges (for validation)
+  # - Uninitialized model: loss ~1.0-2.0
+  # - Converged model: loss <0.2
+  expected_ranges:
+    initial:
+      total_loss: [0.5, 2.0]
+      ce_loss: [0.5, 1.5]
+      dice_loss: [0.3, 1.0]
+      boundary_loss: [0.1, 0.8]
+    converged:
+      total_loss: [0.0, 0.3]
+      ce_loss: [0.0, 0.2]
+      dice_loss: [0.0, 0.15]
+      boundary_loss: [0.0, 0.1]
+
+# ============================================================
+# Class Imbalance Handling
+# ============================================================
+class_imbalance:
+  # Dataset statistics (from task-2-2 analysis)
+  total_pixels: 4377157417
+  background_pixels: 3130833978  # 71.5%
+  tongue_pixels: 1246323439       # 28.5%
+  imbalance_ratio: 2.51            # background:tongue ratio
+
+  # Weight calculation
+  formula: "weight_i = total / (num_classes × count_i)"
+  weights:
+    - class: 0  # background
+      name: "background"
+      weight: 0.699
+      reason: "Majority class - lower weight"
+
+    - class: 1  # tongue
+      name: "tongue"
+      weight: 1.756
+      reason: "Minority class - higher weight for better detection"
+
+  # Strategy: Higher weight on minority class (tongue)
+  # This compensates for pixel imbalance during training
+
+# ============================================================
+# Loss Schedule (Optional)
+# ============================================================
+schedule:
+  enabled: false  # Set to true for dynamic loss weighting
+
+  # Example: Increase boundary loss weight in later epochs
+  # to sharpen boundaries after initial learning
+  epochs:
+    - epoch_range: [1, 40]
+      ce_weight: 0.6
+      dice_weight: 0.3
+      boundary_weight: 0.1
+
+    - epoch_range: [41, 80]
+      ce_weight: 0.4
+      dice_weight: 0.3
+      boundary_weight: 0.3  # Increase boundary focus
+
+# ============================================================
+# References
+# ============================================================
+references:
+  combined_loss:
+    title: "Boundary loss for highly unbalanced segmentation"
+    authors: ["Taghanaki, S.A.", "Zheng, Y.", "Zhou, S.K.", "Merti, M.","Weusthof, C.","Van Ginneken, B.","Navab, N."]
+    conference: "MICCAI 2019"
+    url: "https://arxiv.org/abs/1812.07032"
+
+  dice_loss:
+    title: "Generalised Dice overlap as a deep learning loss function for imbalanced segmentations"
+    authors: ["Sudre, C.", "Li, W.", "Vercauteren, T.", "Ourselin, S.", "Cardoso, M.J."]
+    conference: "MICCAI 2017"
+
+  boundary_detection:
+    title: "Sobel-Feldman operator"
+    wikipedia: "https://en.wikipedia.org/wiki/Sobel_operator"

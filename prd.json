@@ -196,7 +196,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-2-1"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "损失函数权重配置正确",
         "边界损失强化舌体边缘分割",
