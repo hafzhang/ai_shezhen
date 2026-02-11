@@ -81,4 +81,25 @@
 - Patterns discovered: random.sample() requires a list, cannot be used directly in extend(); Must create temporary variable when oversampling
 - Gotchas encountered: When minority_indices or majority_indices is empty, random.sample() raises ValueError; Need fallback to random sampling from all classes
 - Useful context: Dominant class is determined by first positive label in feature dimensions; Class weights range from ~0.34 (白苔) to ~13.58 (黑苔); 10.0 is used for unseen classes
+
+---
+
+## [2026-02-11] - task-1-6
+- Implemented data anonymization and EXIF cleaning script (datasets/tools/anonymize.py)
+- EXIFCleaner: Analyzes and removes sensitive EXIF tags (GPS, device info, timestamps, etc.)
+- FilenameAnonymizer: Hashes filenames using SHA-256 for anonymization
+- DataAnonymizer: Main class for batch processing with report generation
+- Created comprehensive anonymization protocol documentation (docs/data_anonymization_protocol.md)
+- Generated verification reports for all splits:
+  - Train: 5594 images, 301 with sensitive EXIF (65 with GPS)
+  - Val: 572 images, 30 with sensitive EXIF
+  - Test: 553 images, no sensitive EXIF
+- Total 331 images identified as requiring anonymization
+- Sensitive tags found: DateTime (263), Software (243), GPSInfo (65), Make/Model (106)
+
+**Learnings for future iterations:**
+- Patterns discovered: BMP/PNG images don't have _getexif() method; Need hasattr check before calling
+- Gotchas encountered: PIL.Image._getexif() only works for JPEG; For other formats, need different approach
+- Useful context: 65 images contain GPS data - high risk for privacy; All sensitive images are in train/val splits
+- The script supports --report-only mode for analysis without modifying files; --hash-filenames for filename anonymization
 ---

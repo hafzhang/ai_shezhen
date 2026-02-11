@@ -1,0 +1,20 @@
+{
+  "anonymization_date": "2026-02-11T20:17:10.236674",
+  "input_directory": "shezhenv3-coco\\test\\images",
+  "output_directory": "datasets\\processed\\anonymized\\test",
+  "options": {
+    "hash_filenames": false
+  },
+  "statistics": {
+    "total_images": 553,
+    "images_with_exif": 0,
+    "images_cleaned": 0,
+    "exif_tags_removed": 0,
+    "filenames_hashed": 0
+  },
+  "exif_analysis": {
+    "images_with_sensitive_data": [],
+    "sensitive_tags_summary": {}
+  },
+  "errors": []
+}

@@ -1,0 +1,343 @@
+{
+  "anonymization_date": "2026-02-11T20:17:09.811061",
+  "input_directory": "shezhenv3-coco\\val\\images",
+  "output_directory": "datasets\\processed\\anonymized\\val",
+  "options": {
+    "hash_filenames": false
+  },
+  "statistics": {
+    "total_images": 572,
+    "images_with_exif": 0,
+    "images_cleaned": 0,
+    "exif_tags_removed": 0,
+    "filenames_hashed": 0
+  },
+  "exif_analysis": {
+    "images_with_sensitive_data": [
+      {
+        "file": "tongue (100).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (69).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Copyright",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (27).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (365).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (223).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (468).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (421).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (97).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (63).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (470).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (399).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (43).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (196).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (307).jpg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (273).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (469).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (345).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "XPKeywords"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (199).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Copyright",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "A (31).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (20).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (272).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (40).jpg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "A (60).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (346).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (51).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (89).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (95).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Copyright",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (114).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (47).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "tongue (362).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      }
+    ],
+    "sensitive_tags_summary": {
+      "Make": 14,
+      "Model": 14,
+      "Software": 24,
+      "DateTime": 24,
+      "DateTimeOriginal": 20,
+      "DateTimeDigitized": 20,
+      "ImageDescription": 7,
+      "Copyright": 3,
+      "UserComment": 4,
+      "XPKeywords": 1
+    }
+  },
+  "errors": []
+}

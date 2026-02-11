@@ -1,0 +1,169 @@
+{
+  "report_title": "数据脱敏验证报告",
+  "report_date": "2026-02-11",
+  "dataset": "shezhenv3-coco",
+  "anonymization_tool": "datasets/tools/anonymize.py",
+  "protocol_document": "docs/data_anonymization_protocol.md",
+
+  "executive_summary": {
+    "total_images_analyzed": 6719,
+    "images_with_sensitive_exif": 331,
+    "images_with_gps_data": 65,
+    "requires_anonymization": true,
+    "anonymization_status": "analysis_complete",
+    "recommendation": "在正式训练前需要对包含敏感EXIF信息的331张图像进行脱敏处理"
+  },
+
+  "split_statistics": {
+    "train": {
+      "total_images": 5594,
+      "images_with_sensitive_data": 301,
+      "images_with_gps": 65,
+      "sensitive_tags": {
+        "DateTime": 239,
+        "Software": 219,
+        "DateTimeOriginal": 167,
+        "DateTimeDigitized": 167,
+        "GPSInfo": 65,
+        "Make": 92,
+        "Model": 92,
+        "ImageDescription": 57,
+        "Artist": 54,
+        "XPAuthor": 47,
+        "UserComment": 26,
+        "LensModel": 14,
+        "XPKeywords": 1,
+        "Copyright": 1
+      }
+    },
+    "val": {
+      "total_images": 572,
+      "images_with_sensitive_data": 30,
+      "images_with_gps": 0,
+      "sensitive_tags": {
+        "DateTime": 24,
+        "Software": 24,
+        "DateTimeOriginal": 20,
+        "DateTimeDigitized": 20,
+        "Make": 14,
+        "Model": 14,
+        "ImageDescription": 7,
+        "UserComment": 4,
+        "Copyright": 3,
+        "XPKeywords": 1
+      }
+    },
+    "test": {
+      "total_images": 553,
+      "images_with_sensitive_data": 0,
+      "images_with_gps": 0,
+      "sensitive_tags": {}
+    }
+  },
+
+  "risk_assessment": {
+    "high_risk": {
+      "description": "包含GPS定位信息的图像",
+      "count": 65,
+      "affected_splits": ["train"],
+      "data_types": ["GPSInfo"],
+      "recommendation": "必须清理GPS信息，防止患者位置泄露"
+    },
+    "medium_risk": {
+      "description": "包含设备信息和拍摄时间的图像",
+      "count": 331,
+      "affected_splits": ["train", "val"],
+      "data_types": ["Make", "Model", "DateTime", "Software"],
+      "recommendation": "建议清理所有EXIF信息，防止设备指纹追踪"
+    },
+    "low_risk": {
+      "description": "无敏感EXIF信息的图像",
+      "count": 6388,
+      "affected_splits": ["train", "val", "test"],
+      "recommendation": "无需处理"
+    }
+  },
+
+  "compliance_checklist": {
+    "exif_analysis_complete": true,
+    "gps_data_identified": true,
+    "anonymization_script_ready": true,
+    "protocol_document_created": true,
+    "verification_report_generated": true,
+    "actual_anonymization_performed": false,
+    "post_anonymization_verification": false
+  },
+
+  "sensitive_tags_reference": {
+    "GPSInfo": {
+      "risk_level": "HIGH",
+      "description": "GPS定位信息，可能暴露拍摄位置"
+    },
+    "Make": {
+      "risk_level": "MEDIUM",
+      "description": "设备制造商信息"
+    },
+    "Model": {
+      "risk_level": "MEDIUM",
+      "description": "设备型号信息"
+    },
+    "SerialNumber": {
+      "risk_level": "HIGH",
+      "description": "设备序列号，可唯一标识设备"
+    },
+    "DateTime": {
+      "risk_level": "MEDIUM",
+      "description": "拍摄时间"
+    },
+    "Artist": {
+      "risk_level": "HIGH",
+      "description": "作者信息，可能包含姓名"
+    },
+    "Copyright": {
+      "risk_level": "MEDIUM",
+      "description": "版权信息"
+    },
+    "UserComment": {
+      "risk_level": "MEDIUM",
+      "description": "用户评论，可能包含个人信息"
+    },
+    "Software": {
+      "risk_level": "LOW",
+      "description": "处理软件信息"
+    }
+  },
+
+  "next_steps": [
+    {
+      "step": 1,
+      "action": "运行脱敏脚本处理所有图像",
+      "command": "python datasets/tools/anonymize.py --input shezhenv3-coco --output datasets/processed/anonymized --report-output datasets/processed/anonymization_report.json",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "action": "验证脱敏结果",
+      "command": "python datasets/tools/anonymize.py --input datasets/processed/anonymized --output /dev/null --report-only",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "action": "更新COCO标注文件（如使用文件名哈希化）",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "action": "生成最终合规报告",
+      "status": "pending"
+    }
+  ],
+
+  "deliverables": {
+    "anonymize_script": "datasets/tools/anonymize.py",
+    "protocol_document": "docs/data_anonymization_protocol.md",
+    "verification_report": "datasets/processed/anonymization_verification_report.json",
+    "train_report": "datasets/processed/anonymization_report.json",
+    "val_report": "datasets/processed/anonymization_report_val.json",
+    "test_report": "datasets/processed/anonymization_report_test.json"
+  }
+}

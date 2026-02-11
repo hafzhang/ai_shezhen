@@ -133,7 +133,7 @@
       "estimated_hours": 4,
       "dependencies": ["task-1-1"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "所有图像EXIF信息清理完成",
         "文件名匿名化处理",

@@ -1,0 +1,3083 @@
+{
+  "anonymization_date": "2026-02-11T20:16:58.338717",
+  "input_directory": "shezhenv3-coco\\train\\images",
+  "output_directory": "datasets\\processed\\anonymized\\train",
+  "options": {
+    "hash_filenames": false
+  },
+  "statistics": {
+    "total_images": 5594,
+    "images_with_exif": 0,
+    "images_cleaned": 0,
+    "exif_tags_removed": 0,
+    "filenames_hashed": 0
+  },
+  "exif_analysis": {
+    "images_with_sensitive_data": [
+      {
+        "file": "F (1429).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (299).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (486).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (32).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (428).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (446).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (253).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (362).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (261).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "AA (12).jpeg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (268).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (908).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (163).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (920).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (205).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (317).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "UserComment",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (9).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (2).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (22).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (250).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (283).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (461).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (181).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (166).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (176).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (595).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "XPKeywords"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (199).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (331).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (192).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (220).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (457).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (901).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (452).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (183).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (285).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (207).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (21).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (265).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (172).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (297).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1369).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (873).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (20).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (440).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (216).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (289).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (165).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (34).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (1022).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (432).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (77).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (266).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (918).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "EE (31).jpeg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (166).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (464).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (288).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (39).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (291).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (257).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (38).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (438).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1427).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (906).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (46).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (153).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (108).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (427).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (714).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (383).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (162).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (44).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (260).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (256).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (185).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (895).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (451).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (144).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (215).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (599).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (217).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (184).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (76).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (37).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (287).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (253).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (647).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (163).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "C (1005).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (3).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (191).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (260).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (308).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (177).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (158).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (360).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (311).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (18).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (102).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (1362).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (171).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "Copyright",
+          "ImageDescription",
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "EE (14).jpeg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (178).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (26).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (33).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (203).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "AA (53).jpeg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (781).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (429).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (384).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1367).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1188).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (168).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (28).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (914).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (250).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "A (1417).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (185).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (157).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (43).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (919).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (173).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (465).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (1444).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (448).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (259).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (507).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (195).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (447).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (704).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1174).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1319).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (697).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (916).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (170).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (262).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (186).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "C (903).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (131).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (113).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (106).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (190).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (204).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (463).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (36).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (84).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (196).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "AA (72).jpeg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (30).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (310).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (657).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (168).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1115).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (189).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (267).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (357).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (264).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (247).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1321).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (439).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (206).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (150).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (441).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (358).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (280).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1422).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (251).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (636).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1435).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (42).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (222).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (148).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (915).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1371).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (19).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (381).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (898).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (453).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1314).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (175).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (515).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (188).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (917).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (255).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (242).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (329).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (258).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (282).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (318).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (178).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (485).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (286).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (283).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (91).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (5).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (78).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (145).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (489).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (109).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (82).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (488).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (4).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (171).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (263).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (370).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (66).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (164).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (208).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (359).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (212).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (67).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (209).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (416).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (249).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (81).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (52).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (41).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (174).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (49).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "AA (85).jpeg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (487).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (426).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1346).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (5).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (191).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (58).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (449).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (194).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (167).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (276).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (496).jpg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (433).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (421).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (371).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (179).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (182).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (181).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (468).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (65).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (31).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (267).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (430).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (903).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (219).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (47).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (300).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (316).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "UserComment",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (172).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (180).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (450).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (454).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (23).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (180).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (187).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (132).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (645).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (343).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (151).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (161).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (330).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (386).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (1).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (19).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (169).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (466).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (921).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (460).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (1320).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "EE (25).jpeg",
+        "sensitive_tags": [
+          "LensModel"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (169).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (309).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "Artist",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (193).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (103).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (37).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (470).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (293).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (455).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (152).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (249).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "C (805).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "LensModel"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (182).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (278).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (727).jpg",
+        "sensitive_tags": [
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (12).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (35).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "B (218).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (75).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "F (1467).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (149).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "C (621).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (314).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (1160).jpg",
+        "sensitive_tags": [
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription",
+          "UserComment"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "E (179).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (156).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (443).jpg",
+        "sensitive_tags": [
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (48).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      },
+      {
+        "file": "E (167).jpg",
+        "sensitive_tags": [
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "Artist",
+          "XPAuthor"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "F (910).jpg",
+        "sensitive_tags": [
+          "Software"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (202).jpg",
+        "sensitive_tags": [
+          "Software",
+          "DateTime"
+        ],
+        "gps_present": false
+      },
+      {
+        "file": "B (40).jpg",
+        "sensitive_tags": [
+          "GPSInfo",
+          "Make",
+          "Model",
+          "Software",
+          "DateTime",
+          "DateTimeOriginal",
+          "DateTimeDigitized",
+          "ImageDescription"
+        ],
+        "gps_present": true
+      }
+    ],
+    "sensitive_tags_summary": {
+      "Software": 219,
+      "DateTime": 239,
+      "DateTimeOriginal": 167,
+      "DateTimeDigitized": 167,
+      "GPSInfo": 65,
+      "Make": 92,
+      "Model": 92,
+      "ImageDescription": 57,
+      "Artist": 54,
+      "XPAuthor": 47,
+      "UserComment": 26,
+      "LensModel": 14,
+      "XPKeywords": 1,
+      "Copyright": 1
+    }
+  },
+  "errors": []
+}
