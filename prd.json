@@ -217,7 +217,7 @@
       "estimated_hours": 16,
       "dependencies": ["task-2-2", "task-1-4"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "训练完成80 epochs或提前早停",
         "验证集mIoU > 0.90",

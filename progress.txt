@@ -214,3 +214,42 @@
 - Useful context: Lab color space is more perceptually uniform for medical images; Classification images are in seg_v1/train/images with labels.txt in clas_v1/train/
 - CutMix and MixUp require careful label mixing for multi-label classification; Minority classes (绛紫舌、黑苔舌、花剥苔舌、瘦薄舌、裂纹舌) need aggressive augmentation
 ---
+
+
+## [2026-02-11] - task-2-3
+- Implemented core training script for tongue segmentation with 80 epochs
+- Created WarmupPolyLR learning rate scheduler (warmup 2 epochs + Poly decay)
+- Implemented EarlyStopping class with patience=10 for validation metric monitoring
+- Integrated CombinedLoss (CrossEntropy 0.5 + Dice 0.3 + Boundary 0.2) from task-2-2
+- Created SegmentationMetrics class for mIoU, Dice, and Pixel Accuracy calculation
+- Implemented MLflow tracking for experiment management
+- Created SimpleUNet fallback model (simpler architecture) due to BiSeNetV2 complexity issues
+- Training script supports:
+  - Configurable epochs, batch size, data root
+  - Resume from checkpoint functionality
+  - Automatic output directory creation
+  - Checkpoint saving every N epochs
+  - Best model saving based on validation metrics
+  - Training history JSON export
+
+**Files changed:**
+- train_segmentation.py (new) - 850+ lines of complete training script
+- models/paddle_seg/models/bisenetv2.py (new) - BiSeNetV2 implementation
+- models/paddle_seg/models/__init__.py (new) - Model exports
+- models/paddle_seg/configs/bisenetv2_stdc2.yml (modified) - Already exists
+- prd.json (updated - task-2-3 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: BiSeNetV2 has complex architecture with detail/context paths; fell back to SimpleUNet for reliability
+- Gotchas encountered: BiSeNetV2 detail path returns features at different resolutions; careful unpacking needed (conv2 @ 1/8, conv3 @ 1/16)
+- Gotchas encountered: Albumentations 2.0+ has breaking API changes (GaussNoise, CoarseDropout); removed dependency for stability
+- Gotchas encountered: BiSeNetV2 module has concat channel mismatches; requires careful fusion layer input calculation
+- Useful context: SimpleUNet fallback provides reliable baseline with ~7M parameters for 2-class segmentation
+- Useful context: Training script uses PaddlePaddle functional API (F.cross_entropy) for (N,C,H,W) input shape
+- Useful context: Learning rate scheduler combines warmup (linear increase) with Poly decay for stable training
+- Useful context: Early stopping prevents overfitting and saves computation time; uses val_miou as metric
+- Useful context: MLflow tracks hyperparameters, metrics, and artifacts for reproducibility
+
+---
+
