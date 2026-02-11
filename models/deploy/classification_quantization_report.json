@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-02-12T03:01:38.165993",
+  "model_path": "models/paddle_clas/output/best_model/model.pdparams",
+  "quantizations": [
+    {
+      "precision": "FP16",
+      "input_model": "models/paddle_clas/output/best_model/model.pdparams",
+      "output_model": "models/deploy\\classify_fp16\\model_fp16.pdparams",
+      "fp32_size_mb": 31.06017780303955,
+      "fp16_size_mb": 17.264172554016113,
+      "compression_ratio": 1.7991118720493855,
+      "quantization_time": 0.02,
+      "status": "success"
+    },
+    {
+      "precision": "INT8",
+      "input_model": "models/paddle_clas/output/best_model/model.pdparams",
+      "output_model": "models/deploy\\classify_int8\\model_int8.pdparams",
+      "fp32_size_mb": 31.06017780303955,
+      "int8_size_mb": 8.635712623596191,
+      "compression_ratio": 3.59671276209109,
+      "quantization_time": 0.05,
+      "calibration_samples": 50,
+      "status": "success"
+    }
+  ],
+  "benchmarks": [
+    {
+      "precision": "fp16",
+      "batch_size": 1,
+      "num_runs": 50,
+      "mean_latency_ms": 122.36450000025798,
+      "std_latency_ms": 45.94777110693445,
+      "p50_latency_ms": 91.36820001003798,
+      "p95_latency_ms": 181.1834849853767,
+      "p99_latency_ms": 225.62857400975187,
+      "fps": 8.172304875988475,
+      "device": "cpu"
+    },
+    {
+      "precision": "int8",
+      "batch_size": 1,
+      "num_runs": 50,
+      "mean_latency_ms": 180.98569000314455,
+      "std_latency_ms": 10.473408945727465,
+      "p50_latency_ms": 179.25544999889098,
+      "p95_latency_ms": 183.37284501321847,
+      "p99_latency_ms": 220.8144190185702,
+      "fps": 5.525298712746988,
+      "device": "cpu"
+    }
+  ],
+  "verification": [
+    {
+      "precision": "fp16",
+      "fp32_accuracy": 0.26666666666666666,
+      "quantized_accuracy": 0.06666666666666667,
+      "accuracy_loss": 0.2,
+      "accuracy_loss_percentage": 20.0,
+      "test_samples": 10,
+      "status": "fail"
+    },
+    {
+      "precision": "int8",
+      "fp32_accuracy": 0.13333333333333333,
+      "quantized_accuracy": 0.2,
+      "accuracy_loss": 0.06666666666666668,
+      "accuracy_loss_percentage": 6.666666666666668,
+      "test_samples": 10,
+      "status": "fail"
+    }
+  ]
+}

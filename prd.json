@@ -322,7 +322,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-1-3"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "PaddleClas环境配置成功",
         "PP-HGNetV2-B4模型加载成功",

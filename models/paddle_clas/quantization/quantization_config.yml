@@ -1,0 +1,132 @@
+# Classification Model Quantization Configuration
+# AI舌诊智能诊断系统 - 分类模型量化配置
+
+# Quantization Settings
+quantization:
+  # Target precisions
+  precisions:
+    - fp16
+    - int8
+
+  # FP16 Settings
+  fp16:
+    enabled: true
+    convert_weights: true
+    keep_orig_model: true
+
+  # INT8 Settings (Post-Training Quantization)
+  int8:
+    enabled: true
+    method: "ptq"  # Post-training quantization
+
+    # Calibration settings
+    calibration:
+      batch_size: 8
+      max_samples: 50
+      num_epochs: 1
+
+    # Weight quantization
+    weight_quantize:
+      symmetric: true
+      per_channel: false
+
+    # Activation quantization
+    activation_quantize:
+      symmetric: false
+      moving_avg: true
+
+# Model Paths
+model:
+  # Input FP32 model
+  input_path: "models/paddle_clas/output/best_model/model.pdparams"
+
+  # Output paths
+  output_dir: "models/deploy"
+
+  # FP16 output
+  fp16_path: "models/deploy/classify_fp16/model_fp16.pdparams"
+
+  # INT8 output
+  int8_path: "models/deploy/classify_int8/model_int8.pdparams"
+
+# Data Paths (for calibration and validation)
+data:
+  base_dir: "datasets/processed/seg_v1"
+  train_images: "train/images"
+  val_images: "val/images"
+
+# Accuracy Verification
+verification:
+  enabled: true
+  tolerance_percent: 3.0  # Maximum accuracy loss
+  test_samples: 100
+  batch_size: 8
+
+  # Metrics to track
+  metrics:
+    - accuracy
+    - f1_score
+    - precision
+    - recall
+
+# Inference Benchmark
+benchmark:
+  enabled: true
+  num_runs: 50
+  batch_size: 1
+
+  # Target latency (ms)
+  target_latency_p95: 120  # CPU
+  target_latency_p95_gpu: 30  # GPU
+
+  # Target model size (MB)
+  target_model_size: 20
+
+# Model Specifications
+model_spec:
+  architecture: "PP-HGNetV2-B4"
+  input_shape: [3, 224, 224]
+  num_classes: 18  # Multi-label: 8 + 6 + 4
+
+  # Multi-head configuration
+  heads:
+    head1: 8   # 舌色(4) + 苔色(4)
+    head2: 6   # 舌形(3) + 苔质(3)
+    head3: 4   # 特征(3) + 健康(1)
+
+# Deployment Settings
+deployment:
+  # Target platform
+  platform: "cpu"  # cpu or gpu
+
+  # Optimization flags
+  optimize:
+    - "remove_dropout"  # Remove dropout for inference
+    - "fuse_bn"        # Fuse batch normalization
+    - "constant_folding"  # Constant folding
+
+# Logging and Reporting
+logging:
+  level: "INFO"
+  log_file: "models/paddle_clas/quantization/quantization.log"
+  report_format: "json"
+
+  # Output report
+  report_path: "models/deploy/classification_quantization_report.json"
+
+# Advanced Settings
+advanced:
+  # Mixed precision (FP16 weights, FP32 activations)
+  mixed_precision: false
+
+  # Dynamic quantization (only weights, not activations)
+  dynamic_quantization: false
+
+  # Static quantization (weights + activations with calibration)
+  static_quantization: true
+
+  # Quantization aware training (QAT)
+  qat:
+    enabled: false
+    epochs: 5
+    learning_rate: 0.0001

@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-02-12T06:42:54.464017",
+  "paddlepaddle": {
+    "installed": true,
+    "version": "3.3.0",
+    "device": "cpu",
+    "cuda_available": false,
+    "gpu_count": 0
+  },
+  "model": {
+    "success": true,
+    "backbone_params": 8263392,
+    "head_params": 666900,
+    "total_params": 8930292,
+    "feature_dim": 864,
+    "num_heads": 6
+  },
+  "baseline": {
+    "success": true,
+    "mean_latency_ms": 244.5440000083181,
+    "std_latency_ms": 7.413679911916757,
+    "throughput_samples_per_sec": 16.35697461341902
+  },
+  "weights": {
+    "pphgnetv2_b4": {
+      "path": "models/paddle_clas/weights\\pphgnetv2_b4_pretrained.pdparams",
+      "exists": false
+    }
+  },
+  "config": {
+    "min_paddle_version": [
+      3,
+      0
+    ],
+    "weights_dir": "models/paddle_clas/weights",
+    "output_dir": "models/paddle_clas"
+  },
+  "summary": {
+    "environment_ready": true
+  }
+}

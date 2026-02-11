@@ -1,0 +1,410 @@
+# PP-HGNetV2-B4 Classification Model Configuration
+# AI舌诊智能诊断系统 - 分类模型配置
+# Multi-Head Tongue Classification with 6 diagnostic dimensions
+
+# ============================================================
+# Model Architecture
+# ============================================================
+model:
+  name: "PP-HGNetV2_B4"
+  architecture: "PP-HGNetV2"
+
+  # Backbone configuration
+  backbone:
+    type: "PP_HGNetV2_B4"
+    pretrained: "ImageNet22k"
+    feature_dim: 864
+
+  # Input configuration
+  input:
+    channels: 3
+    image_size: [224, 224]
+
+  # Multi-Head Configuration for Tongue Diagnosis
+  # Each head predicts a different diagnostic dimension
+  multi_head:
+    # Head 1: 舌色 (Tongue Color) - 4 classes
+    tongue_color:
+      enabled: true
+      num_classes: 4
+      names:
+        - "淡红舌"    # light_red (healthy)
+        - "红舌"       # red
+        - "绛紫舌"     # purple
+        - "淡白舌"     # pale
+      description: "舌体颜色分类"
+      loss_weight: 0.25
+
+    # Head 2: 苔色 (Coating Color) - 4 classes
+    coating_color:
+      enabled: true
+      num_classes: 4
+      names:
+        - "白苔"       # white
+        - "黄苔"       # yellow
+        - "黑苔"       # black
+        - "花剥苔"     # peeling (map-like)
+      description: "舌苔颜色分类"
+      loss_weight: 0.2
+
+    # Head 3: 舌形 (Tongue Shape) - 3 classes
+    tongue_shape:
+      enabled: true
+      num_classes: 3
+      names:
+        - "正常"       # normal
+        - "胖大舌"     # swollen
+        - "瘦薄舌"     # thin
+      description: "舌体形态分类"
+      loss_weight: 0.15
+
+    # Head 4: 苔质 (Coating Quality) - 3 classes
+    coating_quality:
+      enabled: true
+      num_classes: 3
+      names:
+        - "薄苔"       # thin
+        - "厚苔"       # thick
+        - "腐苔"       # greasy
+      description: "舌苔质地分类"
+      loss_weight: 0.15
+
+    # Head 5: 特征 (Special Features) - 4 classes (multi-label)
+    features:
+      enabled: true
+      num_classes: 4
+      names:
+        - "无"         # none
+        - "红点"       # red_dots
+        - "裂纹"       # cracks
+        - "齿痕"       # teeth_marks
+      description: "舌体特殊特征（可多选）"
+      loss_weight: 0.15
+      multi_label: true
+
+    # Head 6: 健康状态 (Health Status) - 2 classes
+    health:
+      enabled: true
+      num_classes: 2
+      names:
+        - "不健康"     # unhealthy
+        - "健康舌"     # healthy
+      description: "整体健康状态评估"
+      loss_weight: 0.1
+
+  # Regularization
+  dropout: 0.2
+  use_batch_norm: true
+
+# ============================================================
+# Loss Functions
+# ============================================================
+loss:
+  # Multi-task loss weights
+  task_weights:
+    tongue_color: 0.25
+    coating_color: 0.20
+    tongue_shape: 0.15
+    coating_quality: 0.15
+    features: 0.15
+    health: 0.10
+
+  # Focal Loss for imbalanced classes
+  focal_loss:
+    enabled: true
+    alpha: 0.25
+    gamma: 2.0
+    reduction: "mean"
+
+  # Asymmetric Loss for multi-label tasks
+  asymmetric_loss:
+    enabled: true
+    gamma_pos: 0.0
+    gamma_neg: 4.0
+    clip: 0.05
+    reduction: "sum"
+
+  # Class weighting strategy
+  class_weight_strategy: "sqrt_inv"  # Options: "sqrt_inv", "inv", "log_inv", "none"
+
+# ============================================================
+# Training Configuration
+# ============================================================
+training:
+  # Basic settings
+  num_epochs: 60
+  batch_size: 16
+  accumulation_steps: 2
+
+  # Optimizer
+  optimizer:
+    type: "Momentum"
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.0005
+
+  # Learning rate schedule
+  scheduler:
+    type: "CosineAnnealingWarmRestarts"
+    warmup_epochs: 5
+    warmup_start_lr: 0.0001
+    min_lr: 0.000001
+    T_0: 10  # Restart period
+    T_mult: 2  # Multiply period by this after each restart
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 10
+    min_delta: 0.001
+    monitor: "val_macro_f1"
+    mode: "max"
+
+  # Mixed precision
+  amp:
+    enabled: true
+    level: "O1"
+
+  # Gradient clipping
+  grad_clip:
+    enabled: true
+    max_norm: 1.0
+
+# ============================================================
+# Data Configuration
+# ============================================================
+data:
+  # Dataset paths
+  train:
+    images: "datasets/processed/seg_v1/train/images"
+    labels: "datasets/processed/clas_v1/train/labels.txt"
+
+  val:
+    images: "datasets/processed/seg_v1/val/images"
+    labels: "datasets/processed/clas_v1/val/labels.txt"
+
+  test:
+    images: "datasets/processed/seg_v1/test/images"
+    labels: "datasets/processed/clas_v1/test/labels.txt"
+
+  # Image preprocessing
+  image_size: [224, 224]
+  interpolation: "bilinear"
+
+  # Normalization (ImageNet stats)
+  normalize:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+
+# ============================================================
+# Data Augmentation
+# ============================================================
+augmentation:
+  # Training augmentations
+  train:
+    - RandomResizedCrop:
+        size: [224, 224]
+        scale: [0.8, 1.0]
+        ratio: [0.9, 1.1]
+
+    - RandomHorizontalFlip:
+        prob: 0.5
+
+    - RandomVerticalFlip:
+        prob: 0.1
+
+    - RandomRotation:
+        degrees: 15
+
+    - ColorJitter:
+        brightness: 0.2
+        contrast: 0.2
+        saturation: 0.1
+        hue: 0.05
+
+    - RandomGaussianBlur:
+        prob: 0.2
+        kernel_size: 5
+
+    - Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+
+  # Validation/Test augmentations
+  val:
+    - Resize:
+        size: [256, 256]
+
+    - CenterCrop:
+        size: [224, 224]
+
+    - Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+
+  # Minority class augmentation (for rare classes)
+  minority_augmentation:
+    enabled: true
+    minority_classes:
+      - "绛紫舌"
+      - "黑苔"
+      - "花剥苔"
+      - "瘦薄舌"
+      - "裂纹"
+
+    augment_factor: 5  # Multiply samples by this factor
+
+    transform:
+      - RandomResizedCrop:
+          size: [224, 224]
+          scale: [0.6, 1.0]
+
+      - RandomRotation:
+          degrees: 30
+
+      - RandomPerspective:
+          prob: 0.3
+          distortion_scale: 0.2
+
+      - Cutout:
+          prob: 0.5
+          n_holes: 1
+          length: 56
+
+# ============================================================
+# Validation & Evaluation
+# ============================================================
+evaluation:
+  # Validation frequency
+  eval_freq: 1  # Evaluate every N epochs
+
+  # Metrics
+  metrics:
+    - "macro_f1"
+    - "micro_f1"
+    - "mAP"
+    - "per_class_accuracy"
+    - "confusion_matrix"
+
+  # Per-head evaluation
+  head_metrics:
+    tongue_color:
+      primary: "macro_f1"
+      target: 0.70
+    coating_color:
+      primary: "macro_f1"
+      target: 0.65
+    tongue_shape:
+      primary: "macro_f1"
+      target: 0.65
+    coating_quality:
+      primary: "macro_f1"
+      target: 0.60
+    features:
+      primary: "mAP"
+      target: 0.60
+    health:
+      primary: "accuracy"
+      target: 0.85
+
+  # Class imbalance monitoring
+  monitor_imbalance:
+    enabled: true
+    threshold: 0.15  # Max allowed std between class F1s
+
+# ============================================================
+# Checkpointing & Logging
+# ============================================================
+output:
+  # Output directories
+  checkpoint_dir: "models/paddle_clas/output/checkpoints"
+  best_model_dir: "models/paddle_clas/output/best_model"
+  log_dir: "models/paddle_clas/logs"
+
+  # Checkpoint settings
+  save_freq: 5  # Save checkpoint every N epochs
+  keep_best: true  # Always keep best model
+  keep_last_n: 3  # Keep last N checkpoints
+
+  # Logging
+  tensorboard: true
+  print_freq: 50  # Print every N batches
+  log_gradients: false
+
+# ============================================================
+# MLflow Tracking
+# ============================================================
+mlflow:
+  enabled: true
+  tracking_uri: "file:///C:/Users/Administrator/Desktop/AI_shezhen/mlruns"
+  experiment_name: "paddle_clas_tongue_classification"
+  run_name: null  # Auto-generate if null
+
+  # Parameters to log
+  log_params:
+    - "model"
+    - "batch_size"
+    - "learning_rate"
+    - "num_epochs"
+    - "loss_weights"
+    - "augmentation"
+
+  # Metrics to log
+  log_metrics:
+    - "train_loss"
+    - "val_loss"
+    - "val_macro_f1"
+    - "val_mAP"
+    - "learning_rate"
+
+# ============================================================
+# Pretrained Weights
+# ============================================================
+pretrained:
+  # ImageNet22k pretrained weights
+  backbone_url: "https://paddle-imagenet-models-name.bj.bcebos.com/dygraph_v2.0/PPHGNetV2_B4_pretrained.pdparams"
+  weights_dir: "models/paddle_clas/weights"
+  auto_download: true
+
+  # Load strategy
+  load_strategy: "backbone_only"  # Options: "backbone_only", "full", "none"
+  strict: false  # Allow partial weight loading
+
+# ============================================================
+# Inference Configuration
+# ============================================================
+inference:
+  # Model export
+  export_format: "paddle"  # Options: "paddle", "onnx"
+  input_shape: [1, 3, 224, 224]
+
+  # Post-processing
+  sigmoid_threshold: 0.5
+  multi_label_threshold: 0.3
+
+  # Batch inference
+  batch_size: 1
+  num_workers: 2
+
+# ============================================================
+# Acceptance Criteria
+# ============================================================
+acceptance_criteria:
+  # Model configuration
+  model_configured: true
+  multi_head_designed: true
+  num_heads: 6
+
+  # Performance targets (after full training)
+  targets:
+    macro_f1: 0.65
+    mAP: 0.70
+    majority_class_accuracy: 0.85
+    minority_class_recall: 0.60
+
+  # Training completion
+  min_epochs: 60
+  early_stop_enabled: true
+
+  # Requirements file
+  requirements_file: "models/paddle_clas/requirements.txt"
