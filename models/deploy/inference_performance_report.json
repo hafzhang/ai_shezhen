@@ -1,0 +1,142 @@
+{
+  "task_2_6": {
+    "title": "推理速度测试与优化",
+    "timestamp": "2026-02-12T06:25:30.000Z",
+    "acceptance_criteria": {
+      "cpu_fps_target": 30,
+      "gpu_fps_target": 80,
+      "p95_latency_target_ms": 33,
+      "memory_target_mb": 2048
+    },
+    "test_environment": {
+      "device": "CPU",
+      "platform": "Windows",
+      "framework": "PaddlePaddle 3.3.0",
+      "data_root": "datasets/processed/seg_v1/train"
+    },
+    "test_results": {
+      "classify_fp16": {
+        "model": "PP-HGNetV2-B4 Multi-Head Classification",
+        "precision": "FP16",
+        "device": "CPU",
+        "model_size_mb": 18.0,
+        "batch_size": 1,
+        "fps": 10.76,
+        "avg_latency_ms": 92.13,
+        "min_latency_ms": 87.62,
+        "max_latency_ms": 97.00,
+        "p50_latency_ms": 92.00,
+        "p95_latency_ms": 97.00,
+        "p99_latency_ms": 97.00,
+        "memory_peak_mb": 252.82,
+        "memory_used_mb": 9.51,
+        "cpu_fps_pass": false,
+        "p95_latency_pass": false,
+        "memory_target_pass": true,
+        "overall_status": "FAIL"
+      },
+      "classify_int8": {
+        "model": "PP-HGNetV2-B4 Multi-Head Classification",
+        "precision": "INT8",
+        "device": "CPU",
+        "model_size_mb": 8.7,
+        "batch_size": 1,
+        "fps": 10.74,
+        "avg_latency_ms": 92.63,
+        "min_latency_ms": 87.00,
+        "max_latency_ms": 98.00,
+        "p50_latency_ms": 93.00,
+        "p95_latency_ms": 96.00,
+        "p99_latency_ms": 97.51,
+        "memory_peak_mb": 252.89,
+        "memory_used_mb": 9.42,
+        "cpu_fps_pass": false,
+        "p95_latency_pass": false,
+        "memory_target_pass": true,
+        "overall_status": "FAIL"
+      }
+    },
+    "batch_size_analysis": {
+      "fp16_batch_1": {
+        "fps": 10.76,
+        "p95_ms": 97.00,
+        "memory_mb": 252.82
+      },
+      "fp16_batch_4": {
+        "fps": 7.74,
+        "p95_ms": 530.28,
+        "memory_mb": 300.72
+      },
+      "fp16_batch_8": {
+        "fps": 8.17,
+        "p95_ms": 1000.31,
+        "memory_mb": 320.77
+      }
+    },
+    "conclusions": {
+      "cpu_inference": "CPU inference does NOT meet the 30 FPS target for production deployment. Current performance is ~10-11 FPS on average.",
+      "p95_latency": "P95 latency (~97ms) exceeds the 33ms target by ~3x.",
+      "memory_usage": "Memory usage is well within target (< 2GB), averaging ~250-320MB peak.",
+      "batch_size": "Batch size 1 provides best single-image latency. Larger batches don't improve throughput on CPU due to memory constraints.",
+      "quantization": "INT8 quantization reduces model size by 52% (18MB -> 8.7MB) but provides minimal speedup on CPU without INT8 hardware support.",
+      "gpu_requirement": "GPU inference is REQUIRED to meet the 30 FPS target. Expected 10-20x speedup with GPU."
+    },
+    "optimization_recommendations": [
+      {
+        "priority": "P0",
+        "optimization": "GPU Inference",
+        "description": "Use NVIDIA GPU with CUDA for inference",
+        "expected_improvement": "10-20x speedup (100-200 FPS)",
+        "implementation": "paddle.set_device('gpu')"
+      },
+      {
+        "priority": "P0",
+        "optimization": "ONNX Runtime",
+        "description": "Export model to ONNX format and use ONNX Runtime",
+        "expected_improvement": "1.5-2x CPU speedup with optimizations",
+        "implementation": "paddle.onnx.export"
+      },
+      {
+        "priority": "P1",
+        "optimization": "Model Pruning",
+        "description": "Apply structured pruning to reduce FLOPs",
+        "expected_improvement": "20-40% FLOPs reduction",
+        "implementation": "Remove low-importance channels"
+      },
+      {
+        "priority": "P1",
+        "optimization": "Dynamic Batching",
+        "description": "Implement request batching at API level",
+        "expected_improvement": "2-4x throughput improvement",
+        "implementation": "Batch inference requests with 10-50ms delay"
+      },
+      {
+        "priority": "P2",
+        "optimization": "TensorRT (GPU)",
+        "description": "Use TensorRT for NVIDIA GPU optimization",
+        "expected_improvement": "2-3x additional GPU speedup",
+        "implementation": "Export to ONNX, convert to TensorRT engine"
+      },
+      {
+        "priority": "P2",
+        "optimization": "MKL-DNN / oneDNN",
+        "description": "Enable Intel CPU optimizations",
+        "expected_improvement": "1.2-1.5x CPU speedup",
+        "implementation": "Build PaddlePaddle with MKL-DNN support"
+      }
+    ],
+    "action_items": [
+      "For Production: Deploy with GPU instances (NVIDIA T4/V100)",
+      "For CPU Deployment: Use ONNX Runtime with quantized model",
+      "For API: Implement async processing with batching",
+      "Monitoring: Track P95 latency and alert on >50ms",
+      "Model Optimization: Apply 30% pruning to reduce inference time"
+    ]
+  },
+  "files_created": [
+    "models/inference_speed_test.py - Comprehensive inference testing script",
+    "models/inference_optimizer.py - Optimization utilities",
+    "models/deploy/optimized/optimization_report.json - Optimization recommendations",
+    "models/deploy/inference_performance_report.json - This performance report"
+  ]
+}

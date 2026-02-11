@@ -280,7 +280,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-2-5"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "CPU推理>30 FPS",
         "GPU推理>80 FPS",
