@@ -16,6 +16,27 @@
 - PaddlePaddle CrossEntropyLoss uses functional API with axis=1 for (N,C,H,W) input shape
 - PaddlePaddle 3.x uses nn.CrossEntropyLoss() but F.cross_entropy() for multi-dimensional inputs
 - For one_hot encoding, handle ignore_index before calling F.one_hot() to avoid errors
+- Albumentations 2.0+ uses new API: GaussNoise uses std_range instead of var_limit, CoarseDropout uses max_size instead of max_height/max_width
+- Classification dataset uses labels.txt with 19-dimensional one-hot vectors, images located in seg_v1/train/images
+
+---
+- The dataset uses COCO format with train/val/test splits
+- Image files have irregular filenames (with parentheses like 'F (1).jpg')
+- Categories are defined in classes.txt files with Chinese names
+- Category IDs start from 0 (jiankangshe) to 20 (xinfeitu)
+- The annotation file may reference category_id 21 which is not defined in categories
+- Mask files are stored as PNG with binary values (0=background, 255=tongue)
+- COCO annotations contain polygon coordinates that need conversion using cv2.fillPoly
+- Multiple annotations per image are merged using bitwise OR operation
+- Class mapping: 21 original classes map to 6 dimensions (tongue_color:4, coating_color:4, tongue_shape:3, coating_quality:3, features:3, health:1)
+- Syndrome classes (13-20) are excluded from classification training and reserved for LLM few-shot prompts
+- Label files use TAB-separated format: filename<TAB>label1,label2,...,label19 (one-hot vector)
+- Class weights formula: weight_i = total / (num_classes × count_i) - higher weights for minority classes
+- For stratified sampling with no minority/majority classes, use fallback to random sampling from all classes
+- torch.utils.data.Sampler requires __iter__ and __len__ methods; BatchSampler yields lists of indices
+- PaddlePaddle CrossEntropyLoss uses functional API with axis=1 for (N,C,H,W) input shape
+- PaddlePaddle 3.x uses nn.CrossEntropyLoss() but F.cross_entropy() for multi-dimensional inputs
+- For one_hot encoding, handle ignore_index before calling F.one_hot() to avoid errors
 
 ---
 
@@ -167,4 +188,29 @@
 - Gotchas encountered: nn.CrossEntropyLoss module doesn't support (N,C,H,W) shape, must use F.cross_entropy() functional API; When target contains ignore_index=255, must clean before one_hot encoding
 - Useful context: Class weights calculated from pixel counts (4.3B total pixels, 71.5% background, 28.5% tongue); CombinedLoss returns dictionary with individual losses for monitoring
 - Boundary loss uses Sobel kernels [[-1,0,1],[-2,0,2],[-1,0,1]] and [[-1,-2,-1],[0,0,0],[1,2,1]] for edge detection
+- Albumentations 2.0+ uses new API: GaussNoise uses std_range instead of var_limit, CoarseDropout uses max_size instead of max_height/max_width
+- Classification dataset uses labels.txt with 19-dimensional one-hot vectors, images located in seg_v1/train/images
+
+---
+
+## [2026-02-11] - task-1-5
+- Implemented comprehensive augmentation pipeline for segmentation and classification tasks (datasets/tools/augmentation.py)
+- Created segmentation pipeline with geometric transforms (flip, rotate, scale, elastic, grid distortion)
+- Created classification pipeline with CutMix (0.2 prob), MixUp (0.1 prob), RandAugment support)
+- Implemented minority class specific augmentation with 5x multiplier for rare classes
+- Created Lab color space augmentation for medical imaging (better perceptual uniformity)
+- Generated augmentation configuration YAML (datasets/tools/augmentation_config.yml)
+- Generated 9 visualization variants per sample for both segmentation and classification tasks
+- Fixed albumentations 2.0 API compatibility issues (GaussNoise std_range, CoarseDropout max_size)
+
+**Files changed:**
+- datasets/tools/augmentation.py (new) - 1200+ lines of augmentation code
+- datasets/tools/augmentation_config.yml (new) - comprehensive configuration
+- datasets/tools/augmentation_visualization/ (new) - 6 visualization images (3 seg + 3 cla)
+
+**Learnings for future iterations:**
+- Patterns discovered: Albumentations 2.0+ changed API significantly - GaussNoise now uses std_range in [0,1] range instead of var_limit; CoarseDropout uses max_size instead of max_height/max_width
+- Gotchas encountered: Windows console needs UTF-8 encoding wrapper for Unicode characters; Visualization grid layout needs careful calculation for 2x5 layout with first column used for original
+- Useful context: Lab color space is more perceptually uniform for medical images; Classification images are in seg_v1/train/images with labels.txt in clas_v1/train/
+- CutMix and MixUp require careful label mixing for multi-label classification; Minority classes (绛紫舌、黑苔舌、花剥苔舌、瘦薄舌、裂纹舌) need aggressive augmentation
 ---
