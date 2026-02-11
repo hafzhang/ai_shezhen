@@ -70,7 +70,7 @@
       "estimated_hours": 10,
       "dependencies": ["task-1-1"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "完整映射表（6维度：舌色4类+苔色4类+舌形3类+苔质3类+特征3类+健康1类）",
         "所有训练样本生成18维one-hot向量",

@@ -7,6 +7,8 @@
 - Mask files are stored as PNG with binary values (0=background, 255=tongue)
 - COCO annotations contain polygon coordinates that need conversion using cv2.fillPoly
 - Multiple annotations per image are merged using bitwise OR operation
+- Class mapping: 21 original classes map to 6 dimensions (tongue_color:4, coating_color:4, tongue_shape:3, coating_quality:3, features:3, health:1)
+- Syndrome classes (13-20) are excluded from classification training and reserved for LLM few-shot prompts
 
 ---
 
@@ -42,5 +44,22 @@
 - Gotchas encountered: Irregular filenames with parentheses need special handling when matching masks to images; Use Path.stem to get base filename without extension
 - Useful context: cv2.fillPoly is faster than PIL for polygon filling; Mask visualization with semi-transparent overlay helps verify quality
 - Conversion script supports --validate flag for automatic quality checking and --visualize flag for generating sample overlays
+
+---
+
+## [2026-02-11] - task-1-3
+- Implemented multi-label encoding mapping script (datasets/tools/class_mapping.py)
+- Created complete 21-class to 6-dimension 19-class one-hot encoding mapping
+- Generated label files for all splits (train: 5594, val: 572, test: 553)
+- Mapping structure: 舌色(4) + 苔色(4) + 舌形(3) + 苔质(3) + 特征(3) + 健康(1) = 18 features + 1 health flag = 19 dimensions
+- Syndrome classes (13-20) are excluded from classification training (reserved for LLM few-shot prompts)
+- Statistics: 71.2% multi-label images, avg 1.99 labels per image, 206 healthy tongue samples
+- Generated mapping table CSV, class weights JSON, and comprehensive documentation
+
+**Learnings for future iterations:**
+- Patterns discovered: 6-dimension mapping structure enables multi-task learning; Each dimension can have different loss weights
+- Gotchas encountered: F-string formatting needs escaped double braces for literal braces in documentation; Windows console needs UTF-8 encoding for Chinese characters
+- Useful context: One-hot vector structure: [0:4]=tongue_color, [4:8]=coating_color, [8:11]=tongue_shape, [11:14]=coating_quality, [14:17]=features, [17]=reserved, [18]=health_flag
+- Label file format: filename<TAB>label1,label2,...,label19 (comma-separated one-hot vector)
 
 ---

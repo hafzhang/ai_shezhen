@@ -1,0 +1,31 @@
+{
+  "dimension_sizes": {
+    "tongue_color": 4,
+    "coating_color": 4,
+    "tongue_shape": 3,
+    "coating_quality": 3,
+    "features": 3,
+    "health": 2
+  },
+  "total_categories": 19,
+  "weights": {
+    "tongue_color_0": 2.0177,
+    "tongue_color_1": 2.0177,
+    "tongue_color_2": 1.1706,
+    "tongue_color_3": 7.3033,
+    "coating_color_0": 0.3416,
+    "coating_color_1": 1.5147,
+    "coating_color_2": 13.8822,
+    "coating_color_3": 6.9411,
+    "tongue_shape_0": 4.6322,
+    "tongue_shape_1": 3.2744,
+    "tongue_shape_2": 7.914,
+    "coating_quality_0": 5.7134,
+    "coating_quality_1": 11.4269,
+    "coating_quality_2": 11.4269,
+    "features_0": 1.8253,
+    "features_1": 1.3549,
+    "features_2": 2.1269
+  },
+  "weight_formula": "weight_i = total / (num_classes × count_i)"
+}

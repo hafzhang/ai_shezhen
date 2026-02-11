@@ -1,0 +1,159 @@
+{
+  "total_images_processed": 6719,
+  "empty_labels_count": 194,
+  "multi_label_images": 4784,
+  "healthy_tongue_count": 206,
+  "syndrome_only_count": 3,
+  "average_labels_per_image": 1.99,
+  "category_distribution": {
+    "8": 1053,
+    "9": 4918,
+    "4": 684,
+    "6": 1227,
+    "10": 1109,
+    "2": 1435,
+    "7": 1653,
+    "3": 230,
+    "5": 283,
+    "12": 242,
+    "1": 392,
+    "0": 19,
+    "11": 121
+  },
+  "dimension_distribution": {
+    "features": 3933,
+    "coating_color": 6390,
+    "tongue_shape": 967,
+    "tongue_color": 1665,
+    "coating_quality": 392,
+    "health": 19
+  },
+  "dimension_summary": {
+    "tongue_color": {
+      "categories": [
+        "淡白",
+        "淡红",
+        "红",
+        "绛紫"
+      ],
+      "positive_counts": [
+        0,
+        0,
+        1435,
+        230
+      ],
+      "prevalence": [
+        0.0,
+        0.0,
+        21.36,
+        3.42
+      ]
+    },
+    "coating_color": {
+      "categories": [
+        "白苔",
+        "黄苔",
+        "黑苔",
+        "花剥苔"
+      ],
+      "positive_counts": [
+        4918,
+        1109,
+        121,
+        242
+      ],
+      "prevalence": [
+        73.2,
+        16.51,
+        1.8,
+        3.6
+      ]
+    },
+    "tongue_shape": {
+      "categories": [
+        "正常",
+        "胖大",
+        "瘦薄"
+      ],
+      "positive_counts": [
+        0,
+        684,
+        283
+      ],
+      "prevalence": [
+        0.0,
+        10.18,
+        4.21
+      ]
+    },
+    "coating_quality": {
+      "categories": [
+        "薄苔",
+        "厚苔",
+        "腻苔"
+      ],
+      "positive_counts": [
+        392,
+        0,
+        0
+      ],
+      "prevalence": [
+        5.83,
+        0.0,
+        0.0
+      ]
+    },
+    "features": {
+      "categories": [
+        "红点",
+        "裂纹",
+        "齿痕"
+      ],
+      "positive_counts": [
+        1227,
+        1653,
+        1053
+      ],
+      "prevalence": [
+        18.26,
+        24.6,
+        15.67
+      ]
+    }
+  },
+  "cooccurrence_matrix": {
+    "features": {
+      "coating_color": 3798,
+      "tongue_shape": 522,
+      "tongue_color": 980,
+      "features": 474,
+      "coating_quality": 140
+    },
+    "coating_color": {
+      "features": 3798,
+      "tongue_shape": 886,
+      "tongue_color": 1426,
+      "coating_color": 306,
+      "coating_quality": 383
+    },
+    "tongue_shape": {
+      "features": 522,
+      "coating_color": 886,
+      "tongue_color": 130,
+      "coating_quality": 35
+    },
+    "tongue_color": {
+      "coating_color": 1426,
+      "features": 980,
+      "tongue_shape": 130,
+      "coating_quality": 127,
+      "tongue_color": 6
+    },
+    "coating_quality": {
+      "coating_color": 383,
+      "features": 140,
+      "tongue_shape": 35,
+      "tongue_color": 127
+    }
+  }
+}
