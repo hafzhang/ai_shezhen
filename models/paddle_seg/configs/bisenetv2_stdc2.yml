@@ -1,0 +1,224 @@
+# BiSeNetV2-STDCNet2 Configuration for Tongue Segmentation
+# AI舌诊智能诊断系统 - 分割模型配置
+# task-2-1: PaddleSeg环境搭建与基准测试
+
+# ============================================================
+# Model Architecture
+# ============================================================
+model:
+  name: BiSeNetV2
+  backbone: STDCNet2
+  architecture:
+    # BiSeNetV2 architecture settings
+    in_channels: 3
+    num_classes: 2          # Background (0) + Tongue (1)
+    attention: True        # Use attention module
+    use_boundary: True     # Use boundary supervision
+
+  # STDCNet2 backbone settings
+  backbone_config:
+    layers: [4, 5, 14]    # STDC-1448 configuration
+    channels: 64           # Base channels
+    downsample_mode: "avg_pooling"
+    dropout: 0.1
+
+  # Pretrained weights
+  pretrained:
+    enabled: true
+    url: "https://bj.bcebos.com/paddleseg/dygraph_v2.0/bisenetv2_cityscapes_1024x1024_160k/model.pdparams"
+    md5: "a1b2c3d4e5f6"    # Verify after download
+
+# ============================================================
+# Dataset Configuration
+# ============================================================
+dataset:
+  type: TongueSegmentationDataset
+  format: COCO
+
+  train:
+    images: "datasets/processed/seg_v1/train/images"
+    masks: "datasets/processed/seg_v1/train/masks"
+    annotations: "datasets/processed/seg_v1/train/annotations.json"
+    num_samples: 5594
+
+  val:
+    images: "datasets/processed/seg_v1/val/images"
+    masks: "datasets/processed/seg_v1/val/masks"
+    annotations: "datasets/processed/seg_v1/val/annotations.json"
+    num_samples: 572
+
+  test:
+    images: "datasets/processed/seg_v1/test/images"
+    masks: "datasets/processed/seg_v1/test/masks"
+    annotations: "datasets/processed/seg_v1/test/annotations.json"
+    num_samples: 553
+
+  # Data preprocessing
+  preprocessing:
+    image_size: [512, 512]   # Training image size (H, W)
+    mean: [0.485, 0.456, 0.406]  # ImageNet mean
+    std: [0.229, 0.224, 0.225]   # ImageNet std
+    to_rgb: true
+
+# ============================================================
+# Data Augmentation
+# ============================================================
+augmentation:
+  train:
+    - type: RandomResize
+      min_size: 400
+      max_size: 600
+      prob: 0.5
+    - type: RandomHorizontalFlip
+      prob: 0.5
+    - type: RandomVerticalFlip
+      prob: 0.2
+    - type: RandomRotate
+      degrees: [-15, 15]
+      prob: 0.5
+    - type: RandomBrightnessContrast
+      brightness_limit: 0.2
+      contrast_limit: 0.2
+      prob: 0.5
+    - type: RandomGaussianBlur
+      blur_limit: 3
+      prob: 0.3
+    - type: Normalize
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+  val:
+    - type: Resize
+      size: [512, 512]
+    - type: Normalize
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+# ============================================================
+# Training Configuration
+# ============================================================
+training:
+  # Epoch settings
+  num_epochs: 80
+  warmup_epochs: 2
+  warmup_start_lr: 1.0e-6
+
+  # Learning rate schedule
+  learning_rate:
+    type: PolyLR
+    base_lr: 0.01
+    power: 0.9
+    min_lr: 1.0e-6
+
+  # Optimizer settings
+  optimizer:
+    type: SGD
+    momentum: 0.9
+    weight_decay: 0.0001
+    nesterov: true
+
+  # Batch settings
+  batch_size: 16           # Adjust based on GPU memory
+  num_workers: 4           # Data loading workers
+  pin_memory: true         # Pin memory for faster GPU transfer
+
+  # Gradient accumulation
+  accumulate: 1            # Gradient accumulation steps
+
+  # AMP (Automatic Mixed Precision)
+  amp:
+    enabled: true
+    level: "O1"            # FP16 training
+
+# ============================================================
+# Loss Function (Combined Loss)
+# ============================================================
+loss:
+  type: CombinedLoss
+
+  # Cross Entropy Loss
+  ce_loss:
+    weight: 0.5
+    ignore_index: 255
+    use_class_weights: true
+
+  # Dice Loss
+  dice_loss:
+    weight: 0.3
+    ignore_index: 255
+
+  # Boundary Loss
+  boundary_loss:
+    weight: 0.2
+    theta: 3
+    ignore_index: 255
+
+# ============================================================
+# Evaluation Configuration
+# ============================================================
+evaluation:
+  # Metrics
+  metrics:
+    - mIoU                 # Mean Intersection over Union
+    - Dice                 # Dice Coefficient
+    - F1                   # F1 Score
+    - BoundaryF1            # Boundary F1 Score
+
+  # Evaluation settings
+  eval_freq: 1             # Evaluate every N epochs
+  num_workers: 4
+
+# ============================================================
+# Early Stopping
+# ============================================================
+early_stopping:
+  enabled: true
+  patience: 10
+  min_delta: 0.001
+  monitor: "val_miou"      # Metric to monitor
+  mode: "max"              # Higher is better
+
+# ============================================================
+# Checkpointing
+# ============================================================
+checkpoint:
+  output_dir: "models/paddle_seg/output"
+  save_dir: "best_model"
+  checkpoint_dir: "checkpoints"
+  save_freq: 5            # Save checkpoint every N epochs
+  keep_best: true          # Keep best model
+  keep_last: 3             # Keep last N checkpoints
+
+# ============================================================
+# Logging & Visualization
+# ============================================================
+logging:
+  print_freq: 10           # Print every N batches
+  visualize: true          # Visualize predictions
+  vis_freq: 100           # Visualize every N iterations
+  vis_num_images: 4        # Number of images to visualize
+
+# ============================================================
+# MLflow Configuration
+# ============================================================
+mlflow:
+  enabled: true
+  tracking_uri: "./mlruns"
+  experiment_name: "tongue_segmentation_bisenetv2"
+  run_name: null           # Auto-generated if null
+
+# ============================================================
+# Hardware Configuration
+# ============================================================
+hardware:
+  device: "gpu:0"          # "gpu:0", "gpu:1", or "cpu"
+  num_gpus: 1              # Number of GPUs to use
+  distributed: false        # Distributed training
+
+# ============================================================
+# Reproducibility
+# ============================================================
+reproducibility:
+  seed: 42
+  deterministic: true      # Use deterministic algorithms
+  benchmark: false          # Disable cuDNN benchmark for reproducibility
