@@ -4,6 +4,9 @@
 - Categories are defined in classes.txt files with Chinese names
 - Category IDs start from 0 (jiankangshe) to 20 (xinfeitu)
 - The annotation file may reference category_id 21 which is not defined in categories
+- Mask files are stored as PNG with binary values (0=background, 255=tongue)
+- COCO annotations contain polygon coordinates that need conversion using cv2.fillPoly
+- Multiple annotations per image are merged using bitwise OR operation
 
 ---
 
@@ -22,5 +25,22 @@
 - Patterns discovered: The dataset uses COCO format but with Chinese category names and irregular filenames
 - Gotchas encountered: Windows console encoding issues with Unicode characters - needed to wrap stdout/stderr with UTF-8 encoding; Category ID 21 exists in annotations but not in categories definition
 - Useful context: The validation script uses both PIL and cv2 to verify image readability; pycocotools.COCO class is used for loading annotations
+
+---
+
+## [2026-02-11] - task-1-2
+- Implemented COCO to binary mask conversion script (datasets/tools/coco_to_mask.py)
+- Converted 6,719 COCO polygon annotations to binary masks (train: 5594, val: 572, test: 553)
+- All masks generated successfully with 100% pass rate
+- 191 images had empty annotations (generated all-zero masks)
+- Total 18,223 polygons processed (avg 2.71 polygons per image)
+- Generated visualizations with mask overlay (red semi-transparent overlay + green contours)
+- All masks are binary (0=background, 255=tongue) and match original image dimensions
+
+**Learnings for future iterations:**
+- Patterns discovered: COCO segmentation format uses polygon coordinates [x1,y1,x2,y2,...]; Multiple polygons per image should be merged using bitwise OR
+- Gotchas encountered: Irregular filenames with parentheses need special handling when matching masks to images; Use Path.stem to get base filename without extension
+- Useful context: cv2.fillPoly is faster than PIL for polygon filling; Mask visualization with semi-transparent overlay helps verify quality
+- Conversion script supports --validate flag for automatic quality checking and --visualize flag for generating sample overlays
 
 ---

@@ -49,7 +49,7 @@
       "estimated_hours": 12,
       "dependencies": ["task-1-1"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "所有polygon成功转换为二值mask（舌体=255，背景=0）",
         "mask与原图尺寸一致",
