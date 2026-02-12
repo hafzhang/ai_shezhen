@@ -574,7 +574,7 @@
       "estimated_hours": 12,
       "dependencies": ["task-3-7"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "POST /api/v1/segment 可用",
         "POST /api/v1/classify 可用",
