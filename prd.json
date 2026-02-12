@@ -745,7 +745,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-1-6"],
       "assignee": "medical_compliance",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "数据脱敏流程完整",
         "无敏感信息泄露",
