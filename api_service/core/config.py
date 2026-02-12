@@ -130,11 +130,18 @@ class Settings(BaseSettings):
     DATA_RETENTION_DAYS: int = 180
 
     # Monitoring
+    ENABLE_PROMETHEUS: bool = True
+    PROMETHEUS_MULTIPROC_DIR: str = "prometheus_multiproc_dir"
     ENABLE_MLFLOW: bool = False
     MLFLOW_TRACKING_URI: str = "http://localhost:5000"
     ENABLE_COST_MONITORING: bool = True
     MONTHLY_BUDGET_ALERT: float = 1000.0
     DAILY_MAX_REQUESTS: int = 1000
+
+    # Performance Optimization (task-5-1)
+    ENABLE_CACHE: bool = True
+    CACHE_TTL_SECONDS: int = 86400  # 24 hours
+    CACHE_TARGET_HIT_RATE: float = 0.50
 
     # Development
     DEBUG: bool = False

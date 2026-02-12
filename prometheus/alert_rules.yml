@@ -1,0 +1,380 @@
+# Prometheus告警规则配置 - AI舌诊智能诊断系统
+#
+# Alert rules for Tongue Diagnosis AI System
+# Defines P0-P3 priority alert levels for different scenarios.
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+#
+# Alert Levels:
+#   - P0 (Critical): Immediate action required, service down
+#   - P1 (High): Significant degradation, user impact
+#   - P2 (Medium): Minor issues, monitoring required
+#   - P3 (Low): Informational, trend analysis
+
+groups:
+  # ============================================================================
+  # API Service Alerts (P0-P2)
+  # ============================================================================
+  - name: api_service_alerts
+    rules:
+      # P0: API服务完全不可用
+      - alert: APIServiceDown
+        expr: up{job="shezhen-api"} == 0
+        for: 1m
+        labels:
+          severity: P0
+          team: backend
+          service: api
+        annotations:
+          summary: "API服务不可用"
+          description: "API服务 {{ $labels.instance }} 已停机超过1分钟"
+          runbook_url: "https://docs.example.com/runbooks/api-down"
+
+      # P1: API响应时间过长
+      - alert: APIHighResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            rate(http_request_duration_seconds_bucket{job="shezhen-api"}[5m])
+          ) > 2
+        for: 5m
+        labels:
+          severity: P1
+          team: backend
+          service: api
+        annotations:
+          summary: "API响应时间过长"
+          description: "API P95响应时间 {{ $value }}s 超过阈值2s，持续5分钟"
+          runbook_url: "https://docs.example.com/runbooks/api-slow"
+
+      # P1: API错误率过高
+      - alert: APIHighErrorRate
+        expr: |
+          (
+            rate(http_requests_total{job="shezhen-api",status=~"5.."}[5m])
+            /
+            rate(http_requests_total{job="shezhen-api"}[5m])
+          ) > 0.05
+        for: 3m
+        labels:
+          severity: P1
+          team: backend
+          service: api
+        annotations:
+          summary: "API错误率过高"
+          description: "API 5xx错误率 {{ $value | humanizePercentage }} 超过阈值5%"
+          runbook_url: "https://docs.example.com/runbooks/api-errors"
+
+      # P2: QPS突增（可能需要扩容）
+      - alert: APIQPSAnomaly
+        expr: |
+          (
+            rate(http_requests_total{job="shezhen-api"}[5m])
+            -
+            rate(http_requests_total{job="shezhen-api"}[1h] offset 5m)
+          ) / rate(http_requests_total{job="shezhen-api"}[1h] offset 5m) > 0.5
+        for: 2m
+        labels:
+          severity: P2
+          team: backend
+          service: api
+        annotations:
+          summary: "API流量突增"
+          description: "API QPS较1小时前增长超过50%，当前: {{ $value | humanizePercentage }}"
+
+  # ============================================================================
+  # Celery Worker Alerts (P0-P2)
+  # ============================================================================
+  - name: celery_worker_alerts
+    rules:
+      # P0: Celery worker完全不可用
+      - alert: CeleryWorkerDown
+        expr: up{job="shezhen-celery"} == 0
+        for: 2m
+        labels:
+          severity: P0
+          team: backend
+          service: celery
+        annotations:
+          summary: "Celery Worker不可用"
+          description: "Celery Worker {{ $labels.instance }} 已停机超过2分钟"
+
+      # P1: 任务队列积压严重
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length{queue="diagnosis"} > 100
+        for: 5m
+        labels:
+          severity: P1
+          team: backend
+          service: celery
+        annotations:
+          summary: "任务队列积压"
+          description: "诊断队列长度 {{ $value }} 超过阈值100"
+
+      # P2: 任务执行失败率过高
+      - alert: CeleryHighFailureRate
+        expr: |
+          (
+            rate(celery_task_failed_total[5m])
+            /
+            rate(celery_task_received_total[5m])
+          ) > 0.1
+        for: 5m
+        labels:
+          severity: P2
+          team: backend
+          service: celery
+        annotations:
+          summary: "Celery任务失败率过高"
+          description: "任务失败率 {{ $value | humanizePercentage }} 超过阈值10%"
+
+      # P2: Worker处理能力不足
+      - alert: CeleryWorkerCapacity
+        expr: celery_worker_concurrency < celery_active_tasks_count * 2
+        for: 10m
+        labels:
+          severity: P2
+          team: backend
+          service: celery
+        annotations:
+          summary: "Worker处理能力不足"
+          description: "活跃任务数接近并发上限，考虑增加worker数量"
+
+  # ============================================================================
+  # Redis Alerts (P0-P2)
+  # ============================================================================
+  - name: redis_alerts
+    rules:
+      # P0: Redis服务不可用
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: P0
+          team: backend
+          service: redis
+        annotations:
+          summary: "Redis服务不可用"
+          description: "Redis {{ $labels.instance }} 已停机超过1分钟"
+
+      # P1: Redis内存使用率过高
+      - alert: RedisHighMemoryUsage
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: P1
+          team: backend
+          service: redis
+        annotations:
+          summary: "Redis内存使用率过高"
+          description: "Redis内存使用率 {{ $value | humanizePercentage }} 超过90%"
+
+      # P2: Redis连接数过多
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > redis_config_maxclients * 0.8
+        for: 5m
+        labels:
+          severity: P2
+          team: backend
+          service: redis
+        annotations:
+          summary: "Redis连接数过多"
+          description: "Redis连接数 {{ $value }} 接近最大值的80%"
+
+      # P2: Redis键过期过快（可能缓存配置不当）
+      - alert: RedisHighEvictionRate
+        expr: rate(redis_evicted_keys_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: P2
+          team: backend
+          service: redis
+        annotations:
+          summary: "Redis键驱逐率过高"
+          description: "Redis每秒驱逐 {{ $value }} 个键，检查缓存配置"
+
+  # ============================================================================
+  # System Resource Alerts (P0-P2)
+  # ============================================================================
+  - name: system_alerts
+    rules:
+      # P0: 磁盘空间不足
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) < 0.1
+        for: 5m
+        labels:
+          severity: P0
+          team: backend
+          service: system
+        annotations:
+          summary: "磁盘空间不足"
+          description: "根分区剩余空间 {{ $value | humanizePercentage }} 低于10%"
+
+      # P1: CPU使用率过高
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: P1
+          team: backend
+          service: system
+        annotations:
+          summary: "CPU使用率过高"
+          description: "实例 {{ $labels.instance }} CPU使用率 {{ $value }}% 超过85%"
+
+      # P1: 内存使用率过高
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
+          ) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: P1
+          team: backend
+          service: system
+        annotations:
+          summary: "内存使用率过高"
+          description: "实例 {{ $labels.instance }} 内存使用率 {{ $value | humanizePercentage }} 超过90%"
+
+      # P2: 系统负载过高
+      - alert: HighSystemLoad
+        expr: node_load15 > node_num_cpu * 2
+        for: 10m
+        labels:
+          severity: P2
+          team: backend
+          service: system
+        annotations:
+          summary: "系统负载过高"
+          description: "15分钟平均负载 {{ $value }} 超过CPU核心数的2倍"
+
+  # ============================================================================
+  # Business Metrics Alerts (P1-P3)
+  # ============================================================================
+  - name: business_alerts
+    rules:
+      # P1: API可用性低于SLA
+      - alert: APIAvailabilityBelowSLA
+        expr: |
+          (
+            sum(rate(http_requests_total{job="shezhen-api",status!~"5.."}[1h]))
+            /
+            sum(rate(http_requests_total{job="shezhen-api"}[1h]))
+          ) < 0.99
+        for: 5m
+        labels:
+          severity: P1
+          team: backend
+          service: api
+        annotations:
+          summary: "API可用性低于SLA"
+          description: "API可用性 {{ $value | humanizePercentage }} 低于99% SLA"
+
+      # P2: 诊断成功率下降
+      - alert: DiagnosisSuccessRateLow
+        expr: |
+          (
+            sum(rate(diagnosis_requests_total{status="success"}[10m]))
+            /
+            sum(rate(diagnosis_requests_total[10m]))
+          ) < 0.95
+        for: 5m
+        labels:
+          severity: P2
+          team: backend
+          service: api
+        annotations:
+          summary: "诊断成功率下降"
+          description: "诊断成功率 {{ $value | humanizePercentage }} 低于95%"
+
+      # P3: 缓存命中率下降
+      - alert: CacheHitRateLow
+        expr: |
+          (
+            sum(rate(cache_hits_total[1h]))
+            /
+            (sum(rate(cache_hits_total[1h])) + sum(rate(cache_misses_total[1h])))
+          ) < 0.5
+        for: 15m
+        labels:
+          severity: P3
+          team: backend
+          service: api
+        annotations:
+          summary: "缓存命中率低于目标"
+          description: "缓存命中率 {{ $value | humanizePercentage }} 低于目标50%"
+
+      # P3: 文心API调用成本过高
+      - alert: HighWenxinAPICost
+        expr: |
+          sum(increase(wenxin_api_cost_total[1d])) > 500
+        for: 0s
+        labels:
+          severity: P3
+          team: backend
+          service: api
+        annotations:
+          summary: "文心API日成本过高"
+          description: "昨日API成本 {{ $value }} 元 超过预算500元"
+
+  # ============================================================================
+  # Model Inference Alerts (P1-P2)
+  # ============================================================================
+  - name: model_inference_alerts
+    rules:
+      # P1: 分割模型推理失败率过高
+      - alert: SegmentationModelFailure
+        expr: |
+          (
+            rate(segmentation_requests_total{status="error"}[5m])
+            /
+            rate(segmentation_requests_total[5m])
+          ) > 0.05
+        for: 3m
+        labels:
+          severity: P1
+          team: ml_engineer
+          service: models
+        annotations:
+          summary: "分割模型推理失败率过高"
+          description: "分割模型失败率 {{ $value | humanizePercentage }} 超过5%"
+
+      # P2: 分类模型推理延迟过高
+      - alert: ClassificationHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(classification_inference_duration_seconds_bucket[5m])
+          ) > 0.3
+        for: 5m
+        labels:
+          severity: P2
+          team: ml_engineer
+          service: models
+        annotations:
+          summary: "分类模型推理延迟过高"
+          description: "分类模型P95延迟 {{ $value }}s 超过300ms"
+
+      # P2: 端到端诊断成功率下降
+      - alert: EndToEndDiagnosisFailure
+        expr: |
+          (
+            rate(diagnosis_requests_total{type="end_to_end",status="error"}[5m])
+            /
+            rate(diagnosis_requests_total{type="end_to_end"}[5m])
+          ) > 0.1
+        for: 3m
+        labels:
+          severity: P2
+          team: backend
+          service: api
+        annotations:
+          summary: "端到端诊断失败率过高"
+          description: "端到端诊断失败率 {{ $value | humanizePercentage }} 超过10%"

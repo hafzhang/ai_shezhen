@@ -1,0 +1,106 @@
+# Prometheus配置文件 - AI舌诊智能诊断系统
+#
+# Prometheus configuration for Tongue Diagnosis AI System
+# Collects metrics from API service, Celery workers, and system resources.
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+#
+# Usage:
+#   docker compose -f docker-compose.yml --profile monitoring up -d
+#   Access Prometheus UI: http://localhost:9090
+
+global:
+  scrape_interval: 15s  # Default scrape interval
+  scrape_timeout: 10s    # Default scrape timeout
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+
+# AlertManager configuration (optional, for future use)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Rule files
+rule_files:
+  - "/etc/prometheus/alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # --------------------------------------------------------------------------
+  # Prometheus self-monitoring
+  # --------------------------------------------------------------------------
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          environment: 'production'
+
+  # --------------------------------------------------------------------------
+  # API Service - FastAPI with Prometheus metrics
+  # --------------------------------------------------------------------------
+  - job_name: 'shezhen-api'
+    scrape_interval: 10s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:8000']
+        labels:
+          service: 'api'
+          component: 'fastapi'
+          environment: 'production'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        target_label: __param_target
+
+  # --------------------------------------------------------------------------
+  # Celery Worker Metrics (via Flower)
+  # --------------------------------------------------------------------------
+  - job_name: 'shezhen-celery'
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['flower:5555']
+        labels:
+          service: 'celery'
+          component: 'worker'
+          environment: 'production'
+
+  # --------------------------------------------------------------------------
+  # Redis Exporter - Redis metrics
+  # --------------------------------------------------------------------------
+  - job_name: 'redis'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+          component: 'cache'
+          environment: 'production'
+
+  # --------------------------------------------------------------------------
+  # Node Exporter - System metrics (CPU, memory, disk)
+  # --------------------------------------------------------------------------
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'system'
+          component: 'host'
+          environment: 'production'
+
+  # --------------------------------------------------------------------------
+  # cAdvisor - Container metrics
+  # --------------------------------------------------------------------------
+  - job_name: 'cadvisor'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'containers'
+          component: 'docker'
+          environment: 'production'

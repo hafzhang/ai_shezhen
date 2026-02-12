@@ -31,6 +31,10 @@ sys.path.insert(0, str(project_root))
 from api_service.app.api.v1 import api_router
 from api_service.core.config import settings
 from api_service.core.logging_config import setup_logging
+from api_service.app.middleware import (
+    update_model_status,
+    update_redis_status
+)
 
 # Setup logging
 setup_logging()
@@ -47,7 +51,7 @@ redis_client: Optional[Redis] = None
 
 
 def initialize_middleware():
-    """Initialize middleware components (task-4-8)"""
+    """Initialize middleware components (task-4-8, task-5-2)"""
     global redis_client
 
     # Initialize Redis client for rate limiting
@@ -64,9 +68,11 @@ def initialize_middleware():
             )
             redis_client.ping()
             logger.info(f"Redis client initialized for rate limiting: {settings.REDIS_HOST}:{settings.REDIS_PORT}")
+            update_redis_status(True)  # task-5-2: Update Prometheus metric
         except Exception as e:
             logger.warning(f"Redis unavailable for rate limiting, using in-memory fallback: {e}")
             redis_client = None
+            update_redis_status(False)  # task-5-2: Update Prometheus metric
 
     # Initialize rate limiter
     if settings.ENABLE_RATE_LIMIT:
@@ -137,6 +143,11 @@ def initialize_models():
             )
             logger.info("End-to-end pipeline initialized successfully")
 
+        # task-5-2: Update Prometheus metrics for model status
+        update_model_status("segmentation", segmentor_instance is not None)
+        update_model_status("classification", classifier_instance is not None)
+        update_model_status("pipeline", pipeline_instance is not None)
+
     except Exception as e:
         logger.error(f"Failed to initialize models: {e}")
         logger.warning("API will run in mock mode without models")
@@ -156,6 +167,7 @@ async def lifespan(app: FastAPI):
     if redis_client:
         try:
             redis_client.close()
+            update_redis_status(False)  # task-5-2: Update Prometheus metric
         except Exception:
             pass
 
@@ -191,6 +203,11 @@ if settings.ENABLE_RATE_LIMIT:
             default_window=1
         )
         logger.info("Rate limiting middleware enabled")
+
+# Configure Prometheus Middleware (task-5-2)
+from api_service.app.middleware import PrometheusMiddleware
+app.add_middleware(PrometheusMiddleware)
+logger.info("Prometheus metrics middleware enabled")
 
 
 # Custom exception handlers
@@ -277,6 +294,54 @@ async def get_circuit_breaker_status():
     """Get circuit breaker states for monitoring"""
     from api_service.app.middleware import get_circuit_breaker_states
     return await get_circuit_breaker_states()
+
+
+# Cache statistics endpoint (task-5-1)
+@app.get("/api/v1/cache/stats", tags=["Monitoring"])
+async def get_cache_stats():
+    """Get cache statistics for monitoring"""
+    from api_service.performance import get_cache_manager
+    cache_mgr = get_cache_manager()
+    return cache_mgr.get_report()
+
+
+# Cache management endpoint (task-5-1)
+@app.post("/api/v1/cache/clear", tags=["Monitoring"])
+async def clear_cache(cache_type: Optional[str] = None):
+    """Clear cache by type
+
+    Args:
+        cache_type: Cache type to clear (segment/classify/diagnosis/all)
+                   If None, clears all caches
+    """
+    from api_service.performance import get_cache_manager
+    cache_mgr = get_cache_manager()
+
+    if cache_type == "segment":
+        cache_mgr.clear_segment_cache()
+        message = "Segment cache cleared"
+    elif cache_type == "classify":
+        cache_mgr.clear_classify_cache()
+        message = "Classify cache cleared"
+    elif cache_type == "diagnosis":
+        cache_mgr.clear_diagnosis_cache()
+        message = "Diagnosis cache cleared"
+    else:  # None or "all"
+        cache_mgr.clear_all_cache()
+        message = "All caches cleared"
+
+    return {
+        "success": True,
+        "message": message
+    }
+
+
+# Prometheus metrics endpoint (task-5-2)
+@app.get("/metrics", tags=["Monitoring"])
+async def prometheus_metrics():
+    """Prometheus metrics endpoint for scraping"""
+    from api_service.app.middleware import metrics_endpoint
+    return await metrics_endpoint()
 
 
 def main():

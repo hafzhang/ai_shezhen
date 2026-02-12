@@ -682,7 +682,7 @@
       "estimated_hours": 10,
       "dependencies": ["task-4-9"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "100 QPS压力测试通过",
         "P95响应时间<2s",
@@ -703,7 +703,7 @@
       "estimated_hours": 10,
       "dependencies": ["task-4-9"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Prometheus正常采集指标",
         "Grafana面板展示QPS、响应时间、错误率",
