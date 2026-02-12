@@ -1,0 +1,34 @@
+# AI舌诊智能诊断系统 - Kibana配置
+#
+# Kibana configuration for log visualization and analysis.
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+#
+
+server.name: shezhen-kibana
+server.host: "0.0.0.0"
+server.port: 5601
+
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "${ELASTICSEARCH_USER:kibana_system}"
+elasticsearch.password: "${ELASTICSEARCH_PASSWORD:changeme}"
+
+# Language
+i18n.locale: "zh-CN"
+
+# Security
+xpack.security.enabled: true
+xpack.encryptedSavedObjects.encryptionKey: "${KIBANA_ENCRYPTION_KEY:shezhen-encryption-key-32-chars-long!!}"
+
+# Monitoring
+monitoring.kibana.collection.enabled: false
+
+# Logging
+logging.dest: stdout
+logging.silent: false
+logging.quiet: false
+logging.verbose: false
+
+# Default app
+kibana.defaultAppId: "discover"

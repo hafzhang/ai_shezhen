@@ -1,0 +1,37 @@
+# AI舌诊智能诊断系统 - Elasticsearch配置
+#
+# Elasticsearch configuration for log storage and analysis.
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+#
+
+# Cluster configuration
+cluster.name: shezhen-cluster
+node.name: es-node-1
+network.host: 0.0.0.0
+http.port: 9200
+discovery.type: single-node
+
+# Paths
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Security
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
+
+# Indices lifecycle management - 180 day retention
+xpack.ilm.enabled: true
+
+# Memory (default is 50% of RAM)
+# bootstrap.memory_lock: true
+
+# Audit trail - WORM (Write Once Read Many) for compliance
+# Audit logs should be append-only and tamper-evident
+xpack.security.audit.enabled: true
+xpack.security.audit.logfile.events.include: _all
+xpack.security.audit.logfile.events.exclude: []
+
+# Index settings for audit logs (configured via API, see setup script)

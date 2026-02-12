@@ -55,6 +55,11 @@ from api_service.core.logging_config import (
     log_error,
     AuditContext
 )
+from api_service.core.audit_trail import (
+    log_diagnosis_workflow,
+    log_data_access,
+    get_audit_manager
+)
 from api_service.core.rule_based_diagnosis import (
     diagnose_from_classification,
     RuleDiagnosisResult

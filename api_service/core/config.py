@@ -129,6 +129,15 @@ class Settings(BaseSettings):
     # Data Retention
     DATA_RETENTION_DAYS: int = 180
 
+    # ELK Stack Configuration (task-5-3)
+    ELASTICSEARCH_HOSTS: str = "http://localhost:9200"
+    ELASTICSEARCH_USER: str = "elastic"
+    ELASTICSEARCH_PASSWORD: str = "changeme"
+    ELASTICSEARCH_SSL: bool = False
+    ELASTICSEARCH_VERIFY_SSL: bool = True
+    ENABLE_ELK_LOGGING: bool = False  # Set to true to enable ELK
+    ELK_ENVIRONMENT: str = "production"
+
     # Monitoring
     ENABLE_PROMETHEUS: bool = True
     PROMETHEUS_MULTIPROC_DIR: str = "prometheus_multiproc_dir"
