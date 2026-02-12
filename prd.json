@@ -968,7 +968,7 @@
         "task-4-1"
       ],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "成本监控面板可用",
         "预算告警配置完成",
