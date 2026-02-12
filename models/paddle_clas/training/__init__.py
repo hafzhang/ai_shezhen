@@ -6,6 +6,7 @@ This module provides:
 - DynamicClassWeightScheduler: Adaptive class weighting
 - GradientAccumulator: Stable training with small batches
 - CurriculumTrainingConfig: Complete training configuration
+- train: Main training script with 60 epochs, CosineAnnealingWarmRestarts, early stopping
 """
 
 from .curriculum_learning import (

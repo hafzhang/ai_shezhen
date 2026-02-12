@@ -22,13 +22,10 @@ import sys
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Tuple, Dict, Any, Union
 
-# Configure UTF-8 encoding for Windows console
-if sys.platform == 'win32':
-    import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+# Note: UTF-8 encoding is configured by setting PYTHONIOENCODING=utf-8
+# We don't wrap stdout/stderr at module level as it causes issues with imports
 
 
 # ============================================================================
@@ -359,7 +356,7 @@ class PP_HGNetV2_B4(nn.Layer):
     def forward(
         self,
         x: paddle.Tensor,
-        return intermediates: bool = False
+        return_intermediates: bool = False
     ) -> Union[paddle.Tensor, Tuple[paddle.Tensor, Dict[str, paddle.Tensor]]]:
         """
         Forward pass
