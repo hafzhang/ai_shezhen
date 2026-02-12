@@ -469,7 +469,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-3-7"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "测试集多标签mAP > 0.70",
         "宏平均F1 > 0.65",
