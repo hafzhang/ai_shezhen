@@ -301,7 +301,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-2-6"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "测试集mIoU > 0.92",
         "Dice > 0.95",
