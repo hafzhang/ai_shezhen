@@ -234,6 +234,83 @@ class SegmentationMetrics:
             'accuracy': float(accuracy),
         }
 
+    def compute_boundary_metrics(self, pred, target) -> Dict[str, float]:
+        """
+        Compute boundary F1, precision, and recall.
+
+        This method is called by evaluate.py for comprehensive boundary evaluation.
+
+        Args:
+            pred: Predictions tensor of shape (N, H, W) or numpy array
+            target: Ground truth tensor of shape (N, H, W) or numpy array
+
+        Returns:
+            Dictionary with boundary_f1, boundary_precision, boundary_recall
+        """
+        # Convert to numpy if needed
+        if paddle.is_tensor(pred):
+            pred = pred.numpy()
+        if paddle.is_tensor(target):
+            target = target.numpy()
+
+        try:
+            from scipy import ndimage
+        except ImportError:
+            # If scipy not available, return placeholder values
+            logger.warning("scipy not available, returning placeholder boundary metrics")
+            return {
+                'boundary_f1': 0.0,
+                'boundary_precision': 0.0,
+                'boundary_recall': 0.0,
+            }
+
+        boundary_tp = 0
+        boundary_fp = 0
+        boundary_fn = 0
+        struct_elem = np.ones((3, 3), dtype=np.uint8)
+
+        for i in range(len(pred)):
+            pred_mask = pred[i]
+            target_mask = target[i]
+
+            # Handle ignore index
+            valid_mask = (target_mask != self.ignore_index)
+
+            # Extract boundaries using morphological gradient
+            pred_boundaries = self._extract_boundary(pred_mask, struct_elem, valid_mask)
+            target_boundaries = self._extract_boundary(target_mask, struct_elem, valid_mask)
+
+            # Compute TP, FP, FN for boundaries
+            boundary_tp += ((pred_boundaries == 1) & (target_boundaries == 1)).sum()
+            boundary_fp += ((pred_boundaries == 1) & (target_boundaries == 0)).sum()
+            boundary_fn += ((pred_boundaries == 0) & (target_boundaries == 1)).sum()
+
+        # Compute metrics
+        boundary_precision = boundary_tp / max(boundary_tp + boundary_fp, 1e-5)
+        boundary_recall = boundary_tp / max(boundary_tp + boundary_fn, 1e-5)
+        boundary_f1 = 2 * boundary_precision * boundary_recall / max(boundary_precision + boundary_recall, 1e-5)
+
+        return {
+            'boundary_f1': float(boundary_f1),
+            'boundary_precision': float(boundary_precision),
+            'boundary_recall': float(boundary_recall),
+        }
+
+    def _extract_boundary(self, mask: np.ndarray, struct_elem: np.ndarray, valid_mask: np.ndarray) -> np.ndarray:
+        """Extract boundary pixels using morphological operations."""
+        # Clean mask for boundary extraction
+        mask_clean = np.where(valid_mask, mask, 0)
+
+        # Dilated and eroded versions
+        dilated = ndimage.binary_dilation(mask_clean.astype(np.uint8), structure=struct_elem)
+        eroded = ndimage.binary_erosion(mask_clean.astype(np.uint8), structure=struct_elem)
+
+        # Boundary = dilated - eroded
+        boundaries = (dilated.astype(np.int8) - eroded.astype(np.int8)).astype(np.uint8)
+
+        # Focus on foreground (tongue) boundaries only
+        return boundaries & (mask_clean > 0).astype(np.uint8)
+
 
 # ============================================================
 # Dataset
