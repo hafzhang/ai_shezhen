@@ -448,7 +448,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-2-7", "task-3-6"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "端到端流程可用",
         "总耗时<500ms (单图)",

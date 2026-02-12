@@ -1,0 +1,118 @@
+# End-to-End Pipeline Configuration
+# AI舌诊智能诊断系统 - 端到端Pipeline配置
+# task-3-7: 端到端联调（分割+分类）
+
+# ============================================================
+# Model Paths
+# ============================================================
+models:
+  # Segmentation model (BiSeNetV2)
+  segmentation:
+    model_path: "models/paddle_seg/output/best_model/model.pdparams"
+    fp16_path: "models/deploy/segment_fp16/model_fp16.pdparams"
+    int8_path: "models/deploy/segment_int8/model_int8.pdparams"
+
+  # Classification model (PP-HGNetV2-B4 + Multi-Head)
+  classification:
+    model_path: "models/paddle_clas/output/best_model/model.pdparams"
+    fp16_path: "models/deploy/classify_fp16/model_fp16.pdparams"
+    int8_path: "models/deploy/classify_int8/model_int8.pdparams"
+
+# ============================================================
+# Pipeline Configuration
+# ============================================================
+pipeline:
+  # Input sizes
+  seg_input_size: [512, 512]   # (H, W) for segmentation
+  clas_input_size: [224, 224]  # (H, W) for classification
+
+  # Whether to extract tongue region before classification
+  extract_tongue: true
+
+  # Minimum tongue area (pixels) to proceed to classification
+  min_tongue_area: 5000
+
+  # Inference settings
+  use_fp16: false                # Set true for FP16 acceleration
+  device: "cpu"                # "cpu" or "gpu"
+
+  # Quality thresholds
+  confidence_threshold: 0.5        # Minimum confidence for predictions
+  segmentation_threshold: 0.5        # Threshold for binary segmentation
+
+# ============================================================
+# Output Format Configuration
+# ============================================================
+output:
+  # API response format
+  api_format:
+    include_raw_outputs: false
+    include_intermediates: false
+    include_timing: true
+    round_confidence: 4
+
+  # LLM prompt format
+  llm_format:
+    include_descriptions: true
+    include_probabilities: false
+    confidence_threshold: 0.7
+
+  # Visualization
+  visualization:
+    save_overlay: true
+    save_mask: true
+    overlay_color: [255, 0, 0]  # Red for tongue region
+    mask_tongue_value: 255
+    mask_background_value: 0
+
+# ============================================================
+# Performance Monitoring
+# ============================================================
+monitoring:
+  # Timing thresholds (ms)
+  max_total_time: 500              # Maximum acceptable end-to-end time
+  max_seg_time: 200               # Maximum segmentation time
+  max_clas_time: 300              # Maximum classification time
+
+  # Quality thresholds
+  min_tongue_ratio: 0.01          # Minimum tongue/image area ratio
+  max_tongue_ratio: 0.95          # Maximum tongue/image area ratio
+  min_seg_confidence: 0.8          # Minimum segmentation quality score
+
+# ============================================================
+# Fallback Behavior
+# ============================================================
+fallback:
+  # What to do when segmentation fails
+  on_segmentation_failure: "use_full_image"  # Options: "use_full_image", "return_error"
+
+  # What to do when tongue area is too small
+  on_small_tongue: "return_error"  # Options: "use_full_image", "return_error"
+
+  # What to do when classification fails
+  on_classification_failure: "return_partial_result"  # Options: "return_error", "return_partial_result"
+
+# ============================================================
+# Validation Dataset
+# ============================================================
+validation:
+  # Test dataset for end-to-end validation
+  test_images: "datasets/processed/seg_v1/test/images"
+  test_masks: "datasets/processed/seg_v1/test/masks"
+  test_labels: "datasets/processed/clas_v1/test/labels.txt"
+
+  # Validation metrics
+  metrics:
+    - "end_to_end_time"
+    - "segmentation_accuracy"
+    - "classification_accuracy"
+    - "pipeline_success_rate"
+
+# ============================================================
+# Logging
+# ============================================================
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "models/pipeline/logs/pipeline.log"
+  log_timing: true
+  log_errors: true
