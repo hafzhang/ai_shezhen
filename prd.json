@@ -385,7 +385,7 @@
       "estimated_hours": 16,
       "dependencies": ["task-3-3", "task-1-5"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "训练完成60 epochs或提前早停",
         "验证集多标签mAP > 0.70",

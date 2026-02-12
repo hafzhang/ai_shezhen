@@ -1,3 +1,31 @@
 # Ralph Progress Log
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
+
+## [2026-02-12] - task-3-4
+- **What was implemented:**
+  - Main training script (models/paddle_clas/training/train.py) with 60-epoch training
+  - CosineAnnealingWarmRestarts learning rate scheduler implementation
+  - Early stopping mechanism (patience=10, monitor=val_macro_f1)
+  - CutMix and MixUp data augmentation functions
+  - Curriculum learning integration (20 epochs main task only, then all tasks)
+  - Training/validation loops with metric tracking
+  - MLflow integration hooks
+  - Model checkpoint saving and best model tracking
+  
+- **Files changed:**
+  - models/paddle_clas/training/train.py (created)
+  - models/paddle_clas/training/__init__.py (updated)
+  - models/paddle_clas/models/pphgnetv2.py (fixed: removed stdout wrapper, added Union import)
+  - models/paddle_clas/models/multi_head.py (fixed: removed stdout wrapper)
+  - prd.json (updated: marked task-3-4 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** The stdout wrapper (sys.stdout = io.TextIOWrapper(...)) at module level causes issues when modules are imported. It should be avoided or only used in __main__ block.
+  - **Gotcha:** Windows MINGW64 bash heredoc with special characters can fail. Use Python to create files instead of bash heredoc for complex content.
+  - **Pattern:** PaddlePaddle uses `paddle` instead of `torch`. Key differences: `paddle.randn` instead of `torch.randn`, `paddle.nn` instead of `torch.nn`, etc.
+  - **Pattern:** The project uses absolute paths from PROJECT_ROOT for portability.
+  - **Gotcha:** The training dataset uses tab-separated labels file with one-hot encoded multi-label values. Need to parse correctly: [tongue_color(4), coating_color(4), tongue_shape(3), coating_quality(3), features(3), health(2)] = 19 total.
+  - **Context:** The curriculum learning strategy (from task-3-3) expects  train only main task (tongue_color) for first 20 epochs, then all tasks jointly.
+
+---
