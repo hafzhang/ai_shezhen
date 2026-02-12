@@ -617,7 +617,7 @@
       "estimated_hours": 10,
       "dependencies": ["task-1-7"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "规则库覆盖常见场景（80%+）",
         "相似度检索正常工作",
