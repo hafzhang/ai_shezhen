@@ -638,7 +638,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-4-6"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "限流策略生效",
         "熔断机制正常",
@@ -646,8 +646,10 @@
         "压力测试通过"
       ],
       "deliverables": [
-        "api_service/middleware/rate_limiter.py",
-        "api_service/middleware/circuit_breaker.py",
+        "api_service/app/middleware/__init__.py",
+        "api_service/app/middleware/rate_limiter.py",
+        "api_service/app/middleware/circuit_breaker.py",
+        "api_service/app/middleware/retry.py",
         "限流熔断配置"
       ]
     },

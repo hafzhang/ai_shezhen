@@ -106,9 +106,25 @@ class Settings(BaseSettings):
     ENABLE_AUDIT_LOG: bool = True
     AUDIT_LOG_PATH: str = "logs/audit.log"
 
-    # Security and Rate Limiting
+    # Security and Rate Limiting (task-4-8)
     RATE_LIMIT_PER_SECOND: int = 100
+    RATE_LIMIT_BURST: int = 100
+    ENABLE_RATE_LIMIT: bool = True
     ENABLE_API_KEY_AUTH: bool = False
+
+    # Circuit Breaker Configuration (task-4-8)
+    CIRCUIT_BREAKER_FAILURE_THRESHOLD: int = 5
+    CIRCUIT_BREAKER_SUCCESS_THRESHOLD: int = 2
+    CIRCUIT_BREAKER_TIMEOUT: int = 60
+    CIRCUIT_BREAKER_HALF_OPEN_MAX_CALLS: int = 3
+    ENABLE_CIRCUIT_BREAKER: bool = True
+
+    # Retry Configuration (task-4-8)
+    RETRY_MAX_ATTEMPTS: int = 3
+    RETRY_BASE_DELAY: float = 1.0
+    RETRY_MAX_DELAY: float = 10.0
+    RETRY_ENABLE_JITTER: bool = True
+    ENABLE_RETRY: bool = True
 
     # Data Retention
     DATA_RETENTION_DAYS: int = 180

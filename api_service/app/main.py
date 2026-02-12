@@ -21,6 +21,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from redis import Redis
 import uvicorn
 
 # Add project root to path
@@ -40,6 +41,44 @@ logger = logging.getLogger(__name__)
 pipeline_instance = None
 segmentor_instance = None
 classifier_instance = None
+
+# Global middleware instances (task-4-8)
+redis_client: Optional[Redis] = None
+
+
+def initialize_middleware():
+    """Initialize middleware components (task-4-8)"""
+    global redis_client
+
+    # Initialize Redis client for rate limiting
+    if settings.ENABLE_RATE_LIMIT:
+        try:
+            redis_client = Redis(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB,
+                password=settings.REDIS_PASSWORD,
+                decode_responses=False,
+                socket_connect_timeout=5,
+                socket_timeout=5
+            )
+            redis_client.ping()
+            logger.info(f"Redis client initialized for rate limiting: {settings.REDIS_HOST}:{settings.REDIS_PORT}")
+        except Exception as e:
+            logger.warning(f"Redis unavailable for rate limiting, using in-memory fallback: {e}")
+            redis_client = None
+
+    # Initialize rate limiter
+    if settings.ENABLE_RATE_LIMIT:
+        from api_service.app.middleware import init_rate_limiter
+        rate_limiter = init_rate_limiter(redis_client)
+        logger.info(f"Rate limiter initialized: {rate_limiter.default_rate} requests/second")
+
+    # Initialize circuit breakers
+    if settings.ENABLE_CIRCUIT_BREAKER:
+        from api_service.app.middleware import init_circuit_breakers
+        init_circuit_breakers()
+        logger.info("Circuit breakers initialized")
 
 
 def initialize_models():
@@ -108,11 +147,17 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting AI舌诊智能诊断系统 API...")
+    initialize_middleware()  # task-4-8: Initialize middleware before models
     initialize_models()
     logger.info("API service ready")
     yield
     # Shutdown
     logger.info("Shutting down API service...")
+    if redis_client:
+        try:
+            redis_client.close()
+        except Exception:
+            pass
 
 
 # Create FastAPI application
@@ -133,6 +178,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Configure Rate Limiting Middleware (task-4-8)
+if settings.ENABLE_RATE_LIMIT:
+    from api_service.app.middleware import RateLimitMiddleware, get_rate_limiter
+    rate_limiter = get_rate_limiter()
+    if rate_limiter:
+        app.add_middleware(
+            RateLimitMiddleware,
+            rate_limiter=rate_limiter,
+            default_limit=settings.RATE_LIMIT_PER_SECOND,
+            default_window=1
+        )
+        logger.info("Rate limiting middleware enabled")
 
 
 # Custom exception handlers
@@ -213,8 +271,16 @@ async def health_check():
     )
 
 
+# Circuit breaker state endpoint (task-4-8)
+@app.get("/api/v1/circuit-breakers", tags=["Monitoring"])
+async def get_circuit_breaker_status():
+    """Get circuit breaker states for monitoring"""
+    from api_service.app.middleware import get_circuit_breaker_states
+    return await get_circuit_breaker_states()
+
+
 def main():
-    """Run the API server"""
+    """Run API server"""
     uvicorn.run(
         "api_service.app.main:app",
         host=settings.API_HOST,
