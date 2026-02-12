@@ -922,7 +922,7 @@
         "task-4-5"
       ],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "反馈按钮可用",
         "反馈数据正常收集",

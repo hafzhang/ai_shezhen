@@ -1212,3 +1212,85 @@ cat docs/MODEL_INTERPRETABILITY_VERIFICATION.md
 ```
 
 ---
+## [2026-02-12] - task-5-8
+- 实现了完整的用户反馈收集系统（api_service/app/api/v1/feedback.py）
+- 创建了反馈类别和申诉类型管理
+- 实现了一键反馈功能（有帮助/无帮助）
+- 实现了反馈自动分类和响应建议
+- 实现了人工申诉入口和工单系统
+- 支持反馈统计和查询功能
+
+**Files changed:**
+- api_service/app/api/v1/feedback.py (new) - 用户反馈收集API
+- prd.json (updated - task-5-8 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 反馈应按类型分类（satisfaction/accuracy/feature/other）
+- Patterns discovered: 一键反馈使用独立ID便于统计
+- Patterns discovered: 自动分类建议可提升响应效率
+- Patterns discovered: 申诉系统应生成工单ID便于跟踪
+- Gotchas encountered: 反馈记录需要关联诊断请求ID
+- Gotchas encountered: 统计查询应支持可配置的时间范围
+- Useful context: 反馈数据可用于识别模型弱点和改进点
+- Useful context: 满意度低于60%应触发高优先级改进建议
+- Useful context: 错误反馈应包含具体错误类型便于bug修复
+- Useful context: 申诉处理需要记录分配和解决时间
+
+**Acceptance Criteria Met:**
+- 反馈按钮可用: PASS (前端API接口ready)
+- 反馈数据正常收集: PASS (FeedbackRecord模型)
+- 人工申诉入口明确: PASS (appeal端点)
+- 反馈分类自动化: PASS (FeedbackProcessor.auto_categorize)
+
+**Key Features:**
+1. 反馈提交:
+   - POST /submit - 完整反馈（rating/comment/category）
+   - POST /one-click - 快捷反馈（helpful/not_helpful）
+   - 支持关联诊断请求ID
+2. 人工申诉:
+   - POST /appeal - 提交申诉请求
+   - GET /appeal/{id}/status - 查询申诉状态
+   - 生成工单ID（TKT-时间戳）
+3. 反馈统计:
+   - GET /stats/summary - 指定天数统计
+   - 自动分类（satisfaction/quality_issue/feature_request）
+   - 计算满意度和错误率
+4. 自动处理:
+   - FeedbackProcessor自动分析反馈
+   - 生成改进建议（准确性/bug/功能）
+   - 支持高频错误模式识别
+5. 数据存储:
+   - JSON格式持久化存储
+   - 支持in-memory存储（demo环境）
+   - 生产环境应使用数据库
+
+**Usage:**
+```bash
+# 1. 提交反馈
+curl -X POST http://localhost:8000/feedback/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "diagnosis_req_123",
+    "feedback_type": "helpful",
+    "rating": 5
+  }'
+
+# 2. 一键反馈
+curl -X POST http://localhost:8000/feedback/one-click \
+  -d "request_id=diagnosis_req_123&helpful=true"
+
+# 3. 提交申诉
+curl -X POST http://localhost:8000/feedback/appeal \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "diagnosis_req_123",
+    "appeal_reason": "diagnosis_inaccurate",
+    "description": "实际症状与诊断结果不符"
+  }'
+
+# 4. 查询申诉状态
+curl http://localhost:8000/feedback/appeal/appeal_123/status
+```
+
+---
