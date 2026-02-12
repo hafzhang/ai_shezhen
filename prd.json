@@ -490,7 +490,7 @@
       "estimated_hours": 4,
       "dependencies": [],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "API密钥申请成功",
         "测试环境搭建完成",
