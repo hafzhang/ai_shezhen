@@ -29,6 +29,10 @@
 - Multi-head classification: Each head can have different loss weights, num_classes, and multi-label settings
 - Multi-head model structure: Backbone (864-dim) -> 6 heads with configurable hidden layers and dropout
 - PaddleClas setup: Use LayerDict for named heads, register_buffer for loss weights as tensors
+- Few-shot examples format: JSON with image_id, filename, syndromes[], tongue_features{}, expert_reasoning, category_ids[], metadata{}
+- TCM syndrome knowledge base: Defines typical features for each syndrome (13-20) for validation and consistency checking
+- Few-shot expert reasoning format: 【舌象观察】【典型特征】【辨证分析】【治则】4-part structure
+- Syndrome "图" types (14,16,18,20) have very few samples in dataset - need targeted collection
 
 ---
 - The dataset uses COCO format with train/val/test splits
