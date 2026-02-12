@@ -38,7 +38,14 @@ from api_service.schemas.schemas import (
     DiagnosisRequest,
     DiagnosisResponse,
     HealthResponse,
-    ErrorResponse
+    ErrorResponse,
+    SyndromeInfo,
+    SyndromeAnalysis,
+    AnomalyDetection,
+    HealthRecommendations,
+    ConfidenceAnalysis,
+    Disclaimer,
+    LDiagnosisResult
 )
 from api_service.core.config import settings
 from api_service.core.logging_config import (
@@ -47,6 +54,14 @@ from api_service.core.logging_config import (
     log_diagnosis_request,
     log_error,
     AuditContext
+)
+from api_service.core.rule_based_diagnosis import (
+    diagnose_from_classification,
+    RuleDiagnosisResult
+)
+from api_service.core.case_retrieval import (
+    retrieve_similar_cases_from_classification,
+    RetrievalResult
 )
 
 logger = logging.getLogger(__name__)
@@ -584,13 +599,113 @@ async def diagnosis_tongue(
 
             try:
                 # TODO: Implement LLM diagnosis (will be added in future tasks)
-                # For now, return without LLM diagnosis
-                pass
+                # For now, use rule-based fallback directly
+                if request.enable_rule_fallback:
+                    # Use rule-based diagnosis as fallback
+                    rule_result = diagnose_from_classification(classification)
+
+                    # Convert rule result to diagnosis format
+                    possible_syndromes = []
+                    for match in rule_result.possible_syndromes:
+                        possible_syndromes.append(SyndromeInfo(
+                            name=match.name,
+                            confidence=match.confidence,
+                            evidence=f"匹配特征: {', '.join(match.matched_features)}",
+                            tcm_theory=rule_result.tcm_theory
+                        ))
+
+                    diagnosis = LDiagnosisResult(
+                        syndrome_analysis=SyndromeAnalysis(
+                            possible_syndromes=possible_syndromes,
+                            primary_syndrome=rule_result.primary_syndrome,
+                            secondary_syndromes=[m.name for m in rule_result.possible_syndromes[1:3]],
+                            syndrome_description=rule_result.syndrome_description
+                        ),
+                        anomaly_detection=AnomalyDetection(
+                            detected=rule_result.confidence < 0.5,
+                            reason="置信度较低，建议咨询专业中医师" if rule_result.confidence < 0.5 else None,
+                            recommendations=["建议进一步面诊确认"] if rule_result.confidence < 0.5 else []
+                        ),
+                        health_recommendations=HealthRecommendations(
+                            dietary=rule_result.health_recommendations.get("dietary", []),
+                            lifestyle=rule_result.health_recommendations.get("lifestyle", []),
+                            tcm_therapy=rule_result.health_recommendations.get("tcm_therapy", []),
+                            medical_consultation=rule_result.health_recommendations.get("medical_consultation", "")
+                        ),
+                        confidence_analysis=ConfidenceAnalysis(
+                            overall_confidence=rule_result.confidence,
+                            confidence_breakdown={
+                                "rule_based": rule_result.confidence,
+                                "feature_coverage": len(rule_result.used_rules) / 7
+                            },
+                            uncertainty_factors=[
+                                "基于规则库诊断，建议结合LLM诊断提高准确性"
+                            ]
+                        ),
+                        disclaimer=Disclaimer(
+                            ai_assistant_only=True,
+                            not_medical_advice=True,
+                            consult_doctor_reminder=True,
+                            emergency_warning=None
+                        )
+                    )
+                    used_fallback = True
+                    logger.info(f"Used rule-based fallback: {rule_result.primary_syndrome}")
 
             except Exception as e:
                 logger.warning(f"LLM diagnosis failed: {e}")
                 if request.enable_rule_fallback:
-                    # TODO: Implement rule-based fallback (will be added in future tasks)
+                    # Rule-based fallback on error
+                    try:
+                        rule_result = diagnose_from_classification(classification)
+
+                        possible_syndromes = []
+                        for match in rule_result.possible_syndromes:
+                            possible_syndromes.append(SyndromeInfo(
+                                name=match.name,
+                                confidence=match.confidence,
+                                evidence=f"匹配特征: {', '.join(match.matched_features)}",
+                                tcm_theory=rule_result.tcm_theory
+                            ))
+
+                        diagnosis = LDiagnosisResult(
+                            syndrome_analysis=SyndromeAnalysis(
+                                possible_syndromes=possible_syndromes,
+                                primary_syndrome=rule_result.primary_syndrome,
+                                secondary_syndromes=[m.name for m in rule_result.possible_syndromes[1:3]],
+                                syndrome_description=rule_result.syndrome_description
+                            ),
+                            anomaly_detection=AnomalyDetection(
+                                detected=rule_result.confidence < 0.5,
+                                reason="置信度较低，建议咨询专业中医师" if rule_result.confidence < 0.5 else None,
+                                recommendations=["建议进一步面诊确认"] if rule_result.confidence < 0.5 else []
+                            ),
+                            health_recommendations=HealthRecommendations(
+                                dietary=rule_result.health_recommendations.get("dietary", []),
+                                lifestyle=rule_result.health_recommendations.get("lifestyle", []),
+                                tcm_therapy=rule_result.health_recommendations.get("tcm_therapy", []),
+                                medical_consultation=rule_result.health_recommendations.get("medical_consultation", "")
+                            ),
+                            confidence_analysis=ConfidenceAnalysis(
+                                overall_confidence=rule_result.confidence,
+                                confidence_breakdown={
+                                    "rule_based": rule_result.confidence,
+                                    "feature_coverage": len(rule_result.used_rules) / 7
+                                },
+                                uncertainty_factors=[
+                                    "LLM诊断失败，使用规则库兜底",
+                                    "建议结合临床诊断"
+                                ]
+                            ),
+                            disclaimer=Disclaimer(
+                                ai_assistant_only=True,
+                                not_medical_advice=True,
+                                consult_doctor_reminder=True,
+                                emergency_warning=None
+                            )
+                        )
+                    except Exception as fallback_error:
+                        logger.error(f"Rule-based fallback also failed: {fallback_error}")
                     used_fallback = True
 
             timing['llm_ms'] = (time.time() - llm_start) * 1000

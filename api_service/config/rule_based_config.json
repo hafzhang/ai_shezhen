@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "description": "本地规则库配置文件 - 用于LLM诊断失败时的兜底方案",
+  "last_updated": "2026-02-12",
+  "coverage_target": 0.8,
+  "config": {
+    "enable_auto_update": true,
+    "fallback_timeout_seconds": 10,
+    "min_confidence_threshold": 0.5,
+    "max_candidates": 5
+  },
+  "syndrome_rules": {
+    "健康舌": {
+      "name_en": "Healthy Tongue",
+      "pinyin": "jiankangshe",
+      "tongue_colors": ["淡红舌"],
+      "coating_colors": ["白苔"],
+      "tongue_shapes": ["正常"],
+      "special_features": [],
+      "health_status": "健康舌",
+      "tcm_theory": "健康舌象，淡红舌，薄白苔，舌体适中，无明显病理特征。表示气血调和，脏腑功能正常。",
+      "treatment_principle": "保持健康生活方式",
+      "base_confidence": 0.90
+    },
+    "阴虚火旺证": {
+      "name_en": "Yin Deficiency with Fire Hyperactivity",
+      "pinyin": "yinxuhuowang",
+      "tongue_colors": ["红舌", "绛紫舌"],
+      "coating_colors": ["花剥苔", "黄苔"],
+      "tongue_shapes": ["瘦薄舌"],
+      "special_features": ["裂纹"],
+      "health_status": "非健康舌",
+      "tcm_theory": "阴虚火旺，虚火上炎。舌红少苔，裂纹，表示阴液不足，虚热内生。",
+      "treatment_principle": "滋阴降火",
+      "base_confidence": 0.75
+    },
+    "痰湿内阻证": {
+      "name_en": "Phlegm-Dampness Internal Obstruction",
+      "pinyin": "tanshineizu",
+      "tongue_colors": ["淡白舌", "红舌"],
+      "coating_colors": ["白苔", "黄苔"],
+      "tongue_shapes": ["胖大舌"],
+      "special_features": ["齿痕"],
+      "health_status": "非健康舌",
+      "tcm_theory": "痰湿内阻，脾失健运。舌淡胖大有齿痕，苔腻，表示湿浊内蕴。",
+      "treatment_principle": "燥湿化痰，健脾和胃",
+      "base_confidence": 0.75
+    },
+    "气滞血瘀证": {
+      "name_en": "Qi Stagnation and Blood Stasis",
+      "pinyin": "qizhixueyu",
+      "tongue_colors": ["绛紫舌", "红舌"],
+      "coating_colors": ["白苔", "黄苔"],
+      "tongue_shapes": [],
+      "special_features": ["裂纹"],
+      "health_status": "非健康舌",
+      "tcm_theory": "气滞血瘀，经络不通。舌质紫暗或有瘀斑，表示气血运行不畅。",
+      "treatment_principle": "行气活血，化瘀通络",
+      "base_confidence": 0.70
+    },
+    "寒湿困脾证": {
+      "name_en": "Cold-Dampness Encumbering Spleen",
+      "pinyin": "hanshikunpi",
+      "tongue_colors": ["淡白舌"],
+      "coating_colors": ["白苔"],
+      "tongue_shapes": ["胖大舌"],
+      "special_features": ["齿痕"],
+      "health_status": "非健康舌",
+      "tcm_theory": "寒湿困脾，运化失司。舌淡胖大，苔白腻，表示寒湿内阻。",
+      "treatment_principle": "温中散寒，燥湿健脾",
+      "base_confidence": 0.70
+    }
+  },
+  "feature_mappings": {
+    "tongue_color_synonyms": {
+      "淡红舌": ["正常舌色", "粉红舌"],
+      "红舌": ["深红舌", "鲜红舌"],
+      "绛紫舌": ["紫舌", "暗红舌"],
+      "淡白舌": ["淡舌", "白舌"]
+    },
+    "coating_color_synonyms": {
+      "白苔": ["薄白苔", "白腻苔"],
+      "黄苔": ["薄黄苔", "黄腻苔"],
+      "黑苔": ["灰黑苔"],
+      "花剥苔": ["剥苔", "地图舌"]
+    },
+    "tongue_shape_synonyms": {
+      "胖大舌": ["齿痕舌", "肿胀舌"],
+      "瘦薄舌": ["瘦舌", "小舌"],
+      "正常": ["中等舌", "适中舌"]
+    },
+    "special_features_synonyms": {
+      "齿痕": ["齿印", "牙齿痕"],
+      "裂纹": ["裂沟", "裂纹舌"],
+      "红点": ["红星", "红点刺"],
+      "瘀点": ["瘀斑", "出血点"],
+      "芒刺": ["草莓舌", "点刺舌"]
+    }
+  },
+  "diagnosis_rules": {
+    "combinations": [
+      {
+        "name": "湿热蕴结",
+        "required_features": {
+          "tongue_colors": ["红舌"],
+          "coating_colors": ["黄苔"]
+        },
+        "optional_features": {
+          "special_features": ["红点"]
+        },
+        "syndrome": "肝胆湿热证",
+        "confidence_boost": 0.1
+      },
+      {
+        "name": "气虚湿盛",
+        "required_features": {
+          "tongue_colors": ["淡白舌"],
+          "tongue_shapes": ["胖大舌"]
+        },
+        "optional_features": {
+          "special_features": ["齿痕"]
+        },
+        "syndrome": "脾胃虚弱证",
+        "confidence_boost": 0.1
+      },
+      {
+        "name": "肾虚表现",
+        "required_features": {
+          "tongue_shapes": ["胖大舌"],
+          "special_features": ["齿痕"]
+        },
+        "optional_features": {
+          "coating_colors": ["白苔", "花剥苔"]
+        },
+        "syndrome": "肾气虚证",
+        "confidence_boost": 0.1
+      }
+    ]
+  },
+  "health_recommendations": {
+    "阴虚火旺证": {
+      "dietary": ["宜滋阴降火食物", "如梨、银耳、百合、莲藕", "忌辛辣煎炸"],
+      "lifestyle": ["避免熬夜", "保持心情平静", "适度运动"],
+      "tcm_therapy": ["可按揉三阴交、太溪穴"],
+      "medical_consultation": "建议咨询中医师，进行滋阴降火调理"
+    },
+    "痰湿内阻证": {
+      "dietary": ["宜化痰祛湿食物", "如陈皮、半夏、茯苓、白术", "忌油腻甜食"],
+      "lifestyle": ["适度运动出汗", "保持居住环境干燥", "规律作息"],
+      "tcm_therapy": ["可拔罐、刮痧", "艾灸足三里、丰隆"],
+      "medical_consultation": "建议咨询中医师，进行化痰祛湿调理"
+    },
+    "气滞血瘀证": {
+      "dietary": ["宜行气活血食物", "如山楂、红花、桃仁、玫瑰花", "忌生冷寒凉"],
+      "lifestyle": ["保持心情舒畅", "适度有氧运动", "避免久坐"],
+      "tcm_therapy": ["可按揉血海、太冲穴", "适当拔罐刮痧"],
+      "medical_consultation": "建议咨询中医师，进行行气活血调理"
+    },
+    "寒湿困脾证": {
+      "dietary": ["宜温中散寒食物", "如生姜、胡椒、羊肉、桂枝", "忌生冷瓜果"],
+      "lifestyle": ["注意腹部保暖", "避免淋雨受凉", "适量活动"],
+      "tcm_therapy": ["艾灸中脘、神阙、关元", "可热敷腹部"],
+      "medical_consultation": "建议咨询中医师，进行温中散寒调理"
+    }
+  },
+  "fallback_strategy": {
+    "llm_timeout_seconds": 10,
+    "llm_max_retries": 2,
+    "enable_case_retrieval": true,
+    "case_retrieval_threshold": 0.4,
+    "enable_rule_based": true,
+    "rule_based_threshold": 0.3,
+    "hybrid_mode": true,
+    "hybrid_weights": {
+      "llm": 0.7,
+      "case_retrieval": 0.2,
+      "rule_based": 0.1
+    }
+  },
+  "monitoring": {
+    "log_fallback_activations": true,
+    "track_fallback_reason": true,
+    "alert_threshold": 0.05,
+    "alert_message": "兜底率超过5%，请检查LLM服务状态"
+  }
+}

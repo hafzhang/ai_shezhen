@@ -147,12 +147,6 @@ class Settings(BaseSettings):
         db_num = db if db is not None else self.REDIS_DB
         return f"redis://{pwd_part}{self.REDIS_HOST}:{self.REDIS_PORT}/{db_num}"
 
-    class Config:
-        # For Pydantic v1 compatibility
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
-
 
 # Global settings instance
 settings = Settings()
