@@ -427,7 +427,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-3-5"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "FP16/INT8模型导出成功",
         "量化后精度损失<3%",
