@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-02-12T10:02:37.794065",
+  "statistics": {
+    "total_images": 553,
+    "syndrome_images": 60,
+    "coverage_rate": "10.85%"
+  },
+  "syndrome_distribution": {
+    "13": {
+      "id": 13,
+      "name": "肾气虚证",
+      "name_en": "Kidney Qi Deficiency",
+      "count": 495,
+      "key_features": [
+        "腰膝酸软",
+        "乏力",
+        "耳鸣",
+        "小便清长"
+      ],
+      "treatment_principle": "补肾益气"
+    },
+    "14": {
+      "id": 14,
+      "name": "肾气虚图",
+      "name_en": "Kidney Qi Deficiency Pattern",
+      "count": 2,
+      "key_features": [
+        "腰膝酸软",
+        "畏寒肢冷"
+      ],
+      "treatment_principle": "温补肾阳"
+    },
+    "15": {
+      "id": 15,
+      "name": "肝胆湿热证",
+      "name_en": "Liver-Gallbladder Damp-Heat",
+      "count": 292,
+      "key_features": [
+        "口苦",
+        "咽干",
+        "烦躁",
+        "身目发黄"
+      ],
+      "treatment_principle": "清热利湿，疏利肝胆"
+    },
+    "16": {
+      "id": 16,
+      "name": "肝胆湿热图",
+      "name_en": "Liver-Gallbladder Damp-Heat Pattern",
+      "count": 9,
+      "key_features": [
+        "胁肋胀痛",
+        "口苦"
+      ],
+      "treatment_principle": "清热利湿"
+    },
+    "17": {
+      "id": 17,
+      "name": "脾胃虚弱证",
+      "name_en": "Spleen-Stomach Weakness",
+      "count": 186,
+      "key_features": [
+        "腹胀",
+        "便溏",
+        "食欲不振",
+        "乏力"
+      ],
+      "treatment_principle": "健脾益气，和胃运湿"
+    },
+    "19": {
+      "id": 19,
+      "name": "心肺气虚证",
+      "name_en": "Heart-Lung Qi Deficiency",
+      "count": 372,
+      "key_features": [
+        "心悸",
+        "气短",
+        "自汗",
+        "易感冒"
+      ],
+      "treatment_principle": "补益心肺气"
+    },
+    "20": {
+      "id": 20,
+      "name": "心肺气虚图",
+      "name_en": "Heart-Lung Qi Deficiency Pattern",
+      "count": 2,
+      "key_features": [
+        "胸闷",
+        "气促"
+      ],
+      "treatment_principle": "补气养心"
+    }
+  },
+  "typical_cases_selected": {
+    "13": {
+      "id": 13,
+      "name": "肾气虚证",
+      "count": 10
+    },
+    "14": {
+      "id": 14,
+      "name": "肾气虚图",
+      "count": 1
+    },
+    "15": {
+      "id": 15,
+      "name": "肝胆湿热证",
+      "count": 7
+    },
+    "16": {
+      "id": 16,
+      "name": "肝胆湿热图",
+      "count": 3
+    },
+    "17": {
+      "id": 17,
+      "name": "脾胃虚弱证",
+      "count": 7
+    },
+    "19": {
+      "id": 19,
+      "name": "心肺气虚证",
+      "count": 10
+    },
+    "20": {
+      "id": 20,
+      "name": "心肺气虚图",
+      "count": 2
+    }
+  },
+  "multi_syndrome_cases": 191
+}

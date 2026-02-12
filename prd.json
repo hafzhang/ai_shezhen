@@ -154,7 +154,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-1-3"],
       "assignee": "medical_compliance",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "每个证型5-10例典型病例",
         "图文对JSON格式正确",
