@@ -406,7 +406,7 @@
       "estimated_hours": 10,
       "dependencies": ["task-3-4"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "少数类召回率提升至>60%",
         "少数类F1-score提升>15%",
