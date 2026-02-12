@@ -991,7 +991,7 @@
         "task-5-2"
       ],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "灾备架构搭建完成",
         "备份策略正常执行",
@@ -1014,7 +1014,7 @@
         "task-5-2"
       ],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "A/B测试框架可用",
         "灰度发布流程正常",
