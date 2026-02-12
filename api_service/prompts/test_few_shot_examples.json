@@ -1,0 +1,1284 @@
+[
+  {
+    "image_id": 453,
+    "filename": "A (225).jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕",
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色白苔, 齿痕, 红点\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      8,
+      8,
+      8,
+      2,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      8
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 19,
+    "filename": "10035.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色白苔, 裂纹\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      2,
+      13,
+      7
+    ],
+    "metadata": {
+      "width": 749,
+      "height": 855
+    }
+  },
+  {
+    "image_id": 365,
+    "filename": "A (137).jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕",
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕, 红点\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      8,
+      6,
+      8
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 249,
+    "filename": "10608.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      8
+    ],
+    "metadata": {
+      "width": 527,
+      "height": 643
+    }
+  },
+  {
+    "image_id": 250,
+    "filename": "10609.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      8
+    ],
+    "metadata": {
+      "width": 709,
+      "height": 853
+    }
+  },
+  {
+    "image_id": 255,
+    "filename": "10623.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 裂纹\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      7,
+      7,
+      13
+    ],
+    "metadata": {
+      "width": 554,
+      "height": 650
+    }
+  },
+  {
+    "image_id": 256,
+    "filename": "10625.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 裂纹\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      7,
+      7,
+      13
+    ],
+    "metadata": {
+      "width": 596,
+      "height": 699
+    }
+  },
+  {
+    "image_id": 286,
+    "filename": "10700.jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "黄苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色黄苔\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      10,
+      13,
+      2
+    ],
+    "metadata": {
+      "width": 508,
+      "height": 500
+    }
+  },
+  {
+    "image_id": 417,
+    "filename": "A (189).jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 裂纹\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      7
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 449,
+    "filename": "A (221).jpg",
+    "syndromes": [
+      {
+        "id": 13,
+        "name": "肾气虚证",
+        "name_en": "Kidney Qi Deficiency",
+        "pinyin": "shenqixu",
+        "treatment_principle": "补肾益气"
+      },
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】肾气虚证典型舌象表现为：舌淡, 苔白, 舌体胖大, 齿痕\n【辨证分析】肾气不足，气化失常，舌体失养\n【治则】补肾益气",
+    "category_ids": [
+      9,
+      13,
+      19,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 143,
+    "filename": "10344.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色白苔, 裂纹\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      2,
+      9,
+      7,
+      7,
+      7,
+      19
+    ],
+    "metadata": {
+      "width": 614,
+      "height": 491
+    }
+  },
+  {
+    "image_id": 80,
+    "filename": "10190.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 裂纹\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19,
+      7
+    ],
+    "metadata": {
+      "width": 493,
+      "height": 593
+    }
+  },
+  {
+    "image_id": 247,
+    "filename": "10606.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色白苔\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      2,
+      19
+    ],
+    "metadata": {
+      "width": 505,
+      "height": 533
+    }
+  },
+  {
+    "image_id": 300,
+    "filename": "10721.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "黄苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色黄苔, 裂纹\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      10,
+      19,
+      7,
+      7,
+      7
+    ],
+    "metadata": {
+      "width": 378,
+      "height": 441
+    }
+  },
+  {
+    "image_id": 301,
+    "filename": "10722.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "黄苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色黄苔, 裂纹\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      10,
+      19,
+      7,
+      7,
+      7
+    ],
+    "metadata": {
+      "width": 445,
+      "height": 548
+    }
+  },
+  {
+    "image_id": 344,
+    "filename": "A (116).jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌, 苔色白苔\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19,
+      2
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 401,
+    "filename": "A (173).jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "裂纹"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 裂纹\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19,
+      7
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 532,
+    "filename": "A (304).jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 234,
+    "filename": "10579.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19
+    ],
+    "metadata": {
+      "width": 492,
+      "height": 567
+    }
+  },
+  {
+    "image_id": 237,
+    "filename": "10585.jpg",
+    "syndromes": [
+      {
+        "id": 19,
+        "name": "心肺气虚证",
+        "name_en": "Heart-Lung Qi Deficiency",
+        "pinyin": "xinfeiqixu",
+        "treatment_principle": "补益心肺气"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】心肺气虚证典型舌象表现为：舌淡, 苔薄白, 舌体胖大\n【辨证分析】心肺气虚，血行不畅，呼吸无力\n【治则】补益心肺气",
+    "category_ids": [
+      9,
+      19
+    ],
+    "metadata": {
+      "width": 458,
+      "height": 581
+    }
+  },
+  {
+    "image_id": 407,
+    "filename": "A (179).jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "黄苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色黄苔, 红点\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      10,
+      15,
+      6
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 139,
+    "filename": "10329.jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      },
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      9,
+      15,
+      15
+    ],
+    "metadata": {
+      "width": 419,
+      "height": 492
+    }
+  },
+  {
+    "image_id": 140,
+    "filename": "10330.jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      },
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      9,
+      15,
+      15
+    ],
+    "metadata": {
+      "width": 428,
+      "height": 504
+    }
+  },
+  {
+    "image_id": 363,
+    "filename": "A (135).jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      },
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": "红舌",
+      "coating_color": null,
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】舌色红舌\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      2,
+      15,
+      15
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 444,
+    "filename": "A (216).jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      9,
+      15
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 482,
+    "filename": "A (254).jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      9,
+      15
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 517,
+    "filename": "A (289).jpg",
+    "syndromes": [
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔\n【典型特征】肝胆湿热证典型舌象表现为：舌红, 苔黄腻, 舌边尖红\n【辨证分析】湿热蕴结肝胆，疏泄失常\n【治则】清热利湿，疏利肝胆",
+    "category_ids": [
+      9,
+      15
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  },
+  {
+    "image_id": 405,
+    "filename": "A (177).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕",
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      8,
+      8,
+      8,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 412,
+    "filename": "A (184).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕",
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      8,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 535,
+    "filename": "A (307).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "齿痕",
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 齿痕, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      8,
+      8,
+      8,
+      8,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 398,
+    "filename": "A (170).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 415,
+    "filename": "A (187).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 470,
+    "filename": "A (242).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      },
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      },
+      {
+        "id": 15,
+        "name": "肝胆湿热证",
+        "name_en": "Liver-Gallbladder Damp-Heat",
+        "pinyin": "gandanshire",
+        "treatment_principle": "清热利湿，疏利肝胆"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      17,
+      9,
+      15,
+      15,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "metadata": {
+      "width": 2048,
+      "height": 1365
+    }
+  },
+  {
+    "image_id": 518,
+    "filename": "A (290).jpg",
+    "syndromes": [
+      {
+        "id": 17,
+        "name": "脾胃虚弱证",
+        "name_en": "Spleen-Stomach Weakness",
+        "pinyin": "piweixuruo",
+        "treatment_principle": "健脾益气，和胃运湿"
+      }
+    ],
+    "tongue_features": {
+      "tongue_color": null,
+      "coating_color": "白苔",
+      "tongue_shape": null,
+      "coating_quality": null,
+      "special_features": [
+        "红点"
+      ],
+      "health_status": "非健康舌"
+    },
+    "expert_reasoning": "【舌象观察】苔色白苔, 红点\n【典型特征】脾胃虚弱证典型舌象表现为：舌淡, 苔白腻, 舌体胖大有齿痕, 舌质嫩\n【辨证分析】脾胃运化失司，气血生化不足\n【治则】健脾益气，和胃运湿",
+    "category_ids": [
+      9,
+      17,
+      6
+    ],
+    "metadata": {
+      "width": 640,
+      "height": 640
+    }
+  }
+]

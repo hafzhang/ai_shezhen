@@ -532,7 +532,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-1-7"],
       "assignee": "medical_compliance",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "每个证型5-10例典型病例",
         "Few-shot示例格式统一",

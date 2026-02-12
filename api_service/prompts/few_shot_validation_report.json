@@ -1,0 +1,84 @@
+{
+  "valid": true,
+  "total_examples": 44,
+  "errors": [],
+  "warnings": [],
+  "syndrome_distribution": {
+    "19": 11,
+    "13": 10,
+    "17": 10,
+    "15": 16,
+    "16": 1,
+    "14": 1,
+    "20": 2
+  },
+  "syndrome_coverage": {
+    "肾气虚证": {
+      "count": 10,
+      "target": 5,
+      "met": true,
+      "percentage": 100
+    },
+    "肾气虚图": {
+      "count": 1,
+      "target": 5,
+      "met": false,
+      "percentage": 20.0
+    },
+    "肝胆湿热证": {
+      "count": 16,
+      "target": 5,
+      "met": true,
+      "percentage": 100
+    },
+    "肝胆湿热图": {
+      "count": 1,
+      "target": 5,
+      "met": false,
+      "percentage": 20.0
+    },
+    "脾胃虚弱证": {
+      "count": 10,
+      "target": 5,
+      "met": true,
+      "percentage": 100
+    },
+    "脾胃虚弱图": {
+      "count": 0,
+      "target": 5,
+      "met": false,
+      "percentage": 0.0
+    },
+    "心肺气虚证": {
+      "count": 11,
+      "target": 5,
+      "met": true,
+      "percentage": 100
+    },
+    "心肺气虚图": {
+      "count": 2,
+      "target": 5,
+      "met": false,
+      "percentage": 40.0
+    }
+  },
+  "feature_completeness": {
+    "total": 44,
+    "complete": 0,
+    "partial": 36,
+    "complete_percentage": 0.0,
+    "partial_percentage": 81.81818181818183,
+    "missing_features": {
+      "tongue_color": 8,
+      "tongue_shape": 7,
+      "coating_quality": 8,
+      "coating_color": 1
+    }
+  },
+  "acceptance_criteria": {
+    "each_syndrome_5_to_10_examples": false,
+    "unified_format": true,
+    "covers_main_syndromes": true
+  },
+  "validation_timestamp": "2026-02-12T12:21:53.696955"
+}
