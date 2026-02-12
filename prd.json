@@ -5,9 +5,23 @@
     "description": "基于PaddlePaddle本地推理 + 文心大模型云端诊断的舌诊AI系统",
     "branchName": "feature/shezhen-ai-system",
     "tech_stack": {
-      "local_inference": ["PaddlePaddle 2.6", "BiSeNetV2", "PP-HGNetV2-B4", "FastAPI"],
-      "cloud_diagnosis": ["文心一言 ERNIE-Speed API", "Few-shot Prompt"],
-      "deployment": ["Docker", "Redis", "Celery", "Prometheus", "Grafana"]
+      "local_inference": [
+        "PaddlePaddle 2.6",
+        "BiSeNetV2",
+        "PP-HGNetV2-B4",
+        "FastAPI"
+      ],
+      "cloud_diagnosis": [
+        "文心一言 ERNIE-Speed API",
+        "Few-shot Prompt"
+      ],
+      "deployment": [
+        "Docker",
+        "Redis",
+        "Celery",
+        "Prometheus",
+        "Grafana"
+      ]
     },
     "dataset": {
       "name": "shezhenv3-coco",
@@ -47,7 +61,9 @@
       "description": "将COCO polygon标注转换为二值mask，使用pycocotools或cv2.fillPoly，处理孔洞（舌面裂纹），生成舌体分割数据集",
       "priority": "high",
       "estimated_hours": 12,
-      "dependencies": ["task-1-1"],
+      "dependencies": [
+        "task-1-1"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -68,7 +84,9 @@
       "description": "实现原始21类到6维度18类的one-hot编码映射，构建映射表，生成分类任务标签文件",
       "priority": "high",
       "estimated_hours": 10,
-      "dependencies": ["task-1-1"],
+      "dependencies": [
+        "task-1-1"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -89,7 +107,9 @@
       "description": "计算各类别权重（weight_i = total / (num_classes × count_i)），实现分层采样器，确保每个batch包含多数类+少数类平衡",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-1-3"],
+      "dependencies": [
+        "task-1-3"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -110,7 +130,10 @@
       "description": "配置分割和分类任务的数据增强策略，包括几何变换、颜色变换、医学图像专用增强，实现Lab颜色空间增强",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-1-2", "task-1-3"],
+      "dependencies": [
+        "task-1-2",
+        "task-1-3"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -131,7 +154,9 @@
       "description": "去除图像EXIF信息（GPS、设备型号等），实现患者ID哈希化，确保数据隐私合规",
       "priority": "high",
       "estimated_hours": 4,
-      "dependencies": ["task-1-1"],
+      "dependencies": [
+        "task-1-1"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -152,7 +177,9 @@
       "description": "提取证型标签（13-20类），构建图文对（舌象特征向量+证型标签+专家辨证依据），筛选典型病例用于Few-shot Prompt",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-1-3"],
+      "dependencies": [
+        "task-1-3"
+      ],
       "assignee": "medical_compliance",
       "passes": true,
       "acceptance_criteria": [
@@ -173,7 +200,9 @@
       "description": "安装CUDA 11.8 + PaddlePaddle 2.6，配置BiSeNetV2-STDCNet2，下载预训练权重，运行基准测试",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-1-2"],
+      "dependencies": [
+        "task-1-2"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -194,7 +223,9 @@
       "description": "配置组合损失函数（CrossEntropy 0.5 + DiceLoss 0.3 + BoundaryLoss 0.2），实现类别不平衡权重",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-2-1"],
+      "dependencies": [
+        "task-2-1"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -215,7 +246,10 @@
       "description": "运行完整80 epoch训练，配置学习率策略（Warmup 2epoch + PolyLR），实现早停机制（patience=10），实时监控loss/mIoU/Dice",
       "priority": "high",
       "estimated_hours": 16,
-      "dependencies": ["task-2-2", "task-1-4"],
+      "dependencies": [
+        "task-2-2",
+        "task-1-4"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -236,7 +270,9 @@
       "description": "每epoch选取loss最高的10%样本，加入下一epoch重训练，实现渐进式训练（前30epoch细节分支，后50epoch联合训练）",
       "priority": "medium",
       "estimated_hours": 8,
-      "dependencies": ["task-2-3"],
+      "dependencies": [
+        "task-2-3"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -257,7 +293,9 @@
       "description": "使用PaddleSeg量化工具，实现FP16和INT8量化，验证量化后精度损失<2%",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-2-3"],
+      "dependencies": [
+        "task-2-3"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -278,7 +316,9 @@
       "description": "测试CPU和GPU推理速度（单图batch=1），优化推理性能，目标CPU>30FPS、GPU>80FPS",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-2-5"],
+      "dependencies": [
+        "task-2-5"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -299,7 +339,9 @@
       "description": "生成完整评估报告，包括mIoU、Dice、Boundary F1、混淆矩阵、错误案例分析",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-2-6"],
+      "dependencies": [
+        "task-2-6"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -320,7 +362,9 @@
       "description": "安装PaddleClas，配置PP-HGNetV2-B4，下载ImageNet22k预训练权重，设计Multi-Head分类头",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-1-3"],
+      "dependencies": [
+        "task-1-3"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -341,7 +385,10 @@
       "description": "配置多任务加权Loss（Head1: 0.4, Head2: 0.35, Head3: 0.25），实现FocalLoss（α=0.25, γ=2）、AsymmetricLoss、类别加权",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-3-1", "task-1-4"],
+      "dependencies": [
+        "task-3-1",
+        "task-1-4"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -362,7 +409,9 @@
       "description": "实现课程学习策略（前20epoch只训练主任务，后40epoch全任务），动态调整类别权重，梯度累积（accumulate=2）",
       "priority": "medium",
       "estimated_hours": 8,
-      "dependencies": ["task-3-2"],
+      "dependencies": [
+        "task-3-2"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -383,7 +432,10 @@
       "description": "运行完整60 epoch训练，配置CosineAnnealingWarmRestarts学习率策略，实现早停（patience=10），使用CutMix和MixUp增强",
       "priority": "high",
       "estimated_hours": 16,
-      "dependencies": ["task-3-3", "task-1-5"],
+      "dependencies": [
+        "task-3-3",
+        "task-1-5"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -404,7 +456,9 @@
       "description": "针对样本数<100的类别（绛紫舌、黑苔舌等），实施专项增强策略，调整损失权重，提升少数类召回率",
       "priority": "high",
       "estimated_hours": 10,
-      "dependencies": ["task-3-4"],
+      "dependencies": [
+        "task-3-4"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -425,7 +479,9 @@
       "description": "实现FP16和INT8量化，验证量化后精度损失<3%，导出推理模型",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-3-5"],
+      "dependencies": [
+        "task-3-5"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -446,7 +502,10 @@
       "description": "串联分割和分类模型，实现完整流程，优化端到端耗时，验证完整pipeline",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-2-7", "task-3-6"],
+      "dependencies": [
+        "task-2-7",
+        "task-3-6"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -467,7 +526,9 @@
       "description": "生成完整评估报告（mAP、F1、混淆矩阵），实现Grad-CAM可视化，生成特征贡献度说明",
       "priority": "medium",
       "estimated_hours": 8,
-      "dependencies": ["task-3-7"],
+      "dependencies": [
+        "task-3-7"
+      ],
       "assignee": "ml_engineer",
       "passes": true,
       "acceptance_criteria": [
@@ -509,7 +570,9 @@
       "description": "设计System Prompt（严格约束、输出结构定义），实现结构化JSON输出，添加异常检测逻辑",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-4-1"],
+      "dependencies": [
+        "task-4-1"
+      ],
       "assignee": "medical_compliance",
       "passes": true,
       "acceptance_criteria": [
@@ -530,7 +593,9 @@
       "description": "基于证型诊断数据集，构建5-10个典型病例示例，优化Prompt一致性",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-1-7"],
+      "dependencies": [
+        "task-1-7"
+      ],
       "assignee": "medical_compliance",
       "passes": true,
       "acceptance_criteria": [
@@ -551,7 +616,9 @@
       "description": "设计User Prompt模板，动态填充舌象特征、量化指标、用户信息",
       "priority": "medium",
       "estimated_hours": 4,
-      "dependencies": ["task-4-2"],
+      "dependencies": [
+        "task-4-2"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -572,7 +639,9 @@
       "description": "实现FastAPI应用，封装分割、分类、诊断API接口，添加健康检查和监控端点",
       "priority": "high",
       "estimated_hours": 12,
-      "dependencies": ["task-3-7"],
+      "dependencies": [
+        "task-3-7"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -594,7 +663,9 @@
       "description": "实现Celery异步任务队列，配置Redis缓存，实现任务超时和重试机制",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-4-5"],
+      "dependencies": [
+        "task-4-5"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -615,7 +686,9 @@
       "description": "实现本地规则库（特征组合→预设证型），配置相似度检索（历史案例），实现降级触发逻辑",
       "priority": "high",
       "estimated_hours": 10,
-      "dependencies": ["task-1-7"],
+      "dependencies": [
+        "task-1-7"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -636,7 +709,9 @@
       "description": "实现令牌桶限流（rate=100/s），配置熔断器（failure_threshold=5），实现指数退避重试",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-4-6"],
+      "dependencies": [
+        "task-4-6"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -659,7 +734,10 @@
       "description": "编写Dockerfile，构建API服务镜像，配置docker-compose（API、Celery、Redis、MLflow）",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-4-5", "task-4-6"],
+      "dependencies": [
+        "task-4-5",
+        "task-4-6"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -680,7 +758,9 @@
       "description": "使用Locust/JMeter进行压力测试（目标100 QPS），优化缓存策略（Redis 24h），实现结果缓存复用",
       "priority": "high",
       "estimated_hours": 10,
-      "dependencies": ["task-4-9"],
+      "dependencies": [
+        "task-4-9"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -701,7 +781,9 @@
       "description": "配置Prometheus指标采集，搭建Grafana监控面板，设置告警规则（P0-P3级别）",
       "priority": "high",
       "estimated_hours": 10,
-      "dependencies": ["task-4-9"],
+      "dependencies": [
+        "task-4-9"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -722,7 +804,9 @@
       "description": "配置日志收集（ELK Stack），实现审计日志（每次诊断完整流程），日志留存≥180天",
       "priority": "high",
       "estimated_hours": 8,
-      "dependencies": ["task-4-9"],
+      "dependencies": [
+        "task-4-9"
+      ],
       "assignee": "backend_developer",
       "passes": true,
       "acceptance_criteria": [
@@ -743,7 +827,9 @@
       "description": "验证数据脱敏流程（EXIF清理、ID哈希化），确保数据隐私合规",
       "priority": "high",
       "estimated_hours": 6,
-      "dependencies": ["task-1-6"],
+      "dependencies": [
+        "task-1-6"
+      ],
       "assignee": "medical_compliance",
       "passes": true,
       "acceptance_criteria": [
@@ -785,9 +871,11 @@
       "description": "实现分割结果可视化叠加、分类热力图（CAM/Grad-CAM）、特征贡献度说明",
       "priority": "medium",
       "estimated_hours": 8,
-      "dependencies": ["task-3-8"],
+      "dependencies": [
+        "task-3-8"
+      ],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "分割结果叠加可视化",
         "分类热力图生成",
@@ -806,7 +894,10 @@
       "description": "准备二类医疗器械注册资料，编写算法透明度报告，准备临床试验验证方案",
       "priority": "high",
       "estimated_hours": 16,
-      "dependencies": ["task-5-4", "task-5-6"],
+      "dependencies": [
+        "task-5-4",
+        "task-5-6"
+      ],
       "assignee": "medical_compliance",
       "passes": true,
       "acceptance_criteria": [
@@ -827,7 +918,9 @@
       "description": "实现诊断结果页反馈（有帮助/无帮助）、一键反馈、人工申诉入口",
       "priority": "medium",
       "estimated_hours": 8,
-      "dependencies": ["task-4-5"],
+      "dependencies": [
+        "task-4-5"
+      ],
       "assignee": "backend_developer",
       "passes": false,
       "acceptance_criteria": [
@@ -848,7 +941,9 @@
       "description": "基于用户反馈筛选困难样本，专家重新标注，触发模型重训练",
       "priority": "medium",
       "estimated_hours": 12,
-      "dependencies": ["task-5-8"],
+      "dependencies": [
+        "task-5-8"
+      ],
       "assignee": "ml_engineer",
       "passes": false,
       "acceptance_criteria": [
@@ -869,7 +964,9 @@
       "description": "实现实时成本监控面板，配置月度预算告警，优化Prompt减少token消耗",
       "priority": "medium",
       "estimated_hours": 6,
-      "dependencies": ["task-4-1"],
+      "dependencies": [
+        "task-4-1"
+      ],
       "assignee": "backend_developer",
       "passes": false,
       "acceptance_criteria": [
@@ -890,7 +987,9 @@
       "description": "实现灾备架构（主备环境），配置备份策略（数据库每日、模型每周），实现自动切换（<5min）",
       "priority": "medium",
       "estimated_hours": 10,
-      "dependencies": ["task-5-2"],
+      "dependencies": [
+        "task-5-2"
+      ],
       "assignee": "backend_developer",
       "passes": false,
       "acceptance_criteria": [
@@ -911,7 +1010,9 @@
       "description": "实现A/B测试框架（流量50:50），配置金丝雀发布（5%→100%），实现模型版本回滚",
       "priority": "low",
       "estimated_hours": 8,
-      "dependencies": ["task-5-2"],
+      "dependencies": [
+        "task-5-2"
+      ],
       "assignee": "backend_developer",
       "passes": false,
       "acceptance_criteria": [

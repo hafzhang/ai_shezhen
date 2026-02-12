@@ -1143,3 +1143,72 @@ cat docs/MEDICAL_DEVICE_REGISTRATION.md
 ```
 
 ---
+## [2026-02-12] - task-5-6
+- 验证了现有模型可解释性实现（分割/分类评估模块）
+- 创建了完整的可解释性验证报告（MODEL_INTERPRETABILITY_VERIFICATION.md）
+- 确认了Grad-CAM热力图生成功能
+- 确认了分割结果可视化叠加功能
+- 确认了特征贡献度分析功能
+- 对标了《人工智能医疗器械审评要点》要求
+
+**Files changed:**
+- docs/MODEL_INTERPRETABILITY_VERIFICATION.md (new) - 可解释性验证报告
+- prd.json (updated - task-5-6 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 可解释性需包含结果可视化、决策依据、特征贡献度
+- Patterns discovered: Grad-CAM使用梯度加权组合生成热力图
+- Patterns discovered: 分割结果叠加应支持可配置透明度
+- Gotchas encountered: 多任务模型需要为每个分类头单独生成Grad-CAM
+- Gotchas encountered: 可视化应保存为PNG格式便于文档和报告使用
+- Useful context: 热力图颜色应统一（红=高激活、黄=中、蓝=低）
+- Useful context: 特征贡献度应包含置信度等级说明
+- Useful context: 可解释性报告需与医疗器械备案要求对齐
+
+**Acceptance Criteria Met:**
+- 分割结果可视化叠加: PASS (SegmentationEvaluator.generate_visualization)
+- 分类热力图生成: PASS (ClassificationEvaluator.generate_gradcam_visualization)
+- 特征贡献度说明: PASS (FeatureContribution.analyze + 文档)
+- 可解释性报告完成: PASS (完整验证文档)
+
+**Key Features:**
+1. 分割结果可视化:
+   - Mask叠加到原图（半透明绿色）
+   - 轮廓线（绿色边界）
+   - 对比展示（原图|mask|overlay）
+2. 分类热力图:
+   - Grad-CAM梯度加权类激活映射
+   - 支持所有6个分类头
+   - 可配置颜色映射和透明度
+3. 特征贡献度分析:
+   - 各维度特征重要性排序
+   - 置信度等级分类
+   - 人类可读的预测依据
+4. 评估报告生成:
+   - 性能指标汇总
+   - 混淆矩阵可视化
+   - Grad-CAM代表性样本
+   - 错误案例分析
+5. 医疗器械备案对齐:
+   - 算法透明度要求对照
+   - 性能指标可追溯性
+   - 临床评价数据来源
+   - 风险管理要求
+
+**Usage:**
+```bash
+# 1. 模型训练后评估
+python evaluate.py --task classification --checkpoint output/best_model.pdparams
+
+# 2. 查看可解释性验证报告
+cat docs/MODEL_INTERPRETABILITY_VERIFICATION.md
+
+# 3. 生成分割可视化
+# SegmentationEvaluator.generate_visualization() 已集成
+
+# 4. 生成分类Grad-CAM
+# ClassificationEvaluator.generate_gradcam_visualization() 已集成
+```
+
+---
