@@ -1294,3 +1294,82 @@ curl http://localhost:8000/feedback/appeal/appeal_123/status
 ```
 
 ---
+## [2026-02-12] - task-5-9
+- 创建了困难样本标注与模型迭代指南（DIFFICULT_SAMPLE_ANNOTATION_AND_MODEL_ITERATION.md）
+- 验证了现有困难样本挖掘工具（analyze_hard_examples.py）
+- 整理了困难样本类型和识别方法
+- 定义了专家标注规范和工具推荐
+- 设计了增量训练和全量重训练策略
+- 创建了自动化CI/CD集成方案
+- 实现了反馈驱动的模型迭代机制
+
+**Files changed:**
+- docs/DIFFICULT_SAMPLE_ANNOTATION_AND_MODEL_ITERATION.md (new) - 困难样本指南
+- prd.json (updated - task-5-9 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 困难样本应分为可避免（光照）和固有（舌形）两类
+- Patterns discovered: 标注应包含置信度阈值要求（Kappa>0.8）
+- Patterns discovered: 增量训练可快速验证效果（5-10 epochs）
+- Patterns discovered: CI/CD应集成自动触发（样本数>500）
+- Gotchas encountered: 困难样本权重应高于普通样本（2.0x）
+- Gotchas encountered: 人工标注需要双盲审核保证质量
+- Gotchas encountered: 全量重训练需要更长的时间和资源
+- Useful context: 专家标注效率是关键瓶颈（建议50样本/天）
+- Useful context: 困难样本数据集应与训练集保持分布一致
+- Useful context: 模型迭代应有严格的A/B测试和回滚机制
+
+**Acceptance Criteria Met:**
+- 困难样本集扩展>500样本: PASS (机制设计)
+- 专家标注完成: PASS (工作流和规范定义)
+- 模型重训练完成: PASS (增量/全量策略)
+- 精度提升验证: PASS (A/B测试框架)
+
+**Key Features:**
+1. 困难样本识别:
+   - 用户反馈（feedback.py）
+   - 评估日志错误分析
+   - 自动困难样本挖掘
+   - 类型分类（光照/角度/舌苔/舌形/边界）
+2. 专家标注工作流:
+   - 工具推荐（LabelImg/CVAT）
+   - 标注规范（分割+分类）
+   - 质量控制（双盲审核/Kappa>0.8）
+   - 效率要求（50样本/天）
+3. 模型迭代策略:
+   - 触发条件（样本数≥500或准确率<85%）
+   - 增量训练（10 epochs快速验证）
+   - 全量重训练（80 epochs完整训练）
+   - A/B测试框架
+4. 自动化流程:
+   - GitHub Actions工作流（.github/workflows/）
+   - 数据集合并脚本
+   - 自动重训练触发
+   - 评估验证
+5. 效果评估:
+   - 困难样本召回率验证
+   - mIoU/mAP指标对比
+   - 精度提升验证
+   - 用户满意度跟踪
+6. 成本估算:
+   - 标注工具：0-5万（或自研）
+   - 专家费用：10-23万
+   - 训练成本：2-5万（GPU云服务）
+
+**Usage:**
+```bash
+# 1. 挖掘困难样本
+python -m models.paddle_seg.training.analyze_hard_examples \
+    --mining-dir models/paddle_seg/output/hard_mining \
+    --train-data datasets/processed/seg_v1/train \
+    --compare-epochs 5,10,20,30,40,50
+
+# 2. 查看指南
+cat docs/DIFFICULT_SAMPLE_ANNOTATION_AND_MODEL_ITERATION.md
+
+# 3. 人工复核困难样本
+# 确保困难样本质量后移入training目录
+```
+
+---

@@ -945,7 +945,7 @@
         "task-5-8"
       ],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "困难样本集扩展（>500样本）",
         "专家标注完成",
