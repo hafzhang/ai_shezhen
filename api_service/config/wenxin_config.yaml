@@ -1,0 +1,318 @@
+# ==============================================================================
+# 文心一言 API 配置文件
+# ==============================================================================
+# 说明：此文件包含文心一言 ERNIE-Speed 模型的完整配置
+# 更新日期：2026-02-12
+# ==============================================================================
+
+# ==============================================================================
+# API 认证配置
+# ==============================================================================
+authentication:
+  # API 密钥（从环境变量或密钥管理服务获取）
+  api_key_env: "BAIDU_API_KEY"
+  secret_key_env: "BAIDU_SECRET_KEY"
+
+  # Access Token 缓存配置
+  access_token:
+    # Token 有效期（秒），百度云默认为 30 天
+    expires_in: 2592000  # 30 * 24 * 60 * 60
+
+    # Token 缓存位置（Redis 或 文件）
+    cache_type: "redis"  # 可选值: redis, file, memory
+
+    # Redis 缓存配置
+    redis:
+      key_prefix: "wenxin:access_token:"
+      ttl: 2500000  # 略小于官方有效期
+
+    # 文件缓存配置
+    file:
+      path: "api_service/cache/access_token.json"
+
+# ==============================================================================
+# 模型配置
+# ==============================================================================
+model:
+  # 默认使用的模型
+  default: "ERNIE-Speed"
+
+  # 可用模型列表
+  available_models:
+    - name: "ERNIE-Speed"
+      display_name: "文心一言 Speed版"
+      description: "高性能版本，适合实时对话场景"
+      max_tokens: 128000
+      input_price_per_1k_tokens: 0.004  # 元
+      output_price_per_1k_tokens: 0.004  # 元
+      avg_response_time: 1.5  # 秒
+
+    - name: "ERNIE-Speed-128K"
+      display_name: "文心一言 Speed 128K版"
+      description: "超长上下文版本，支持128K上下文"
+      max_tokens: 128000
+      input_price_per_1k_tokens: 0.004  # 元
+      output_price_per_1k_tokens: 0.004  # 元
+      avg_response_time: 2.0  # 秒
+
+    - name: "ERNIE-Lite"
+      display_name: "文心一言 Lite版"
+      description: "轻量级版本，成本更低"
+      max_tokens: 7000
+      input_price_per_1k_tokens: 0.003  # 元
+      output_price_per_1k_tokens: 0.003  # 元
+      avg_response_time: 1.0  # 秒
+
+    - name: "ERNIE-Turbo"
+      display_name: "文心一言 Turbo版"
+      description: "极速版本，适合简单任务"
+      max_tokens: 8000
+      input_price_per_1k_tokens: 0.004  # 元
+      output_price_per_1k_tokens: 0.004  # 元
+      avg_response_time: 0.8  # 秒
+
+    - name: "ERNIE-4.0"
+      display_name: "文心一言 4.0"
+      description: "最新旗舰版本，能力最强"
+      max_tokens: 128000
+      input_price_per_1k_tokens: 0.012  # 元
+      output_price_per_1k_tokens: 0.012  # 元
+      avg_response_time: 3.0  # 秒
+
+# ==============================================================================
+# API 端点配置
+# ==============================================================================
+endpoints:
+  # 官方 API 端点
+  base_url: "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
+
+  # 各模型端点映射
+  model_endpoints:
+    "ERNIE-Speed": "/chat/ernie_speed"
+    "ERNIE-Speed-128K": "/chat/ernie_speed_128k"
+    "ERNIE-Lite": "/chat/ernie_lite"
+    "ERNIE-Turbo": "/chat/ernie_turbo"
+    "ERNIE-4.0": "/chat/completions_pro"
+
+  # 请求超时配置
+  timeout:
+    connect: 5  # 连接超时（秒）
+    read: 30   # 读取超时（秒）
+
+# ==============================================================================
+# 请求配置
+# ==============================================================================
+request:
+  # 温度参数（控制输出随机性）
+  temperature: 0.7
+
+  # Top-P 采样
+  top_p: 0.9
+
+  # Top-K 采样
+  top_k: 50
+
+  # 最大输出 Token 数
+  max_output_tokens: 2000
+
+  # 惩罚参数
+  frequency_penalty: 0.0  # 频率惩罚
+  presence_penalty: 0.0    # 存在惩罚
+
+  # 停止序列
+  stop_sequences:
+    - "\n\n"
+    - "###"
+
+# ==============================================================================
+# 重试和容错配置
+# ==============================================================================
+retry:
+  # 最大重试次数
+  max_attempts: 3
+
+  # 初始重试延迟（秒）
+  initial_delay: 1.0
+
+  # 最大重试延迟（秒）
+  max_delay: 10.0
+
+  # 指数退避因子
+  exponential_base: 2.0
+
+  # 抖动因子（避免雷击效应）
+  jitter: true
+
+  # 可重试的 HTTP 状态码
+  retryable_status_codes:
+    - 429  # Too Many Requests
+    - 500  # Internal Server Error
+    - 502  # Bad Gateway
+    - 503  # Service Unavailable
+    - 504  # Gateway Timeout
+
+# ==============================================================================
+# 限流配置
+# ==============================================================================
+rate_limit:
+  # 每秒请求数
+  requests_per_second: 100
+
+  # 并发连接数
+  max_concurrent_requests: 10
+
+  # 令牌桶容量
+  burst_capacity: 20
+
+# ==============================================================================
+# 成本监控配置
+# ==============================================================================
+cost_monitoring:
+  # 启用状态
+  enabled: true
+
+  # 预算告警配置
+  budget_alerts:
+    # 每日预算（元）
+    daily: 100
+
+    # 每月预算（元）
+    monthly: 1000
+
+    # 告警阈值（百分比）
+    alert_thresholds:
+      - 50   # 50% 时警告
+      - 80   # 80% 时严重警告
+      - 100  # 100% 时停止服务
+
+  # 成本统计周期（小时）
+  cost_aggregation_interval: 1
+
+# ==============================================================================
+# Prompt 模板配置
+# ==============================================================================
+prompts:
+  # System Prompt 路径
+  system_prompt_path: "api_service/prompts/system_prompt.txt"
+
+  # Few-shot 示例路径
+  few_shot_examples_path: "api_service/prompts/few_shot_examples.json"
+
+  # User Prompt 模板路径
+  user_prompt_template_path: "api_service/prompts/user_prompt_template.py"
+
+  # Prompt 长度限制（预留 Token 用于输出）
+  max_prompt_tokens: 6000  # 对于 8K 上下文模型
+  max_output_tokens: 2000  # 保留足够空间给模型输出
+
+# ==============================================================================
+# 输出格式配置
+# ==============================================================================
+output:
+  # 响应格式（json/text）
+  response_format: "json"
+
+  # 强制 JSON 输出
+  force_json: true
+
+  # JSON Schema 配置（用于结构化输出）
+  json_schema:
+    # 是否启用 Schema 验证
+    enabled: true
+
+    # Schema 文件路径
+    schema_path: "api_service/config/diagnosis_response_schema.json"
+
+# ==============================================================================
+# 兜底方案配置
+# ==============================================================================
+fallback:
+  # 启用本地规则库兜底
+  enable_rule_based: true
+
+  # API 超时降级阈值（秒）
+  timeout_threshold: 10
+
+  # 连续失败阈值
+  failure_threshold: 5
+
+  # 降级持续时间（秒）
+  fallback_duration: 300
+
+  # 规则库配置路径
+  rule_based_config_path: "api_service/config/rule_based_config.json"
+
+# ==============================================================================
+# 日志和监控配置
+# ==============================================================================
+monitoring:
+  # 请求日志
+  log_requests: true
+
+  # 响应日志
+  log_responses: true
+
+  # Token 使用统计
+  track_token_usage: true
+
+  # 响应时间统计
+  track_response_time: true
+
+  # 错误统计
+  track_errors: true
+
+  # 日志级别
+  log_level: "INFO"
+
+# ==============================================================================
+# 安全和合规配置
+# ==============================================================================
+security:
+  # 敏感信息过滤
+  filter_sensitive_info: true
+
+  # 内容审查
+  content_moderation: true
+
+  # 审计日志
+  audit_log: true
+
+  # 请求签名验证
+  verify_signature: false
+
+# ==============================================================================
+# 测试环境配置
+# ==============================================================================
+testing:
+  # Mock 模式（不调用真实 API）
+  mock_mode: false
+
+  # Mock 响应文件路径
+  mock_response_path: "api_service/tests/mock_responses.json"
+
+  # 测试数据集路径
+  test_data_path: "api_service/tests/test_cases.json"
+
+# ==============================================================================
+# 文档和参考
+# ==============================================================================
+documentation:
+  # 官方文档链接
+  official_docs: "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu"
+
+  # 定价页面
+  pricing: "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Pricing"
+
+  # 错误码参考
+  error_codes: "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Errorcode"
+
+  # API 示例
+  examples: "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/F getting-started"
+
+# ==============================================================================
+# 版本信息
+# ==============================================================================
+version:
+  config_version: "1.0.0"
+  last_updated: "2026-02-12"
+  compatible_api_version: "v1"
