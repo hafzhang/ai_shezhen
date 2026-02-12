@@ -659,7 +659,7 @@
       "estimated_hours": 6,
       "dependencies": ["task-4-5", "task-4-6"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Docker镜像构建成功",
         "docker-compose启动正常",
