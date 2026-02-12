@@ -553,7 +553,7 @@
       "estimated_hours": 4,
       "dependencies": ["task-4-2"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "User Prompt模板完成",
         "动态填充功能正常",

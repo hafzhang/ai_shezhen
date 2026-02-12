@@ -33,6 +33,10 @@
 - TCM syndrome knowledge base: Defines typical features for each syndrome (13-20) for validation and consistency checking
 - Few-shot expert reasoning format: 【舌象观察】【典型特征】【辨证分析】【治则】4-part structure
 - Syndrome "图" types (14,16,18,20) have very few samples in dataset - need targeted collection
+- User Prompt template uses format strings with confidence values formatted as percentages: {variable:.2%}
+- Template auto-selection: Healthy tongue (confidence>0.7) -> healthy template; low confidence (<0.5) -> simplified template; else -> base template
+- Field mapping includes tongue colors (4), coating colors (4), tongue shapes (3), coating qualities (4), special features (3), health status (2)
+- Windows UTF-8 encoding for tests: Use sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict') at module level
 
 ---
 - The dataset uses COCO format with train/val/test splits
@@ -907,5 +911,68 @@ response = wenxin_api.chat(
 5. Acceptable for LLM Prompt testing with current 44 examples
 
 **Note:** "图" type syndromes (14, 16, 18, 20) have insufficient samples due to original dataset limitations. These can be supplemented in future iterations through targeted data annotation.
+
+---
+
+## [2026-02-12] - task-4-4
+- 实现了完整的User Prompt模板模块（api_service/prompts/user_prompt_template.py）
+- 创建了UserPromptBuilder类，支持动态prompt生成
+- 实现了三种模板类型：基础模板、健康舌专用模板、简化模板（低置信度）
+- 创建了完整的字段映射配置（FieldMapping类）
+- 实现了ClassificationResult和UserInfo数据类
+- 创建了create_user_prompt便捷函数
+- 编写了完整的单元测试（25个测试用例，全部通过）
+- 生成了字段映射文档（FIELD_MAPPING.md）
+
+**Files changed:**
+- api_service/prompts/user_prompt_template.py (new) - 650+ lines of User Prompt template code
+- api_service/prompts/FIELD_MAPPING.md (new) - Complete field mapping documentation
+- api_service/prompts/test_user_prompt_template.py (new) - 525+ lines of unit tests
+- prd.json (updated - task-4-4 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: User Prompt模板需要支持动态字段填充和模板自动选择；三种模板类型覆盖不同场景（正常、健康、低置信度）
+- Gotchas encountered: Windows console编码问题需要使用UTF-8编码包装器处理中文字符；单元测试中使用assertIn检查中文字符串时需要特殊处理
+- Useful context: 字段映射包括舌色(4类)、苔色(4类)、舌形(3类)、苔质(4类)、特殊特征(3类)、健康状态(2类)
+- Useful context: 模板选择逻辑：健康舌(置信度>0.7)使用健康模板，低置信度特征(<0.5)使用简化模板，其他使用基础模板
+- Useful context: 置信度格式化使用{variable:.2%}实现百分比显示（如92.00%）
+
+**Acceptance Criteria Met:**
+- User Prompt模板完成: PASS (650+ lines of complete implementation)
+- 动态填充功能正常: PASS (25 unit tests all pass)
+- 字段映射正确: PASS (FieldMapping class with complete mappings)
+- 模板测试通过: PASS (all 25 unit tests pass)
+
+**Key Features:**
+1. UserPromptBuilder: 动态构建用户提示词，支持三种模板类型
+2. FieldMapping: 完整的字段映射配置（舌色、苔色、舌形、苔质、特殊特征）
+3. ClassificationResult: 分类模型输出结果数据类
+4. UserInfo: 用户信息数据类（年龄、性别、症状、病史、主诉）
+5. PromptTemplates: 三种模板常量类（BASE, SIMPLIFIED, HEALTHY）
+6. create_user_prompt: 便捷函数，支持字典输入
+7. 完整单元测试：25个测试用例覆盖所有功能
+
+**Usage Example:**
+```python
+from api_service.prompts.user_prompt_template import create_user_prompt
+
+model_output = {
+    "tongue_color": {"prediction": "淡红舌", "confidence": 0.92, "description": "气血调和"},
+    "coating_color": {"prediction": "白苔", "confidence": 0.88, "description": "苔色薄白"},
+    "tongue_shape": {"prediction": "正常", "confidence": 0.90, "description": "舌形适中"},
+    "coating_quality": {"prediction": "薄苔", "confidence": 0.85, "description": "苔质薄白"},
+    "special_features": {
+        "red_dots": {"present": False, "confidence": 0.0, "description": "无明显红点"},
+        "cracks": {"present": False, "confidence": 0.0, "description": "无明显裂纹"},
+        "teeth_marks": {"present": False, "confidence": 0.0, "description": "无明显齿痕"}
+    },
+    "health_status": {"prediction": "健康舌", "confidence": 0.91, "description": "舌象正常"}
+}
+
+user_info = {"age": 35, "gender": "女", "symptoms": ["乏力"], "chief_complaint": "感觉疲劳"}
+
+prompt = create_user_prompt(model_output, user_info=user_info)
+```
 
 ---
