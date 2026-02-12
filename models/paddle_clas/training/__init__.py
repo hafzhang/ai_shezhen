@@ -7,6 +7,7 @@ This module provides:
 - GradientAccumulator: Stable training with small batches
 - CurriculumTrainingConfig: Complete training configuration
 - train: Main training script with 60 epochs, CosineAnnealingWarmRestarts, early stopping
+- MinorityOptimization: Specialized optimization for minority classes (task-3-5)
 """
 
 from .curriculum_learning import (

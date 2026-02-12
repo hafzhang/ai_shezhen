@@ -1,0 +1,82 @@
+# Minority Class Optimization Configuration
+# Task: task-3-5 - 少数类专项优化
+#
+# This configuration defines optimization strategies for minority classes
+# (classes with sample count < 100 or prevalence < 5%)
+
+# Minority class definitions per head
+# Based on dataset statistics from datasets/processed/clas_v1/statistics_report.json
+minority_classes:
+  # Tongue color (舌色) - 绛紫舌, 淡白舌
+  tongue_color: [2, 3]  # 绛紫(3.42%), 淡白(3.42%)
+
+  # Coating color (苔色) - 黑苔, 花剥苔
+  coating_color: [2, 3]  # 黑苔(1.8%), 花剥苔(3.6%)
+
+  # Tongue shape (舌形) - 正常, 瘦薄舌
+  tongue_shape: [0, 2]  # 正常(0%), 瘦薄(4.21%)
+
+  # Coating quality (苔质) - 薄苔, 厚苔, 腻苔
+  coating_quality: [0, 1, 2]  # 薄苔(5.83%), 厚苔(0%), 腻苔(0%)
+
+  # Features (特征) - No minority classes (all have >1000 samples)
+  features: []  # 红点(18.26%), 裂纹(24.6%), 齿痕(15.67%)
+
+# Augmentation settings
+augmentation:
+  # How many augmented versions per minority sample
+  multiplier: 5
+
+  # Augmentation types for minority classes
+  types:
+    - color_jitter      # Aggressive color variation
+    - rotation         # Random rotation (-30 to 30 degrees)
+    - flip            # Random horizontal/vertical flip
+    - gaussian_blur    # Blur for robustness
+    - combination      # Mix of above augmentations
+
+# Loss weight adjustment
+loss_adjustment:
+  # Factor to boost minority class weights
+  boost_factor: 2.0
+
+  # Apply focal loss with higher gamma for minority classes
+  focal_gamma_minority: 3.0  # Higher than default 2.0
+  focal_gamma_majority: 2.0
+
+  # Asymmetric loss parameters for multi-label heads
+  asymmetric_gamma_pos_minority: 0.5
+  asymmetric_gamma_neg_minority: 5.0
+
+# Target metrics
+targets:
+  # Minimum recall for minority classes
+  recall: 0.60  # 60%
+
+  # F1 score improvement target
+  f1_improvement: 0.15  # 15% improvement
+
+  # Class balance target (F1 standard deviation)
+  f1_std_max: 0.15
+
+# Evaluation settings
+evaluation:
+  # Compute per-class metrics
+  per_class_metrics: true
+
+  # Generate confusion matrices
+  confusion_matrix: true
+
+  # Track minority class performance separately
+  track_minority: true
+
+# Output settings
+output:
+  # Directory for optimization results
+  results_dir: "models/paddle_clas/output/minority_optimized"
+
+  # Save per-class metrics
+  save_per_class_metrics: true
+
+  # Generate before/after comparison report
+  generate_comparison_report: true
