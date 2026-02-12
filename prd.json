@@ -596,7 +596,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-4-5"],
       "assignee": "backend_developer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Celery worker正常运行",
         "Redis缓存配置正确",

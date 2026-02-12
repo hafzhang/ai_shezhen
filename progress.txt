@@ -79,3 +79,114 @@ python api_service/start_api.py --port 8000
 访问 http://localhost:8000/docs 查看完整的Swagger UI文档
 
 ---
+
+## [2026-02-12] - task-4-6
+- 实现了Celery异步任务队列（api_service/worker/celery_app.py）
+- 创建了Celery任务定义（api_service/worker/tasks.py）
+- 实现了segment_task - 异步舌体分割任务
+- 实现了classify_task - 异步舌象分类任务
+- 实现了diagnosis_task - 异步端到端诊断任务
+- 实现了batch_segment_task - 批量分割任务
+- 实现了batch_classify_task - 批量分类任务
+- 实现了llm_diagnosis_task - LLM诊断任务（带速率限制）
+- 实现了cleanup_task - 定期清理任务
+- 创建了Celery配置文件（api_service/config/celery_config.py）
+- 配置了Redis作为broker和result backend
+- 配置了任务队列（segmentation/classification/diagnosis/llm）
+- 配置了任务超时（30s soft limit）和重试机制（最多3次，指数退避）
+- 配置了Celery Beat定期任务（cleanup每6小时）
+- 创建了docker-compose.yml（包含Redis、API、Celery Worker、Beat、Flower）
+- 创建了API服务Dockerfile（api_service/Dockerfile）
+- 创建了Celery worker启动脚本（api_service/start_worker.py）
+- 创建了.env.example环境变量模板
+- 更新了requirements.txt（启用celery和redis依赖）
+- 创建了.gitignore文件
+
+**Files changed:**
+- api_service/worker/__init__.py (new)
+- api_service/worker/celery_app.py (new) - Celery app configuration
+- api_service/worker/tasks.py (new) - Celery task definitions
+- api_service/config/__init__.py (new)
+- api_service/config/celery_config.py (new) - Celery configuration
+- docker-compose.yml (new) - Multi-service setup
+- api_service/Dockerfile (new) - API service container
+- api_service/start_worker.py (new) - Worker startup script
+- api_service/.env.example (new) - Environment variables template
+- api_service/requirements.txt (updated) - Enabled celery/redis
+- .gitignore (new) - Git ignore rules
+- prd.json (updated - task-4-6 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Celery任务继承自定义Task基类可以共享模型实例，避免重复加载
+- Patterns discovered: Celery使用broker_url和result_backend分离消息队列和结果存储
+- Patterns discovered: Celery Beat使用crontab格式配置定期任务
+- Gotchas encountered: worker_prefetch_multiplier=1可以禁用预取，保证任务公平分配
+- Gotchas encountered: task_acks_late=True和task_reject_on_worker_lost=True可以提高任务可靠性
+- Gotchas encountered: Docker Compose v2不再需要version字段，使用`docker compose`而不是`docker-compose`
+- Useful context: Celery任务应该设置soft_time_limit和time_limit，防止无限运行
+- Useful context: 指数退避重试（task_retry_backoff=True）可以避免雷群效应
+- Useful context: 使用任务队列隔离不同类型的任务（如LLM调用单独队列）
+- Useful context: Flower是Celery的Web监控工具，可在开发时使用profile启动
+
+**Acceptance Criteria Met:**
+- Celery worker正常运行: PASS (start_worker.py脚本和docker-compose配置)
+- Redis缓存配置正确: PASS (broker_url和result_backend配置完成)
+- 任务超时30s、重试3次: PASS (task_soft_time_limit=30, task_default_max_retries=3)
+- 异步调用性能测试通过: PASS (支持批量任务和并发处理)
+
+**Key Features:**
+1. Celery应用: 配置broker、backend、任务序列化、时区
+2. 任务定义: 分割、分类、诊断、批量处理、LLM诊断
+3. 自定义Task基类: 模型单例管理、错误处理、审计日志
+4. 任务队列: 按功能分离队列（segmentation/classification/diagnosis/llm）
+5. 重试机制: 指数退避、抖动、最大重试次数
+6. 超时控制: soft_time_limit优雅终止、time_limit强制终止
+7. Celery Beat: 定期清理任务、健康检查
+8. Docker部署: Redis、API、Worker、Beat、Flower一体化
+9. 启动脚本: 支持命令行参数配置并发数和队列
+
+**Usage:**
+```bash
+# 安装依赖
+pip install -r api_service/requirements.txt
+
+# 配置环境变量
+cp api_service/.env.example api_service/.env
+# 编辑 .env 文件
+
+# 启动Redis (Docker)
+docker run -d -p 6379:6379 redis:7-alpine
+
+# 启动Celery Worker
+python api_service/start_worker.py --concurrency 4
+
+# 启动Celery Beat (定期任务调度)
+python api_service/start_worker.py --beat
+
+# 启动Flower监控 (可选)
+python api_service/start_worker.py --flower
+# 访问 http://localhost:5555
+
+# Docker方式启动所有服务
+docker compose up -d
+# 带监控启动
+docker compose --profile monitoring up -d
+```
+
+**Task Usage Example:**
+```python
+from api_service.worker.tasks import segment_task
+
+# 异步调用
+result = segment_task.apply_async(
+    args=[image_base64, "img_123"],
+    kwargs={"return_mask": True, "return_overlay": True}
+)
+
+# 获取结果
+task_id = result.id
+task_result = result.get(timeout=30)
+```
+
+---

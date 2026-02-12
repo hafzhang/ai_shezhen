@@ -1,0 +1,180 @@
+# AI舌诊智能诊断系统 - Docker Compose配置
+#
+# Docker Compose configuration for Tongue Diagnosis AI System
+# Includes API service, Celery worker, Redis, and monitoring services.
+#
+# Author: Ralph Agent
+# Date: 2026-02-12
+#
+# Usage:
+#   docker compose up -d              # Start all services
+#   docker compose up -d --build      # Rebuild and start
+#   docker compose logs -f api        # Follow API logs
+#   docker compose down                # Stop and remove containers
+
+services:
+  # ============================================================================
+  # Redis - Message Broker & Result Backend
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: shezhen-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - shezhen-network
+
+  # ============================================================================
+  # API Service (FastAPI)
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: api_service/Dockerfile
+    container_name: shezhen-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./api_service:/app/api_service
+      - ./logs:/app/logs
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - LOG_LEVEL=INFO
+    env_file:
+      - api_service/.env
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - shezhen-network
+
+  # ============================================================================
+  # Celery Worker - Main Queue
+  # ============================================================================
+  celery-worker:
+    build:
+      context: .
+      dockerfile: api_service/Dockerfile
+    container_name: shezhen-celery-worker
+    restart: unless-stopped
+    command: celery -A api_service.worker.celery_app worker --loglevel=info --concurrency=4
+    volumes:
+      - ./models:/app/models:ro
+      - ./api_service:/app/api_service
+      - ./logs:/app/logs
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - LOG_LEVEL=INFO
+      - INFERENCE_DEVICE=cpu
+    env_file:
+      - api_service/.env
+    depends_on:
+      - redis
+    networks:
+      - shezhen-network
+
+  # ============================================================================
+  # Celery Beat - Periodic Task Scheduler
+  # ============================================================================
+  celery-beat:
+    build:
+      context: .
+      dockerfile: api_service/Dockerfile
+    container_name: shezhen-celery-beat
+    restart: unless-stopped
+    command: celery -A api_service.worker.celery_app beat --loglevel=info
+    volumes:
+      - ./api_service:/app/api_service
+      - ./logs:/app/logs
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - LOG_LEVEL=INFO
+    env_file:
+      - api_service/.env
+    depends_on:
+      - redis
+    networks:
+      - shezhen-network
+
+  # ============================================================================
+  # Flower - Celery Monitoring (Optional)
+  # ============================================================================
+  flower:
+    build:
+      context: .
+      dockerfile: api_service/Dockerfile
+    container_name: shezhen-flower
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    command: celery -A api_service.worker.celery_app flower --port=5555 --broker=redis://redis:6379/1
+    volumes:
+      - ./api_service:/app/api_service
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+      - celery-worker
+    networks:
+      - shezhen-network
+    profiles:
+      - monitoring  # Only start with --profile monitoring
+
+  # ============================================================================
+  # MLflow - Model Tracking (Optional)
+  # ============================================================================
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.9.0
+    container_name: shezhen-mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow_data:/mlflow
+    command: mlflow server --backend-store-uri sqlite:///mlflow/mlflow.db --default-artifact-root /mlflow/artifacts
+    networks:
+      - shezhen-network
+    profiles:
+      - monitoring
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  redis_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  shezhen-network:
+    driver: bridge
