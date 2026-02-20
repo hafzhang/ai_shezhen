@@ -2,7 +2,25 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-21] - task-5-5
+## [2026-02-21] - task-5-2
+- **What was implemented:**
+  - Verified task-5-2 (Prometheus + Grafana监控配置) was already implemented
+  - Prometheus configuration (prometheus/prometheus.yml) with 6 scrape jobs
+  - Grafana dashboard (grafana/dashboards/shezhen-api-dashboard.json) with 10 panels
+  - Alert rules (prometheus/alert_rules.yml) with P0-P3 priority levels
+  - Metrics middleware (api_service/app/middleware/prometheus_metrics.py) integrated
+
+- **Files changed:**
+  - prd1.json (updated: marked task-5-2 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** Prometheus scrapes API at 10s interval, other services at 15s-30s
+  - **Pattern:** Alert levels: P0 (critical, 1m), P1 (high, 3-5m), P2 (medium, 5-10m), P3 (low, 15m)
+  - **Pattern:** Grafana dashboard uses histogram_quantile for P50/P95/P99 latency calculations
+  - **Context:** Scrape jobs include: prometheus, shezhen-api, shezhen-celery, redis, node, cadvisor
+  - **Pattern:** Business metrics track model inference (segment/classify/diagnosis), LLM API calls, cache hit rates, and daily costs
+
+---## [2026-02-21] - task-5-5
 - **What was implemented:**
   - Verified task-5-5 (知情同意书与隐私政策) was already implemented
   - Informed consent form template (docs/INFORMED_CONSENT_FORM.md v2.3)
