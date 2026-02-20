@@ -2,7 +2,26 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-21] - task-5-3
+## [2026-02-21] - task-5-4
+- **What was implemented:**
+  - Verified task-5-4 (数据脱敏流程验证) was already implemented
+  - Data anonymization tool (datasets/tools/anonymize.py) with EXIFCleaner and FilenameAnonymizer
+  - EXIF data cleaning (18 sensitive tags removed including GPSInfo, Make, Model, etc.)
+  - SHA-256 filename hashing with salt for anonymization
+  - Data anonymization protocol documentation (docs/data_anonymization_protocol.md)
+  - Verification report (docs/data_anonymization_verification_report.md)
+
+- **Files changed:**
+  - prd1.json (updated: marked task-5-4 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** EXIFCleaner removes 18 sensitive tags: GPSInfo, Make, Model, Software, DateTime, Artist, Copyright, etc.
+  - **Pattern:** Filename hashing uses SHA-256 with salt ('shezhhen_anonymize_v1') for security
+  - **Pattern:** The tool generates bidirectional mapping (original_hash -> hashed) for audit purposes
+  - **Context:** 5,594 images processed with 0 errors; 65 images contained GPS data (high risk)
+  - **Gotcha:** The filename_mapping.json should have restricted access as it contains the hash mapping
+
+---## [2026-02-21] - task-5-3
 - **What was implemented:**
   - Verified task-5-3 (日志收集与审计日志系统) was already implemented
   - ELK Stack configuration (elasticsearch, logstash, kibana, filebeat)
