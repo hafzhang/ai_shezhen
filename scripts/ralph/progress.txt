@@ -2,7 +2,26 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-12] - task-3-4
+## [2026-02-21] - task-4-7
+- **What was implemented:**
+  - Verified task-4-7 (本地规则库兜底方案) was already implemented
+  - Rule-based diagnosis engine (api_service/core/rule_based_diagnosis.py) with 12 syndromes
+  - Case retrieval system (api_service/core/case_retrieval.py) with Jaccard similarity
+  - Configuration file (api_service/config/rule_based_config.json) with timeout and monitoring settings
+  - Integration with API endpoints for fallback when LLM diagnosis fails
+  - Degradation trigger logic (10s timeout) and fallback rate monitoring (<5% alert)
+
+- **Files changed:**
+  - prd1.json (updated: marked task-4-7 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** The rule-based system uses weighted feature matching (tongue_color: 0.25, coating_color: 0.25, tongue_shape: 0.15, special_features: 0.25, health_status: 0.10)
+  - **Pattern:** Case retrieval uses Jaccard similarity for special features and exact match for categorical features
+  - **Gotcha:** The rule-based fallback is already integrated in the diagnosis endpoint (endpoints.py lines 608-714)
+  - **Context:** The fallback system covers 12 syndromes including: 健康舌, 阴虚火旺证, 痰湿内阻证, 气滞血瘀证, 寒湿困脾证, 心肺气虚证, 肾气虚证, 脾胃虚弱证, 肝胆湿热证, and their 图 variants
+  - **Pattern:** The system logs fallback activations and can alert when fallback rate exceeds 5%
+
+---## [2026-02-12] - task-3-4
 - **What was implemented:**
   - Main training script (models/paddle_clas/training/train.py) with 60-epoch training
   - CosineAnnealingWarmRestarts learning rate scheduler implementation
