@@ -2,7 +2,26 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-21] - task-4-7
+## [2026-02-21] - task-5-5
+- **What was implemented:**
+  - Verified task-5-5 (知情同意书与隐私政策) was already implemented
+  - Informed consent form template (docs/INFORMED_CONSENT_FORM.md v2.3)
+  - Privacy policy document (docs/PRIVACY_POLICY.md v2.3)
+  - User authorization flow API (api_service/app/api/v1/consent.py)
+  - Data deletion endpoints (request, status, 7-day completion guarantee)
+  - Consent withdrawal mechanism with 180-day data retention policy
+
+- **Files changed:**
+  - prd1.json (updated: marked task-5-5 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** The consent system uses in-memory storage with JSON persistence for demo purposes; production requires database integration
+  - **Pattern:** All consent operations are logged with audit trail for compliance (IP address, user agent, timestamps)
+  - **Pattern:** Data deletion follows a 7-day SLA with support ticket tracking
+  - **Context:** The consent API includes 7 endpoints: /form, /submit, /status/{id}, /withdraw, /data-deletion/request, /data-deletion/status/{id}, /privacy-policy
+  - **Gotcha:** The consent records include withdrawal tracking - users can withdraw consent but data is kept for 180 days for audit purposes
+
+---## [2026-02-21] - task-4-7
 - **What was implemented:**
   - Verified task-4-7 (本地规则库兜底方案) was already implemented
   - Rule-based diagnosis engine (api_service/core/rule_based_diagnosis.py) with 12 syndromes

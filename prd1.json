@@ -766,7 +766,7 @@
       "estimated_hours": 8,
       "dependencies": [],
       "assignee": "medical_compliance",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "知情同意书模板完成",
         "隐私政策文本审核通过",
