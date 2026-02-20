@@ -2,7 +2,26 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-21] - task-5-1
+## [2026-02-21] - task-5-6
+- **What was implemented:**
+  - Verified task-5-6 (模型可解释性方案验证) was already implemented
+  - Grad-CAM implementation (models/paddle_clas/evaluation/classification_evaluator.py)
+  - Feature contribution analysis (FeatureContribution class)
+  - Segmentation result overlay visualization
+  - Interpretability verification report (docs/MODEL_INTERPRETABILITY_VERIFICATION.md)
+  - Feature contribution documentation (models/paddle_clas/evaluation/feature_contribution.md)
+
+- **Files changed:**
+  - prd1.json (updated: marked task-5-6 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** Grad-CAM uses gradient-weighted class activation mapping on stage4 (last conv layer)
+  - **Pattern:** FeatureContribution computes head importance scores and generates human-readable explanations
+  - **Pattern:** Segmentation visualization supports overlay, contour, and comparison display modes
+  - **Context:** All 6 classification heads support Grad-CAM: tongue_color, coating_color, tongue_shape, coating_quality, special_features, health_status
+  - **Gotcha:** The interpretability features meet medical device registration requirements per AI medical device review guidelines
+
+---## [2026-02-21] - task-5-1
 - **What was implemented:**
   - Created Locust load test script (tests/load/locust_load_test.py)
   - Implemented test scenarios for all API endpoints (health, segment, classify, diagnosis)

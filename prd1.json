@@ -787,7 +787,7 @@
       "estimated_hours": 8,
       "dependencies": ["task-3-8"],
       "assignee": "ml_engineer",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "分割结果叠加可视化",
         "分类热力图生成",
