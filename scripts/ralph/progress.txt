@@ -2,7 +2,26 @@
 Started: Thu, Feb 12, 2026  9:41:11 AM
 ---
 
-## [2026-02-21] - task-5-2
+## [2026-02-21] - task-5-3
+- **What was implemented:**
+  - Verified task-5-3 (日志收集与审计日志系统) was already implemented
+  - ELK Stack configuration (elasticsearch, logstash, kibana, filebeat)
+  - Audit trail system (api_service/core/audit_trail.py) with SHA256 checksums
+  - WORM (Write Once Read Many) storage for tamper-evidence
+  - 180-day retention policy via Elasticsearch ILM
+  - Complete workflow logging for diagnosis requests
+
+- **Files changed:**
+  - prd1.json (updated: marked task-5-3 as complete)
+
+- **Learnings for future iterations:**
+  - **Pattern:** Audit events use SHA256 checksums calculated on immutable data for tamper detection
+  - **Pattern:** WORM storage is implemented via append-only file mode ('a') and verify_audit_trail() method
+  - **Pattern:** Logstash uses Grok patterns to parse DIAGNOSIS, API_REQUEST, API_RESPONSE, and ERROR events
+  - **Context:** ELK stack uses --profile logging to start services: elasticsearch, logstash, kibana, filebeat, elk-setup
+  - **Pattern:** ILM policy: Hot (0-30d), Warm (30-90d), Cold (90-180d), Delete (after 180d)
+
+---## [2026-02-21] - task-5-2
 - **What was implemented:**
   - Verified task-5-2 (Prometheus + Grafana监控配置) was already implemented
   - Prometheus configuration (prometheus/prometheus.yml) with 6 scrape jobs
