@@ -662,9 +662,9 @@
       "title": "Create deps.py dependency injection",
       "description": "As a backend engineer, I need to create FastAPI dependency injection for authentication.",
       "priority": 112,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/api/deps.py",
         "Implement get_db() database session dependency",
@@ -672,6 +672,9 @@
         "Implement get_optional_user() for optional auth (anonymous support)",
         "Configure OAuth2PasswordBearer",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/deps.py"
       ]
     },
     {

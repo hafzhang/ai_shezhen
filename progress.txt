@@ -2411,3 +2411,78 @@ user = get_user_by_openid(db, openid="oxxxxxx", openid_type="wechat")
 - Force keyword-only arguments with asterisk: def create_user(db: Session, *, phone: Optional[str] = None, ...)
 - Use UTC timezone for timestamps: datetime.datetime.now(datetime.timezone.utc)
 
+
+## [2026-02-21] - US-112
+- Created api_service/app/api/deps.py with FastAPI dependency injection
+- Implemented get_db() database session dependency (wraps database.get_db())
+- Implemented get_current_user() to extract and validate JWT token, return authenticated User
+- Implemented get_optional_user() for optional authentication (supports anonymous users)
+- Implemented get_current_active_user() to check user is not soft deleted
+- Implemented get_current_active_optional_user() for optional + active user check
+- Configured OAuth2PasswordBearer with tokenUrl="/api/v2/auth/login" and auto_error=False
+- Added comprehensive error handling with HTTPException for auth failures
+- Added logging for authentication events
+
+**Files changed:**
+- api_service/app/api/deps.py (new) - 280+ lines of FastAPI dependency injection
+- prd.json (updated - US-112 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: FastAPI dependencies are async generator functions using "yield from" for chaining
+- Patterns discovered: OAuth2PasswordBearer with auto_error=False enables optional authentication
+- Patterns discovered: Use HTTPException with status codes 401 for auth failures, 400 for inactive accounts
+- Patterns discovered: Check deleted_at.isnot(None) for soft deleted user detection
+- Gotchas encountered: OAuth2PasswordBearer's tokenUrl must match the actual login endpoint path
+- Gotchas encountered: For optional auth, set auto_error=False and manually check if token is None
+- Useful context: get_current_user() raises exception on failure, get_optional_user() returns None
+- Useful context: Dependencies can be chained (get_current_active_user depends on get_current_user)
+- Useful context: HTTPException should include WWW-Authenticate header for 401 responses
+
+**Acceptance Criteria Met:**
+- Create api_service/app/api/deps.py: PASS (file created at api_service/app/api/deps.py)
+- Implement get_db() database session dependency: PASS (wraps database.get_db() with yield from)
+- Implement get_current_user() to get user from JWT: PASS (validates token, retrieves user from DB)
+- Implement get_optional_user() for optional auth: PASS (returns None instead of raising exception)
+- Configure OAuth2PasswordBearer: PASS (configured with tokenUrl="/api/v2/auth/login", auto_error=False)
+- Typecheck passes: PASS (Python syntax check and import verification successful)
+
+**Key Features:**
+1. Database Session Injection: get_db() yields database session for endpoint use
+2. Required Authentication: get_current_user() extracts JWT token and returns authenticated User
+3. Optional Authentication: get_optional_user() allows anonymous access (returns None if not authenticated)
+4. Active User Check: get_current_active_user() ensures user account is not soft deleted
+5. Token Validation: Verifies JWT signature, expiration, and token type
+6. Error Handling: Returns appropriate HTTP 401/400 errors with descriptive messages
+7. Logging: Logs authentication events for security monitoring
+
+**Usage:**
+```python
+from fastapi import Depends
+from api_service.app.api.deps import get_db, get_current_user, get_optional_user
+from api_service.app.models.database import User
+
+# Required authentication endpoint
+@app.get("/api/v2/users/me")
+def get_current_user_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return {"nickname": current_user.nickname, "phone": current_user.phone}
+
+# Optional authentication endpoint (anonymous support)
+@app.post("/api/v2/diagnosis")
+def create_diagnosis(
+    data: DiagnosisRequest,
+    db: Session = Depends(get_db),
+    user: Optional[User] = Depends(get_optional_user)
+):
+    diagnosis = perform_diagnosis(data)
+    if user:
+        diagnosis.user_id = user.id
+    return diagnosis
+```
+
+**Codebase Patterns Added:**
+- Use OAuth2PasswordBearer with auto_error=False for optional authentication support
+- FastAPI dependencies use async def and yield from to chain dependencies
+- Return None instead of raising exception for optional authentication paths
