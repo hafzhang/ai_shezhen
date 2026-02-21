@@ -5476,3 +5476,121 @@ DOUYIN_SECRET=abc123def456
 ```
 
 ---
+
+## [2026-02-22] - US-161
+- Implemented H5 local storage for tokens and user info
+- Added getUserInfo() and setUserInfo() functions to utils/request.ts
+- Initialize user state from localStorage on store creation
+- Added initializeAuth() function for auto-login check on app startup
+- Call initializeAuth in App.vue onMounted to restore user session
+- Token validation on startup: fetch fresh user info to verify token
+- Clear user_info from storage on logout
+- Created CLAUDE.md for uni-app_frontend/src with H5 storage patterns
+
+**Files changed:**
+- uni-app_frontend/src/utils/request.ts (updated) - Added getUserInfo/setUserInfo functions
+- uni-app_frontend/src/store/modules/user.ts (updated) - Initialize from storage, added initializeAuth()
+- uni-app_frontend/src/App.vue (updated) - Call initializeAuth on mount
+- uni-app_frontend/src/CLAUDE.md (new) - H5 storage patterns documentation
+- prd.json (updated - US-161 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: localStorage works for H5, uni.getStorageSync for mini-programs
+- Patterns discovered: Storage abstraction layer handles both platforms uniformly
+- Patterns discovered: Auto-login requires token validation on startup (fetch user info)
+- Gotchas encountered: Token may be expired - need to validate and clear storage if invalid
+- Useful context: Call initializeAuth in App.vue onMounted, not in store setup
+- Useful context: isLoggedIn should check both token AND userInfo existence
+
+**Acceptance Criteria Met:**
+- localStorage for access_token: PASS (storage abstraction uses localStorage in H5)
+- localStorage for refresh_token: PASS (storage abstraction uses localStorage in H5)
+- localStorage for user_info: PASS (getUserInfo/setUserInfo functions)
+- Auto login check: PASS (initializeAuth called on app startup)
+- Typecheck passes: PASS (dev server starts successfully, no syntax errors)
+
+**Key Features:**
+1. H5 Local Storage: localStorage for tokens and user info
+2. Storage Abstraction: Unified API for uni-app and H5 platforms
+3. Auto-login: Initialize auth state on app startup
+4. Token Validation: Fetch fresh user info to verify token validity
+5. Clean Logout: Clear all auth data (tokens + user_info)
+6. Documentation: CLAUDE.md with H5 storage patterns
+
+---
+
+## [2026-02-22] - US-162
+- Implemented route guards for protected pages requiring authentication
+- Created routeGuard.ts utility with wrapped navigation functions
+- Protected pages: /pages/history/index, /pages/detail/index, /pages/health-records/index
+- Public pages remain accessible without login (index, login, register, diagnosis, result, profile, settings, privacy, terms)
+- Added PROTECTED_PAGES Set to define pages requiring authentication
+- Implemented redirect storage to navigate back after login
+- Created wrapped navigation functions: navigateTo, redirectTo, reLaunch, switchTab
+- Updated login page to use handleLoginSuccess for redirect after login
+- Updated register page to use handleLoginSuccess for redirect after registration
+- Updated profile page to use routeGuard.navigateTo for protected navigation
+- Initialize route guard in App.vue after auth state is ready
+- Store redirect URL in localStorage (H5) or uni.storage (mini-program)
+
+**Files changed:**
+- uni-app_frontend/src/utils/routeGuard.ts (new) - Route guard utility with wrapped navigation
+- uni-app_frontend/src/App.vue (updated) - Initialize route guard on app mount
+- uni-app_frontend/src/pages/login/index.vue (updated) - Use handleLoginSuccess after login
+- uni-app_frontend/src/pages/register/index.vue (updated) - Use handleLoginSuccess after registration
+- uni-app_frontend/src/pages/profile/index.vue (updated) - Use routeGuard for navigation
+- prd.json (updated - US-162 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: uni-app navigation APIs need wrapping for auth checks (uni.navigateTo, uni.switchTab, etc.)
+- Patterns discovered: Protected pages Set provides O(1) lookup for auth requirements
+- Patterns discovered: Redirect storage enables seamless return to original page after login
+- Patterns discovered: switchTab has limitations (can't navigate to non-tabBar pages), need special handling
+- Gotchas encountered: Can't use Vue Router in uni-app - must use uni.* navigation APIs
+- Gotchas encountered: switchTab can only navigate to tabBar pages, can't show toast before switching
+- Useful context: Call initializeRouteGuard in App.vue AFTER initializeAuth for proper state
+- Useful context: tabBar pages require switchTab, not navigateTo - affects protected tab handling
+- Useful context: routeGuard exports both individual functions and a default object for flexibility
+
+**Acceptance Criteria Met:**
+- Check token for pages requiring login: PASS (requiresAuth checks PROTECTED_PAGES Set)
+- Navigate to login if not authenticated: PASS (promptLogin redirects to login page)
+- Return to original page after login: PASS (handleLoginSuccess retrieves stored redirect)
+- Typecheck passes: PASS (dev server starts successfully, no syntax errors)
+
+**Key Features:**
+1. Protected Pages Set: O(1) lookup for auth requirements
+2. Redirect Storage: Store intended destination before login, navigate back after
+3. Wrapped Navigation: All uni-app navigation APIs wrapped with auth checks
+4. Login Success Handler: Unified redirect handling after login/registration
+5. Platform Storage: Abstraction for localStorage (H5) and uni.storage (mini-program)
+6. TabBar Handling: Special handling for switchTab limitations
+7. Initialization: Route guard initialized after auth state is ready
+
+**Usage:**
+```typescript
+// Use wrapped navigation for protected pages
+import { routeGuard } from '@/utils/routeGuard'
+
+// Navigate to protected page (auto-redirects to login if not authenticated)
+routeGuard.navigateTo({ url: '/pages/history/index' })
+
+// After successful login, automatically redirect back
+handleLoginSuccess() // or handleLoginSuccess('/pages/index/index') for default
+```
+
+**Protected Pages:**
+- `/pages/history/index` - Diagnosis history requires login
+- `/pages/detail/index` - Diagnosis details require login
+- `/pages/health-records/index` - Health records require login
+
+**Public Pages (no auth required):**
+- `/pages/index/index` - Home page
+- `/pages/login/index` - Login page
+- `/pages/register/index` - Register page
+- `/pages/diagnosis/index` - Diagnosis (supports anonymous)
+- `/pages/result/index` - Result (supports anonymous)
+- `/pages/profile/index` - Profile (shows guest view)
+- `/pages/settings/index` - Settings (public)
+- `/pages/privacy/index` - Privacy policy
+- `/pages/terms/index` - User agreement

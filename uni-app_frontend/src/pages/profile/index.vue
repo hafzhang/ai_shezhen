@@ -142,6 +142,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore, useDiagnosisStore } from '@/store'
+import { routeGuard } from '@/utils/routeGuard'
 
 const userStore = useUserStore()
 const diagnosisStore = useDiagnosisStore()
@@ -187,29 +188,20 @@ function handleAvatarClick() {
 }
 
 function goToLogin() {
-  uni.navigateTo({
+  routeGuard.navigateTo({
     url: '/pages/login/index'
   })
 }
 
 function goToHistory() {
-  uni.switchTab({
+  routeGuard.switchTab({
     url: '/pages/history/index'
   })
 }
 
 function goToHealthRecords() {
-  if (!isLoggedIn.value) {
-    uni.showToast({
-      title: '请先登录',
-      icon: 'none'
-    })
-    setTimeout(() => {
-      goToLogin()
-    }, 1500)
-    return
-  }
-  uni.navigateTo({
+  // Use routeGuard - it will handle auth check and redirect if needed
+  routeGuard.navigateTo({
     url: '/pages/health-records/index'
   })
 }

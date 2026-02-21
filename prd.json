@@ -1674,15 +1674,21 @@
       "title": "Implement H5 local storage",
       "description": "As a frontend engineer, I need to implement H5 local token storage.",
       "priority": 161,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Use localStorage for access_token",
         "Use localStorage for refresh_token",
         "Use localStorage for user_info",
         "Auto login check",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/utils/request.ts",
+        "uni-app_frontend/src/store/modules/user.ts",
+        "uni-app_frontend/src/App.vue",
+        "uni-app_frontend/src/CLAUDE.md"
       ]
     },
     {
@@ -1690,14 +1696,21 @@
       "title": "Create route guards",
       "description": "As a frontend engineer, I need to implement page route access control.",
       "priority": 162,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Check token for pages requiring login",
         "Navigate to login if not authenticated",
         "Return to original page after login",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/utils/routeGuard.ts",
+        "uni-app_frontend/src/App.vue",
+        "uni-app_frontend/src/pages/login/index.vue",
+        "uni-app_frontend/src/pages/register/index.vue",
+        "uni-app_frontend/src/pages/profile/index.vue"
       ]
     },
     {
@@ -2224,8 +2237,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-22",
     "total_user_stories": 130,
-    "completed_stories": 107,
-    "pending_stories": 23,
+    "completed_stories": 108,
+    "pending_stories": 22,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true

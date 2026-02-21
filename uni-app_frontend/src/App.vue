@@ -7,6 +7,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useUserStore } from '@/store'
+import { initializeRouteGuard } from '@/utils/routeGuard'
 
 onMounted(async () => {
   console.log('App Mounted')
@@ -14,6 +15,10 @@ onMounted(async () => {
   // Initialize authentication state from storage (H5 auto-login)
   const userStore = useUserStore()
   await userStore.initializeAuth()
+
+  // Initialize route guards after auth state is ready
+  // This will check if the current page requires authentication
+  initializeRouteGuard()
 })
 </script>
 

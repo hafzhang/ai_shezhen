@@ -71,10 +71,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store'
+import { handleLoginSuccess } from '@/utils/routeGuard'
 
-const router = useRouter()
 const userStore = useUserStore()
 const phone = ref('')
 const password = ref('')
@@ -84,11 +83,18 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 function goBack() {
-  router.back()
+  uni.navigateBack({
+    delta: 1,
+    fail: () => {
+      uni.reLaunch({ url: '/pages/index/index' })
+    }
+  })
 }
 
 function goToLogin() {
-  router.push('/login')
+  uni.navigateTo({
+    url: '/pages/login/index'
+  })
 }
 
 async function handleRegister() {
@@ -124,8 +130,16 @@ async function handleRegister() {
     const success = await userStore.register(phone.value, password.value, nickname.value)
 
     if (success) {
-      // Navigate to home on successful registration
-      router.replace('/')
+      // Show success message and redirect using route guard
+      uni.showToast({
+        title: '注册成功',
+        icon: 'success',
+        duration: 1500
+      })
+
+      setTimeout(() => {
+        handleLoginSuccess()
+      }, 1500)
     } else {
       errorMessage.value = '注册失败，请稍后重试'
     }
