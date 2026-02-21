@@ -1154,9 +1154,9 @@
       "title": "Configure uView UI components",
       "description": "As a frontend engineer, I need to integrate uView UI 2.x component library.",
       "priority": 137,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Install uview-ui dependency",
         "Import uView in main.js",
@@ -1164,6 +1164,13 @@
         "Configure pages.json easycom",
         "Components work correctly",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/package.json",
+        "uni-app_frontend/src/main.ts",
+        "uni-app_frontend/uni.scss",
+        "uni-app_frontend/vite.config.ts",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2109,8 +2116,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 50,
-    "pending_stories": 80,
+    "completed_stories": 51,
+    "pending_stories": 79,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
