@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from api_service.app.api.deps import get_db, get_current_user
-from api_service.app.models.database import User
+from api_service.app.models.database import User, DiagnosisHistory, TongueImage
 from api_service.app.api.v2.models import APIResponse
 from api_service.core.config import settings
 
@@ -524,4 +524,127 @@ async def delete_avatar(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete avatar: {str(e)}"
+        )
+
+
+# ============================================================================
+# Associate Anonymous Diagnoses (US-131)
+# ============================================================================
+
+class AssociateDiagnosesRequest(BaseModel):
+    """Request to associate anonymous diagnoses with account"""
+
+    diagnosis_ids: list[str] = Field(..., description="List of anonymous diagnosis IDs to associate")
+
+
+class AssociateDiagnosesResponse(APIResponse):
+    """Response after associating diagnoses"""
+
+    associated_count: int
+    failed_count: int
+    failed_ids: list[str] = []
+
+
+@router.post("/me/associate-diagnoses", response_model=AssociateDiagnosesResponse, tags=["Users"])
+async def associate_anonymous_diagnoses(
+    request: AssociateDiagnosesRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Associate anonymous diagnoses with the authenticated user account.
+
+    This endpoint allows users to claim anonymous diagnoses and link them
+    to their account. Only anonymous diagnoses (user_id IS NULL) can be
+    associated.
+
+    Args:
+        request: List of diagnosis IDs to associate
+        db: Database session (injected)
+        current_user: Authenticated user (injected)
+
+    Returns:
+        AssociateDiagnosesResponse with association results
+
+    Raises:
+        HTTPException 400: If request format is invalid
+        HTTPException 401: If not authenticated
+
+    Example:
+        POST /api/v2/users/me/associate-diagnoses
+        {
+            "diagnosis_ids": [
+                "123e4567-e89b-12d3-a456-426614174000",
+                "223e4567-e89b-12d3-a456-426614174001"
+            ]
+        }
+    """
+    associated_count = 0
+    failed_count = 0
+    failed_ids = []
+
+    try:
+        for diagnosis_id in request.diagnosis_ids:
+            try:
+                # Validate UUID format
+                diagnosis_uuid = UUID(diagnosis_id)
+            except ValueError:
+                failed_count += 1
+                failed_ids.append(diagnosis_id)
+                continue
+
+            # Query diagnosis history
+            diagnosis = db.query(DiagnosisHistory).filter(
+                DiagnosisHistory.id == diagnosis_uuid
+            ).first()
+
+            if diagnosis is None:
+                failed_count += 1
+                failed_ids.append(diagnosis_id)
+                continue
+
+            # Check if diagnosis is anonymous (user_id is NULL)
+            if diagnosis.user_id is not None:
+                failed_count += 1
+                failed_ids.append(diagnosis_id)
+                continue
+
+            # Associate diagnosis with user
+            diagnosis.user_id = current_user.id
+
+            # Also associate tongue image if present
+            if diagnosis.tongue_image_id:
+                tongue_image = db.query(TongueImage).filter(
+                    TongueImage.id == diagnosis.tongue_image_id
+                ).first()
+                if tongue_image and tongue_image.user_id is None:
+                    tongue_image.user_id = current_user.id
+
+            associated_count += 1
+
+        # Commit changes
+        if associated_count > 0:
+            db.commit()
+
+        logger.info(
+            f"Associated {associated_count} diagnoses with user: {current_user.id}, "
+            f"failed: {failed_count}"
+        )
+
+        return AssociateDiagnosesResponse(
+            success=True,
+            message=f"Associated {associated_count} diagnoses successfully",
+            associated_count=associated_count,
+            failed_count=failed_count,
+            failed_ids=failed_ids
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error associating diagnoses: {e}", exc_info=True)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to associate diagnoses: {str(e)}"
         )
