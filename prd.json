@@ -1797,14 +1797,23 @@
       "title": "Implement dark mode",
       "description": "As a frontend engineer, I need to support system dark mode.",
       "priority": 167,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Detect system theme",
         "Switch to dark styles",
         "Persist user preference",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/composables/useDarkMode.ts",
+        "uni-app_frontend/src/composables/index.ts",
+        "uni-app_frontend/src/styles/dark-mode.scss",
+        "uni-app_frontend/src/App.vue",
+        "uni-app_frontend/src/pages/settings/index.vue",
+        "uni-app_frontend/src/pages/index/index.vue",
+        "uni-app_frontend/src/pages/profile/index.vue"
       ]
     },
     {
