@@ -286,7 +286,7 @@
         <text class="btn-icon">📤</text>
         <text class="btn-text">分享</text>
       </button>
-      <button class="btn-action btn-save" @click="saveResult">
+      <button class="btn-action btn-save" @click="saveImage">
         <text class="btn-icon">💾</text>
         <text class="btn-text">保存</text>
       </button>
@@ -316,8 +316,19 @@
 import { ref, computed, onMounted } from 'vue'
 import { useDiagnosisStore } from '@/store'
 import type { DiagnosisResult } from '@/store/modules/diagnosis'
+import {
+  generateShareImage,
+  saveImageToAlbum,
+  shareToWeChat,
+  shareWithSystem,
+  copyToClipboard,
+  generateShareLink,
+  shareDiagnosis,
+  getPlatform
+} from '@/utils/share'
 
 const diagnosisStore = useDiagnosisStore()
+const platform = getPlatform()
 
 // State
 const diagnosisId = ref<string>('')
@@ -373,7 +384,7 @@ function showShareMenu() {
     success: (res) => {
       switch (res.tapIndex) {
         case 0:
-          saveResult()
+          saveImage()
           break
         case 1:
           shareToFriend()
@@ -393,18 +404,136 @@ function saveResult() {
   })
 }
 
-function shareToFriend() {
-  uni.showToast({
-    title: '分享功能开发中',
-    icon: 'none'
-  })
+async function saveImage() {
+  if (!diagnosis.value) return
+
+  try {
+    uni.showLoading({
+      title: '正在生成图片...'
+    })
+
+    // Generate share image
+    const result = await generateShareImage({
+      title: 'AI舌诊诊断结果',
+      imageUrl: diagnosis.value.image_url,
+      primarySyndrome: diagnosis.value.syndromes[0]?.name || '',
+      confidence: diagnosis.value.syndromes[0]?.confidence || 0,
+      recommendations: diagnosis.value.recommendations.dietary?.slice(0, 3) || []
+    })
+
+    uni.hideLoading()
+
+    if (result.success && result.filePath) {
+      // For H5, download the image
+      if (platform.isH5) {
+        // Create download link for H5
+        const link = document.createElement('a')
+        link.href = result.filePath
+        link.download = `tongue-diagnosis-${Date.now()}.png`
+        link.click()
+
+        uni.showToast({
+          title: '图片已下载',
+          icon: 'success'
+        })
+      } else {
+        // For mini-programs, save to album
+        const saveResult = await saveImageToAlbum(result.filePath)
+        if (saveResult.success) {
+          uni.showToast({
+            title: saveResult.message || '已保存到相册',
+            icon: 'success'
+          })
+        } else {
+          uni.showToast({
+            title: saveResult.message || '保存失败',
+            icon: 'none'
+          })
+        }
+      }
+    } else {
+      uni.showToast({
+        title: result.message || '生成失败',
+        icon: 'none'
+      })
+    }
+  } catch (error: any) {
+    uni.hideLoading()
+    uni.showToast({
+      title: error.message || '保存失败',
+      icon: 'none'
+    })
+  }
 }
 
-function copyLink() {
-  uni.showToast({
-    title: '复制功能开发中',
-    icon: 'none'
-  })
+async function shareToFriend() {
+  if (!diagnosis.value) return
+
+  try {
+    uni.showLoading({
+      title: '正在处理...'
+    })
+
+    // Use main share function
+    const result = await shareDiagnosis({
+      diagnosisId: diagnosis.value.id,
+      title: 'AI舌诊诊断结果',
+      imageUrl: diagnosis.value.image_url,
+      primarySyndrome: diagnosis.value.syndromes[0]?.name || '',
+      confidence: diagnosis.value.syndromes[0]?.confidence || 0,
+      recommendations: diagnosis.value.recommendations.dietary?.slice(0, 3) || [],
+      baseUrl: (typeof window !== 'undefined' ? window.location.origin : '') || 'https://your-app.com'
+    })
+
+    uni.hideLoading()
+
+    if (result.success) {
+      uni.showToast({
+        title: result.message || '分享成功',
+        icon: 'success'
+      })
+    } else {
+      uni.showToast({
+        title: result.message || '分享失败',
+        icon: 'none'
+      })
+    }
+  } catch (error: any) {
+    uni.hideLoading()
+    uni.showToast({
+      title: error.message || '分享失败',
+      icon: 'none'
+    })
+  }
+}
+
+async function copyLink() {
+  if (!diagnosis.value) return
+
+  try {
+    const link = generateShareLink(
+      diagnosis.value.id,
+      (typeof window !== 'undefined' ? window.location.origin : '') || 'https://your-app.com'
+    )
+    const result = await copyToClipboard(link)
+
+    if (result.success) {
+      uni.showToast({
+        title: result.message || '链接已复制',
+        icon: 'success'
+      })
+    } else {
+      uni.showToast({
+        title: result.message || '复制失败',
+        icon: 'none'
+      })
+    }
+  } catch (error: any) {
+    uni.showToast({
+      title: error.message || '复制失败',
+      icon: 'none'
+    })
+  }
 }
 
 // Lifecycle
