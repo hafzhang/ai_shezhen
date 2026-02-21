@@ -67,7 +67,8 @@
     "autoscan": true,
     "custom": {
       "^u-(.*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
-      "^tongue-(.*)": "@/components/tongue-$1/tongue-$1.vue"
+      "^tongue-(.*)": "@/components/tongue-$1/tongue-$1.vue",
+      "^recommendation-list$": "@/components/recommendation-list/recommendation-list.vue"
     }
   },
   "uniIdRouter": {},
