@@ -138,7 +138,8 @@
       "^tongue-(.*)": "@/components/tongue-$1/tongue-$1.vue",
       "^feature-display$": "@/components/feature-display/feature-display.vue",
       "^recommendation-list$": "@/components/recommendation-list/recommendation-list.vue",
-      "^loading$": "@/components/loading/loading.vue"
+      "^loading$": "@/components/loading/loading.vue",
+      "^toast$": "@/components/toast/toast.vue"
     }
   },
   "uniIdRouter": {},
