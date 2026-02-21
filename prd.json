@@ -1061,15 +1061,18 @@
       "title": "Create diagnosis history Pydantic models",
       "description": "As a backend engineer, I need to create diagnosis history related Pydantic models.",
       "priority": 132,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "DiagnosisHistoryResponse model",
         "DiagnosisListResponse model (paginated)",
         "DiagnosisStatisticsResponse model",
         "DiagnosisTrendsResponse model",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/models.py"
       ]
     },
     {
@@ -1077,15 +1080,18 @@
       "title": "Create health records Pydantic models",
       "description": "As a backend engineer, I need to create health records related Pydantic models.",
       "priority": 133,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "HealthRecordCreate model",
         "HealthRecordUpdate model",
         "HealthRecordResponse model",
         "HealthRecordListResponse model",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/health_records.py"
       ]
     },
     {
@@ -1093,14 +1099,17 @@
       "title": "Create user Pydantic models",
       "description": "As a backend engineer, I need to create user related Pydantic models.",
       "priority": 134,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "UserResponse model",
         "UserUpdate model",
         "UserAvatarResponse model",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/users.py"
       ]
     },
     {

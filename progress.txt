@@ -3370,3 +3370,72 @@ curl -X POST "http://localhost:8000/api/v2/users/me/associate-diagnoses" \
 ```
 
 ---
+
+## [2026-02-21] - US-132, US-133, US-134
+- 添加了诊断历史Pydantic模型 (api_service/app/api/v2/models.py)
+  - DiagnosisHistoryItem - 单条诊断记录
+  - DiagnosisHistoryResponse - 详细诊断响应
+  - DiagnosisListResponse - 分页列表响应
+  - DiagnosisStatisticsResponse - 统计数据响应
+  - DiagnosisTrendsResponse - 趋势分析响应
+  - SyndromeStatistics, FeatureStatistics, TrendDataPoint - 辅助模型
+  - FeedbackRequest, FeedbackResponse - 反馈模型
+- 验证健康档案Pydantic模型已存在 (api_service/app/api/v2/health_records.py)
+  - HealthRecordCreate, HealthRecordUpdate
+  - HealthRecordResponse, HealthRecordListResponse
+- 验证用户Pydantic模型已存在 (api_service/app/api/v2/users.py)
+  - UserUpdate, UserInfoResponse, UserMeResponse
+  - AvatarUploadResponse, AvatarInfoResponse
+  - AssociateDiagnosesResponse
+
+**Files changed:**
+- api_service/app/api/v2/models.py (updated) - Added 200+ lines for diagnosis history models
+- prd.json (updated) - US-132, US-133, US-134 marked as complete
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 分页响应包含total/page/page_size字段
+- Patterns discovered: 统计响应使用聚合模型（SyndromeStatistics, FeatureStatistics）
+- Patterns discovered: 趋势数据使用时间序列点（TrendDataPoint）
+- Patterns discovered: 嵌套模型使用Dict和List类型存储灵活数据
+- Gotchas encountered: models.py中的模型需要同时更新__all__导出列表
+- Useful context: 响应模型继承自APIResponse基类保证一致性
+- Useful context: 分页参数使用ge/le约束（page>=1, page_size>=1且<=100）
+- Useful context: 可选字段使用Optional类型并设置默认值
+
+**Acceptance Criteria Met (US-132):**
+- DiagnosisHistoryResponse model: PASS
+- DiagnosisListResponse model (paginated): PASS (包含total/page/page_size)
+- DiagnosisStatisticsResponse model: PASS (包含综合统计数据)
+- DiagnosisTrendsResponse model: PASS (包含趋势分析数据)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-133):**
+- HealthRecordCreate model: PASS (已在health_records.py中实现)
+- HealthRecordUpdate model: PASS (已在health_records.py中实现)
+- HealthRecordResponse model: PASS (已在health_records.py中实现)
+- HealthRecordListResponse model: PASS (已在health_records.py中实现)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-134):**
+- UserResponse model: PASS (UserInfoResponse已在users.py中实现)
+- UserUpdate model: PASS (已在users.py中实现)
+- UserAvatarResponse model: PASS (AvatarUploadResponse已在users.py中实现)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. 诊断历史模型:
+   - 单条诊断详情
+   - 分页列表（带total/page/page_size）
+   - 统计数据（证型、特征分布）
+   - 趋势分析（时间序列数据）
+2. 健康档案模型:
+   - 创建/更新请求模型
+   - 单条/列表响应模型
+   - 枚举类型（HealthRecordType）
+3. 用户模型:
+   - 用户信息响应
+   - 用户更新请求
+   - 头像上传/信息响应
+
+---
