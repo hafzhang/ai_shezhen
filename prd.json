@@ -642,9 +642,9 @@
       "title": "Create auth.py business logic",
       "description": "As a backend engineer, I need to create authentication business logic functions.",
       "priority": 111,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/core/auth.py",
         "Implement authenticate_user() to verify credentials",
@@ -652,6 +652,9 @@
         "Implement get_user_by_phone()",
         "Implement get_user_by_openid() for mini-programs",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/auth.py"
       ]
     },
     {
