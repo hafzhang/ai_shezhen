@@ -982,9 +982,9 @@
       "title": "Create health records API",
       "description": "As a backend engineer, I need to create health records management API endpoints.",
       "priority": 128,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/api/v2/health_records.py",
         "GET /api/v2/health-records to get records",
@@ -992,6 +992,9 @@
         "PUT /api/v2/health-records/{id} to update record",
         "DELETE /api/v2/health-records/{id} to delete record",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/health_records.py"
       ]
     },
     {
@@ -999,15 +1002,18 @@
       "title": "Implement user management API",
       "description": "As a backend engineer, I need to create user info management API endpoints.",
       "priority": 129,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/api/v2/users.py",
         "GET /api/v2/users/me to get current user info",
         "PUT /api/v2/users/me to update user info",
         "DELETE /api/v2/users/me to delete account (soft delete)",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/users.py"
       ]
     },
     {

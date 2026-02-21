@@ -1,3 +1,62 @@
+## Codebase Patterns
+
+### Database & ORM
+- Use `sqlalchemy >= 2.0` with `future=True` for modern ORM style
+- Use `UUID(as_uuid=True)` with `server_default=func.gen_random_uuid()` for primary keys
+- Use `JSONB` field type for flexible schema-less data storage
+- Use `has_key()` for checking JSONB key existence in SQLAlchemy queries
+- Use `field.astext` for text extraction from JSONB fields
+- Use `func.date()` for grouping by date in time-series queries
+- Foreign key with `ondelete="CASCADE"` for automatic cleanup of related records
+- Foreign key with `ondelete="SET NULL"` for preserving records when parent is deleted
+
+### Authentication & Authorization
+- Use `get_current_user()` dependency for required authentication
+- Use `get_optional_user()` dependency for optional authentication (anonymous support)
+- Use `get_current_active_user()` to additionally check `deleted_at is NULL`
+- JWT access token expires in 30 minutes
+- JWT refresh token expires in 7 days
+- Password hashing uses bcrypt via `passlib.context.CryptContext`
+- JWT secrets must be changed in production (`openssl rand -hex 32`)
+
+### API Design (v2)
+- All v2 endpoints extend `APIResponse` base model for unified response format
+- Response models include `success: bool` field
+- Use `HTTPException` with proper status codes (400, 401, 403, 404, 500)
+- Pagination uses `page` (1-indexed) and `page_size` parameters
+- Date filters use ISO 8601 format (`2026-01-01T00:00:00Z`)
+- Ownership verification: compare `resource.user_id == current_user.id`
+- Anonymous users supported by storing `user_id = NULL`
+
+### Pydantic Models
+- Use `Field()` for all model fields with descriptions
+- Use `@field_validator` for custom validation logic
+- Use `model_config = {"from_attributes": True}` for ORM mode
+- Use `ge=`/`le=` for numeric constraints
+- Use `max_length=` for string constraints
+
+### Configuration
+- Use `pydantic-settings` (`BaseSettings`) for environment variables
+- Add `MEDIA_ROOT` to settings for file storage paths
+- Use `model_config = SettingsConfigDict(extra="ignore")` to ignore unknown env vars
+- Environment file: `.env` in project root
+
+### Model References
+- Create `set_model_references()` function in endpoint modules
+- Call `set_model_references()` in `initialize_models()` after model loading
+- Use fallback imports to get models from v1/endpoints if not set locally
+
+### File Storage
+- Calculate SHA-256 hash for image deduplication
+- Store images in `MEDIA_ROOT/tongue_images/{hash}.png`
+- Use `file_hash` as unique key for database deduplication
+
+### Error Handling
+- Use `try/except` with specific exception types
+- Log errors with `logger.error()` including `exc_info=True`
+- Use `db.rollback()` on database errors before re-raising
+- Return structured error responses with `detail` field
+
 ## [2026-02-12] - task-4-5
 - 实现了完整的FastAPI应用（api_service/app/main.py）
 - 创建了API v1端点（api_service/app/api/v1/endpoints.py）
@@ -3042,6 +3101,120 @@ curl -X POST "http://localhost:8000/api/v2/diagnosis/{id}/feedback" \
   -H "Authorization: Bearer <access_token>" \
   -H "Content-Type: application/json" \
   -d '{"feedback": 1, "comment": "Accurate diagnosis"}'
+```
+
+---
+
+## [2026-02-21] - US-128, US-129
+- 实现了健康档案管理API (api_service/app/api/v2/health_records.py)
+- 创建了HealthRecordType枚举（血压、心率、体重、体温、血糖等）
+- 实现了GET /api/v2/health-records - 获取用户健康档案列表
+- 实现了POST /api/v2/health-records - 创建新健康档案
+- 实现了PUT /api/v2/health-records/{id} - 更新健康档案
+- 实现了DELETE /api/v2/health-records/{id} - 删除健康档案
+- 实现了用户管理API (api_service/app/api/v2/users.py)
+- 实现了GET /api/v2/users/me - 获取当前用户信息
+- 实现了PUT /api/v2/users/me - 更新用户信息（昵称、邮箱、手机）
+- 实现了DELETE /api/v2/users/me - 软删除账户
+- 添加了邮箱和手机号唯一性验证
+- 添加了所有权验证（只能操作自己的数据）
+- 注册了路由到main.py
+
+**Files changed:**
+- api_service/app/api/v2/health_records.py (new) - 490+ lines of health records API
+- api_service/app/api/v2/users.py (new) - 310+ lines of user management API
+- api_service/app/main.py (updated) - Registered routers
+- prd.json (updated) - US-128 and US-129 marked as complete
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 健康档案使用JSONB字段存储灵活的数据结构（record_value）
+- Patterns discovered: 健康档案类型使用枚举类保证数据一致性
+- Patterns discovered: 软删除使用deleted_at字段而不是物理删除记录
+- Patterns discovered: 所有权验证比较resource.user_id == current_user.id
+- Patterns discovered: 邮箱/手机号唯一性检查需要排除当前用户（id != current_user.id）
+- Gotchas encountered: ISO 8601日期格式解析需要处理'Z'后缀（替换为'+00:00'）
+- Gotchas encountered: UUID验证使用uuid.UUID()构造函数捕获ValueError
+- Gotchas encountered: 至少提供一个字段的验证使用all(v is None for v in [fields]))
+- Useful context: 健康档案可以存储多种类型数据（血压包含收缩压/舒张压，化验结果包含多项指标）
+- Useful context: 软删除保留数据用于合规审计和分析
+
+**Acceptance Criteria Met (US-128):**
+- GET /api/v2/health-records to get records: PASS (支持record_type过滤和limit限制)
+- POST /api/v2/health-records to add record: PASS (record_value为灵活JSON结构)
+- PUT /api/v2/health-records/{id} to update record: PASS (所有权验证+字段更新)
+- DELETE /api/v2/health-records/{id} to delete record: PASS (所有权验证)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-129):**
+- GET /api/v2/users/me to get current user info: PASS (返回完整用户信息)
+- PUT /api/v2/users/me to update user info: PASS (昵称/邮箱/手机，唯一性验证)
+- DELETE /api/v2/users/me to delete account: PASS (软删除设置deleted_at)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. 健康档案CRUD:
+   - 10种预定义档案类型（血压、心率、体重等）
+   - 灵活的JSONB值存储
+   - 按类型过滤和数量限制
+   - 所有权验证
+2. 用户信息管理:
+   - 获取当前用户信息
+   - 更新昵称、邮箱、手机
+   - 邮箱/手机唯一性检查
+   - 软删除账户
+3. 数据验证:
+   - UUID格式验证
+   - ISO 8601日期格式验证
+   - 所有权验证
+   - 至少一个字段更新验证
+
+**Usage:**
+```bash
+# 获取健康档案
+curl -X GET "http://localhost:8000/api/v2/health-records?record_type=blood_pressure&limit=20" \
+  -H "Authorization: Bearer <access_token>"
+
+# 创建健康档案
+curl -X POST "http://localhost:8000/api/v2/health-records" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "record_type": "blood_pressure",
+    "record_value": {"systolic": 120, "diastolic": 80, "unit": "mmHg"},
+    "record_date": "2026-02-21T10:00:00Z",
+    "notes": "早晨测量"
+  }'
+
+# 更新健康档案
+curl -X PUT "http://localhost:8000/api/v2/health-records/{id}" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "record_value": {"systolic": 118, "diastolic": 78, "unit": "mmHg"},
+    "notes": "更新测量"
+  }'
+
+# 删除健康档案
+curl -X DELETE "http://localhost:8000/api/v2/health-records/{id}" \
+  -H "Authorization: Bearer <access_token>"
+
+# 获取当前用户信息
+curl -X GET "http://localhost:8000/api/v2/users/me" \
+  -H "Authorization: Bearer <access_token>"
+
+# 更新用户信息
+curl -X PUT "http://localhost:8000/api/v2/users/me" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nickname": "新昵称",
+    "email": "new@example.com"
+  }'
+
+# 删除账户（软删除）
+curl -X DELETE "http://localhost:8000/api/v2/users/me" \
+  -H "Authorization: Bearer <access_token>"
 ```
 
 ---
