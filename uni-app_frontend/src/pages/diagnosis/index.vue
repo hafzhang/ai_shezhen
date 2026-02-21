@@ -21,6 +21,7 @@
           :show-actions="true"
           :show-info="false"
           :show-preview-hint="true"
+          :compression-info="compressionInfo"
           empty-text="请拍摄或选择舌部照片"
           @delete="removeImage"
           @reselect="selectFromAlbum"
@@ -111,6 +112,7 @@ import { ref, computed } from 'vue'
 import { useDiagnosisStore } from '@/store'
 import type { DiagnosisResult } from '@/store/modules/diagnosis'
 import ImagePreview from '@/components/image-preview/image-preview.vue'
+import { compressImage, formatFileSize } from '@/utils/imageCompress'
 
 const diagnosisStore = useDiagnosisStore()
 
@@ -129,6 +131,13 @@ const formData = ref<FormData>({
 
 // Selected image (base64 or temp file path)
 const selectedImage = ref<string>('')
+
+// Compression info
+const compressionInfo = ref<{
+  originalSize: string
+  compressedSize: string
+  ratio: string
+} | null>(null)
 
 // Computed
 const canSubmit = computed(() => {
@@ -191,27 +200,80 @@ function selectFromAlbum() {
   })
 }
 
-function handleSelectedImage(filePath: string) {
-  // Convert image to base64 for API submission
-  uni.getFileSystemManager().readFile({
-    filePath: filePath,
-    encoding: 'base64',
-    success: (res) => {
-      const base64 = `data:image/jpeg;base64,${res.data}`
-      selectedImage.value = base64
-    },
-    fail: (error) => {
-      console.error('Failed to read file:', error)
-      uni.showToast({
-        title: '图片处理失败',
-        icon: 'none'
-      })
-    }
+async function handleSelectedImage(filePath: string) {
+  // Show loading
+  uni.showLoading({
+    title: '处理中...',
+    mask: true
   })
+
+  try {
+    // Compress image using canvas
+    const result = await compressImage(filePath, {
+      quality: 0.8,
+      maxWidth: 1920,
+      maxHeight: 1920,
+      maxFileSize: 2 * 1024 * 1024, // 2MB
+      format: 'jpeg'
+    })
+
+    // Update selected image
+    selectedImage.value = result.dataUrl
+
+    // Store compression info
+    compressionInfo.value = {
+      originalSize: formatFileSize(result.originalSize),
+      compressedSize: formatFileSize(result.compressedSize),
+      ratio: `${Math.round(result.ratio * 100)}%`
+    }
+
+    // Show compression success message
+    uni.showToast({
+      title: `已压缩 (${compressionInfo.value.ratio})`,
+      icon: 'success',
+      duration: 2000
+    })
+
+    console.log('Image compressed:', {
+      original: formatFileSize(result.originalSize),
+      compressed: formatFileSize(result.compressedSize),
+      ratio: compressionInfo.value.ratio,
+      dimensions: `${result.width}x${result.height}`
+    })
+  } catch (error) {
+    console.error('Image compression failed:', error)
+
+    // Fallback to direct base64 conversion
+    uni.getFileSystemManager().readFile({
+      filePath: filePath,
+      encoding: 'base64',
+      success: (res) => {
+        const base64 = `data:image/jpeg;base64,${res.data}`
+        selectedImage.value = base64
+        compressionInfo.value = null
+        uni.hideLoading()
+        uni.showToast({
+          title: '图片处理完成',
+          icon: 'success'
+        })
+      },
+      fail: (err) => {
+        console.error('Failed to read file:', err)
+        uni.hideLoading()
+        uni.showToast({
+          title: '图片处理失败',
+          icon: 'none'
+        })
+      }
+    })
+  } finally {
+    uni.hideLoading()
+  }
 }
 
 function removeImage() {
   selectedImage.value = ''
+  compressionInfo.value = null
 }
 
 async function submitDiagnosis() {

@@ -40,6 +40,18 @@
       <text class="info-text">{{ imageInfo.width }} x {{ imageInfo.height }}</text>
       <text class="info-text">{{ formatFileSize(imageInfo.size) }}</text>
     </view>
+
+    <!-- Compression Info -->
+    <view class="compression-info" v-if="compressionInfo">
+      <view class="compression-tag">
+        <text class="compression-icon">⚡</text>
+        <text class="compression-text">已压缩</text>
+      </view>
+      <view class="compression-details">
+        <text class="compression-item">{{ compressionInfo.originalSize }} → {{ compressionInfo.compressedSize }}</text>
+        <text class="compression-item ratio">压缩比: {{ compressionInfo.ratio }}</text>
+      </view>
+    </view>
   </view>
 
   <!-- Empty State -->
@@ -62,6 +74,11 @@ interface Props {
   showPreviewHint?: boolean // Show preview hint overlay
   emptyText?: string // Empty state text
   enablePreview?: boolean // Enable click to preview in full screen
+  compressionInfo?: { // Compression info to display
+    originalSize: string
+    compressedSize: string
+    ratio: string
+  } | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,7 +87,8 @@ const props = withDefaults(defineProps<Props>(), {
   showInfo: false,
   showPreviewHint: true,
   emptyText: '暂无图片',
-  enablePreview: true
+  enablePreview: true,
+  compressionInfo: null
 })
 
 // Emits
@@ -312,6 +330,51 @@ defineExpose({
 
 .empty-text {
   font-size: 14px;
+  color: #999999;
+}
+
+.compression-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 8px;
+}
+
+.compression-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px;
+}
+
+.compression-icon {
+  font-size: 12px;
+}
+
+.compression-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.compression-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compression-item {
+  font-size: 11px;
+  color: #666666;
+}
+
+.compression-item.ratio {
+  font-size: 10px;
   color: #999999;
 }
 </style>

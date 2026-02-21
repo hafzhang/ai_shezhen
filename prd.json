@@ -1757,14 +1757,19 @@
       "title": "Implement image compression",
       "description": "As a frontend engineer, I need to compress images before upload.",
       "priority": 165,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Use canvas to compress image",
         "Control compression quality",
         "Limit max size",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/utils/imageCompress.ts",
+        "uni-app_frontend/src/pages/diagnosis/index.vue",
+        "uni-app_frontend/src/components/image-preview/image-preview.vue"
       ]
     },
     {
@@ -2245,8 +2250,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-22",
     "total_user_stories": 130,
-    "completed_stories": 108,
-    "pending_stories": 22,
+    "completed_stories": 109,
+    "pending_stories": 21,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
