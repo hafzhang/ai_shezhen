@@ -137,7 +137,8 @@
       "^u-(.*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
       "^tongue-(.*)": "@/components/tongue-$1/tongue-$1.vue",
       "^feature-display$": "@/components/feature-display/feature-display.vue",
-      "^recommendation-list$": "@/components/recommendation-list/recommendation-list.vue"
+      "^recommendation-list$": "@/components/recommendation-list/recommendation-list.vue",
+      "^loading$": "@/components/loading/loading.vue"
     }
   },
   "uniIdRouter": {},

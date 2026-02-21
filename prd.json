@@ -1568,14 +1568,17 @@
       "title": "Implement Base64 image encoding",
       "description": "As a frontend engineer, I need to implement Base64 encoding for image upload.",
       "priority": 156,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Read local image",
         "Convert to Base64",
         "Add to FormData",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/diagnosis/index.vue"
       ]
     },
     {
@@ -1583,15 +1586,19 @@
       "title": "Create loading component",
       "description": "As a frontend engineer, I need to create global loading state indicator.",
       "priority": 157,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create components/loading/loading.vue",
         "Loading animation",
         "Loading text",
         "Background mask",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/components/loading/loading.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2197,8 +2204,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 104,
-    "pending_stories": 26,
+    "completed_stories": 105,
+    "pending_stories": 25,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
