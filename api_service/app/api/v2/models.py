@@ -27,8 +27,9 @@ Usage:
 """
 
 import re
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from uuid import UUID
+from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -597,6 +598,197 @@ class DiagnosisResponse(APIResponse):
     created_at: Optional[str] = Field(None, description="诊断时间（ISO 8601）")
 
 
+# ============================================================================
+# Feedback Models (US-127)
+# ============================================================================
+
+class FeedbackRequest(BaseModel):
+    """
+    Feedback submission request model.
+
+    Allows users to provide feedback on diagnosis quality.
+
+    Attributes:
+        feedback: Feedback value (1 for helpful, -1 for not helpful)
+        comment: Optional comment explaining the feedback
+
+    Example:
+        >>> feedback = FeedbackRequest(feedback=1, comment="诊断准确")
+    """
+
+    feedback: int = Field(..., ge=-1, le=1, description="反馈值（1为有帮助，-1为无帮助）")
+    comment: Optional[str] = Field(None, max_length=500, description="反馈评论")
+
+
+class FeedbackResponse(APIResponse):
+    """
+    Feedback submission response model.
+
+    Returns success message after feedback submission.
+
+    Example:
+        >>> response = FeedbackResponse(success=True, message="反馈已提交")
+    """
+
+    message: str = Field(default="反馈已提交", description="响应消息")
+
+
+# ============================================================================
+# Diagnosis History Models (US-132)
+# ============================================================================
+
+class DiagnosisHistoryItem(BaseModel):
+    """
+    Single diagnosis history item.
+
+    Contains complete diagnosis information for history display.
+
+    Attributes:
+        id: Diagnosis record ID
+        user_id: User ID (None for anonymous diagnosis)
+        tongue_image_id: Associated tongue image ID
+        user_info: User demographic information
+        features: Classification features
+        results: Diagnosis results
+        feedback: User feedback (optional)
+        feedback_comment: Feedback comment (optional)
+        model_version: Model version used
+        inference_time_ms: Inference time
+        created_at: Diagnosis creation timestamp
+    """
+
+    id: str = Field(..., description="诊断记录ID")
+    user_id: Optional[str] = Field(None, description="用户ID")
+    tongue_image_id: Optional[str] = Field(None, description="舌象图像ID")
+    user_info: Optional[Dict[str, Any]] = Field(None, description="用户信息")
+    features: Dict[str, Any] = Field(..., description="分类特征")
+    results: Dict[str, Any] = Field(..., description="诊断结果")
+    feedback: Optional[int] = Field(None, description="用户反馈（1/-1）")
+    feedback_comment: Optional[str] = Field(None, description="反馈评论")
+    model_version: Optional[str] = Field(None, description="模型版本")
+    inference_time_ms: Optional[int] = Field(None, description="推理时间（毫秒）")
+    created_at: str = Field(..., description="诊断时间")
+
+
+class DiagnosisHistoryResponse(APIResponse):
+    """
+    Single diagnosis history response.
+
+    Returns detailed information for one diagnosis record.
+
+    Attributes:
+        diagnosis: Diagnosis history item
+    """
+
+    diagnosis: DiagnosisHistoryItem
+
+
+class DiagnosisListResponse(APIResponse):
+    """
+    Paginated diagnosis list response.
+
+    Returns list of diagnosis records with pagination info.
+
+    Attributes:
+        total: Total number of records
+        page: Current page number
+        page_size: Records per page
+        items: List of diagnosis items
+    """
+
+    total: int = Field(..., description="总记录数")
+    page: int = Field(..., description="当前页码")
+    page_size: int = Field(..., description="每页记录数")
+    items: List[DiagnosisHistoryItem] = Field(..., description="诊断记录列表")
+
+
+class SyndromeStatistics(BaseModel):
+    """
+    Syndrome statistics item.
+
+    Attributes:
+        syndrome: Syndrome name
+        count: Occurrence count
+        percentage: Percentage of total
+    """
+
+    syndrome: str = Field(..., description="证型名称")
+    count: int = Field(..., description="出现次数")
+    percentage: float = Field(..., description="占比")
+
+
+class FeatureStatistics(BaseModel):
+    """
+    Feature statistics item.
+
+    Attributes:
+        feature_name: Feature name (e.g., "tongue_color")
+        feature_value: Feature value (e.g., "淡红舌")
+        count: Occurrence count
+        percentage: Percentage of total
+    """
+
+    feature_name: str = Field(..., description="特征名称")
+    feature_value: str = Field(..., description="特征值")
+    count: int = Field(..., description="出现次数")
+    percentage: float = Field(..., description="占比")
+
+
+class DiagnosisStatisticsResponse(APIResponse):
+    """
+    Diagnosis statistics response.
+
+    Returns aggregated statistics about user's diagnosis history.
+
+    Attributes:
+        total_diagnoses: Total number of diagnoses
+        syndromes: Most common syndromes
+        tongue_features: Most common tongue features
+        time_distribution: Diagnosis count by date
+        avg_inference_time_ms: Average inference time
+    """
+
+    total_diagnoses: int = Field(..., description="总诊断次数")
+    syndromes: List[SyndromeStatistics] = Field(..., description="常见证型统计")
+    tongue_features: List[FeatureStatistics] = Field(..., description="常见舌象特征统计")
+    time_distribution: List[Dict[str, Any]] = Field(..., description="时间分布")
+    avg_inference_time_ms: Optional[float] = Field(None, description="平均推理时间（毫秒）")
+
+
+class TrendDataPoint(BaseModel):
+    """
+    Single trend data point.
+
+    Attributes:
+        date: Date string
+        value: Value for this date
+        label: Optional label
+    """
+
+    date: str = Field(..., description="日期")
+    value: float = Field(..., description="数值")
+    label: Optional[str] = Field(None, description="标签")
+
+
+class DiagnosisTrendsResponse(APIResponse):
+    """
+    Diagnosis trends response.
+
+    Returns trend analysis data for visualization.
+
+    Attributes:
+        syndrome_trends: Syndrome changes over time
+        feature_trends: Feature changes over time
+        health_score_trend: Health score trend (optional)
+        period: Analysis period (days)
+    """
+
+    syndrome_trends: List[TrendDataPoint] = Field(..., description="证型变化趋势")
+    feature_trends: Dict[str, List[TrendDataPoint]] = Field(..., description="特征变化趋势")
+    health_score_trend: Optional[List[TrendDataPoint]] = Field(None, description="健康评分趋势")
+    period: int = Field(..., description="分析周期（天）")
+
+
 __all__ = [
     # Request models
     "UserRegister",
@@ -604,6 +796,7 @@ __all__ = [
     "RefreshRequest",
     "UserInfoRequest",
     "DiagnosisRequest",
+    "FeedbackRequest",
     # Response models
     "UserInfo",
     "TokenResponse",
@@ -613,6 +806,7 @@ __all__ = [
     "LoginResponse",
     "RefreshResponse",
     "LogoutResponse",
+    "FeedbackResponse",
     # Diagnosis models
     "SegmentationResult",
     "ClassificationFeature",
@@ -620,4 +814,13 @@ __all__ = [
     "ClassificationResult",
     "DiagnosisResult",
     "DiagnosisResponse",
+    # Diagnosis history models (US-132)
+    "DiagnosisHistoryItem",
+    "DiagnosisHistoryResponse",
+    "DiagnosisListResponse",
+    "SyndromeStatistics",
+    "FeatureStatistics",
+    "DiagnosisStatisticsResponse",
+    "TrendDataPoint",
+    "DiagnosisTrendsResponse",
 ]
