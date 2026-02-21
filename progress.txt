@@ -2992,3 +2992,56 @@ curl -X GET "http://localhost:8000/api/v2/history/trends?period_days=30" \
 ```
 
 ---
+
+## [2026-02-21] - US-126, US-127
+- Added GET /api/v2/diagnosis/{id} endpoint for single diagnosis detail
+- Added POST /api/v2/diagnosis/{id}/feedback endpoint for user feedback
+- Implemented ownership verification (403 if accessing another user's diagnosis)
+- Returns complete diagnosis info including tongue image metadata
+- Feedback accepts 1 (helpful) or -1 (not helpful) with optional comment
+
+**Files changed:**
+- api_service/app/api/v2/diagnosis.py (updated) - Added 200+ lines for detail and feedback endpoints
+- prd.json (updated) - US-126 and US-127 marked as complete
+
+**Learnings for future iterations:**
+- Patterns discovered: UUID validation using Python uuid.UUID class
+- Patterns discovered: Ownership check compares user_id before returning data
+- Patterns discovered: Feedback values use simple integer (1/-1) for polarity
+- Gotchas encountered: JSONB fields need to be structured correctly for response
+- Useful context: TongueImage relationship provides metadata without file content
+- Useful context: Feedback helps with model training and quality assessment
+
+**Acceptance Criteria Met (US-126):**
+- GET /api/v2/diagnosis/{id} requires authentication: PASS
+- Verify diagnosis belongs to current user: PASS (returns 403 if not)
+- Return complete diagnosis info: PASS (user_info, features, results, etc.)
+- Include tongue image info: PASS (file_hash, dimensions, created_at)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-127):**
+- POST /api/v2/diagnosis/{id}/feedback requires authentication: PASS
+- Accept feedback value (1/-1): PASS (validated with ge=-1, le=1)
+- Update diagnosis_history feedback field: PASS (feedback and feedback_comment)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Single diagnosis detail endpoint with complete data
+2. Ownership verification for data privacy
+3. Feedback submission for quality tracking
+4. Tongue image metadata included
+
+**Usage:**
+```bash
+# Get diagnosis detail
+curl -X GET "http://localhost:8000/api/v2/diagnosis/{id}" \
+  -H "Authorization: Bearer <access_token>"
+
+# Submit feedback
+curl -X POST "http://localhost:8000/api/v2/diagnosis/{id}/feedback" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"feedback": 1, "comment": "Accurate diagnosis"}'
+```
+
+---

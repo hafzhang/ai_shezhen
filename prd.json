@@ -945,15 +945,18 @@
       "title": "Implement GET /api/v2/diagnosis/{id}",
       "description": "As a backend engineer, I need to create single diagnosis detail API endpoint.",
       "priority": 126,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "GET /api/v2/diagnosis/{id} requires authentication",
         "Verify diagnosis belongs to current user",
         "Return complete diagnosis info",
         "Include tongue image info",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/diagnosis.py"
       ]
     },
     {
@@ -961,14 +964,17 @@
       "title": "Implement POST /api/v2/diagnosis/{id}/feedback",
       "description": "As a backend engineer, I need to create diagnosis feedback API endpoint.",
       "priority": 127,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "POST /api/v2/diagnosis/{id}/feedback requires authentication",
         "Accept feedback value (1/-1)",
         "Update diagnosis_history feedback field",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/diagnosis.py"
       ]
     },
     {

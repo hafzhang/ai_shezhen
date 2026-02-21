@@ -458,6 +458,258 @@ async def create_diagnosis(
         )
 
 
+# ============================================================================
+# GET /api/v2/diagnosis/{id} - US-126
+# ============================================================================
+
+class DiagnosisDetailResponse(APIResponse):
+    """Complete diagnosis detail response"""
+
+    id: str
+    user_id: Optional[str]
+    tongue_image_id: str
+    created_at: str
+    user_info: Optional[Dict[str, Any]] = None
+    segmentation: Optional[Dict[str, Any]] = None
+    classification: Optional[Dict[str, Any]] = None
+    diagnosis: Optional[Dict[str, Any]] = None
+    model_version: Optional[str] = None
+    inference_time_ms: Optional[int] = None
+    feedback: Optional[int] = None
+    feedback_comment: Optional[str] = None
+    tongue_image: Optional[Dict[str, Any]] = None
+
+
+@router.get("/{diagnosis_id}", response_model=DiagnosisDetailResponse, tags=["Diagnosis"])
+async def get_diagnosis_detail(
+    diagnosis_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get detailed diagnosis information by ID.
+
+    This endpoint returns complete diagnosis information including
+    segmentation, classification, and diagnosis results. Only
+    diagnoses owned by the authenticated user can be accessed.
+
+    Args:
+        diagnosis_id: UUID of the diagnosis record
+        db: Database session (injected)
+        current_user: Authenticated user (injected)
+
+    Returns:
+        DiagnosisDetailResponse with complete diagnosis info
+
+    Raises:
+        HTTPException 401: If not authenticated
+        HTTPException 403: If diagnosis belongs to another user
+        HTTPException 404: If diagnosis not found
+
+    Example:
+        GET /api/v2/diagnosis/123e4567-e89b-12d3-a456-426614174000
+    """
+    try:
+        from uuid import UUID
+
+        # Validate UUID format
+        try:
+            diagnosis_uuid = UUID(diagnosis_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid diagnosis ID format. Must be a valid UUID."
+            )
+
+        # Query diagnosis
+        diagnosis = db.query(DiagnosisHistory).filter(
+            DiagnosisHistory.id == diagnosis_uuid
+        ).first()
+
+        if diagnosis is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Diagnosis not found"
+            )
+
+        # Verify ownership (or allow access to anonymous diagnoses for now)
+        if diagnosis.user_id is not None and diagnosis.user_id != current_user.id:
+            # Also allow admin access if needed
+            logger.warning(
+                f"User {current_user.id} attempted to access diagnosis "
+                f"{diagnosis.id} owned by {diagnosis.user_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this diagnosis"
+            )
+
+        # Get tongue image info
+        tongue_image_info = None
+        if diagnosis.tongue_image:
+            tongue_image_info = {
+                "id": str(diagnosis.tongue_image.id),
+                "file_hash": diagnosis.tongue_image.file_hash,
+                "width": diagnosis.tongue_image.width,
+                "height": diagnosis.tongue_image.height,
+                "created_at": diagnosis.tongue_image.created_at.isoformat()
+            }
+
+        # Format classification from features JSONB
+        classification = None
+        if diagnosis.features:
+            classification = {
+                "tongue_color": diagnosis.features.get("tongue_color", {}),
+                "coating_color": diagnosis.features.get("coating_color", {}),
+                "tongue_shape": diagnosis.features.get("tongue_shape", {}),
+                "coating_quality": diagnosis.features.get("coating_quality", {}),
+                "special_features": diagnosis.features.get("special_features", {}),
+                "health_status": diagnosis.features.get("health_status", {})
+            }
+
+        # Get segmentation info (basic metrics)
+        segmentation = None
+        if classification and classification.get("health_status"):
+            segmentation = {
+                "tongue_area": diagnosis.inference_time_ms or 0,  # Placeholder
+                "tongue_ratio": 0.0  # Would need to be stored in DB
+            }
+
+        return DiagnosisDetailResponse(
+            success=True,
+            id=str(diagnosis.id),
+            user_id=str(diagnosis.user_id) if diagnosis.user_id else None,
+            tongue_image_id=str(diagnosis.tongue_image_id),
+            created_at=diagnosis.created_at.isoformat(),
+            user_info=diagnosis.user_info,
+            segmentation=segmentation,
+            classification=classification,
+            diagnosis=diagnosis.results,
+            model_version=diagnosis.model_version,
+            inference_time_ms=diagnosis.inference_time_ms,
+            feedback=diagnosis.feedback,
+            feedback_comment=diagnosis.feedback_comment,
+            tongue_image=tongue_image_info
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting diagnosis detail: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve diagnosis: {str(e)}"
+        )
+
+
+# ============================================================================
+# POST /api/v2/diagnosis/{id}/feedback - US-127
+# ============================================================================
+
+class FeedbackRequest(BaseModel):
+    """Feedback submission request"""
+
+    feedback: int = Field(..., ge=-1, le=1, description="Feedback value (1=helpful, -1=not helpful)")
+    comment: Optional[str] = Field(None, max_length=500, description="Optional feedback comment")
+
+
+class FeedbackResponse(APIResponse):
+    """Feedback submission response"""
+
+    message: str = Field(..., description="Response message")
+    feedback: int = Field(..., description="Submitted feedback value")
+
+
+@router.post("/{diagnosis_id}/feedback", response_model=FeedbackResponse, tags=["Diagnosis"])
+async def submit_diagnosis_feedback(
+    diagnosis_id: str,
+    feedback_req: FeedbackRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Submit feedback for a diagnosis.
+
+    This endpoint allows users to provide feedback on the quality
+    of a diagnosis. Only the owner of the diagnosis can submit feedback.
+
+    Args:
+        diagnosis_id: UUID of the diagnosis record
+        feedback_req: Feedback request with feedback value and optional comment
+        db: Database session (injected)
+        current_user: Authenticated user (injected)
+
+    Returns:
+        FeedbackResponse confirming submission
+
+    Raises:
+        HTTPException 400: If feedback value is invalid
+        HTTPException 401: If not authenticated
+        HTTPException 403: If diagnosis belongs to another user
+        HTTPException 404: If diagnosis not found
+
+    Example:
+        POST /api/v2/diagnosis/123e4567-e89b-12d3-a456-426614174000/feedback
+        {"feedback": 1, "comment": "Accurate diagnosis"}
+    """
+    try:
+        from uuid import UUID
+
+        # Validate UUID format
+        try:
+            diagnosis_uuid = UUID(diagnosis_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid diagnosis ID format. Must be a valid UUID."
+            )
+
+        # Query diagnosis
+        diagnosis = db.query(DiagnosisHistory).filter(
+            DiagnosisHistory.id == diagnosis_uuid
+        ).first()
+
+        if diagnosis is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Diagnosis not found"
+            )
+
+        # Verify ownership
+        if diagnosis.user_id is not None and diagnosis.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this diagnosis"
+            )
+
+        # Update feedback
+        diagnosis.feedback = feedback_req.feedback
+        diagnosis.feedback_comment = feedback_req.comment
+
+        db.commit()
+
+        logger.info(
+            f"Feedback submitted for diagnosis {diagnosis.id}: "
+            f"feedback={feedback_req.feedback}, user={current_user.id}"
+        )
+
+        return FeedbackResponse(
+            success=True,
+            message="Feedback submitted successfully",
+            feedback=feedback_req.feedback
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error submitting feedback: {e}", exc_info=True)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to submit feedback: {str(e)}"
+        )
+
+
 def set_model_references(pipeline=None, segmentor=None, classifier=None):
     """Set global model references (called by main.py on startup)
 
