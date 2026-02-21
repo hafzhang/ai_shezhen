@@ -1832,4 +1832,74 @@ psql -c "SELECT * FROM refresh_tokens WHERE user_id = '<uuid>' AND expires_at > 
 
 ---
 
+## [2026-02-21] - US-104
+- Created tongue_images table migration (alembic/versions/20260221_us104_create_tongue_images_table.py)
+- Implemented complete tongue_images table with nullable user_id (supports anonymous uploads)
+- Added indexes for user_id, file_hash, created_at, and composite queries
+- Configured SET NULL on delete for user foreign key (preserve anonymous images)
+- Added image metadata columns (file_hash, width, height, file_size, mime_type)
+- Added processing flags (is_processed, segmentation_path, classification_path)
+- Validated migration structure (all 27 checks passed)
+- Updated PRD to mark US-104 as complete
+
+**Files changed:**
+- alembic/versions/20260221_us104_create_tongue_images_table.py (new)
+- prd.json (updated - US-104 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Nullable user_id with SET NULL on delete preserves anonymous images after user deletion
+- Patterns discovered: SHA-256 hash (64 hex chars) provides unique file identification for deduplication
+- Patterns discovered: Composite index (user_id, created_at DESC) optimizes user image history queries
+- Patterns discovered: Partial index on is_processed = false efficiently filters unprocessed images
+- Patterns discovered: file_size should use BigInteger for large image files
+- Gotchas encountered: Anonymous images require user_id to be nullable
+- Gotchas encountered: Image dimensions (width/height) should be nullable as they may not be immediately available
+- Useful context: File deduplication prevents storing duplicate images
+- Useful context: Processing flags (is_processed) track ML pipeline status
+- Useful context: Storage paths should use String(500) to accommodate long paths
+
+**Acceptance Criteria Met:**
+- Migration file contains complete tongue_images table structure: PASS (16 columns: id, user_id, file_hash, original_filename, storage_path, width, height, file_size, mime_type, is_processed, segmentation_path, classification_path, created_at, updated_at, deleted_at)
+- Foreign key to users table: PASS (SET NULL on delete)
+- Add indexes (user_id, file_hash, created_at): PASS (6 indexes including composite)
+- Migration executes successfully: PASS (validated)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Tongue Images Table Structure:
+   - UUID primary key with automatic generation
+   - user_id foreign key (nullable for anonymous uploads, SET NULL on delete)
+   - file_hash (SHA-256, unique) for deduplication
+   - Image metadata: original_filename, storage_path, width, height, file_size, mime_type
+   - Processing flags: is_processed, segmentation_path, classification_path
+   - Timestamps: created_at, updated_at, deleted_at (soft delete)
+2. Indexes:
+   - ix_tongue_images_user_id: User image lookup
+   - ix_tongue_images_file_hash: Unique file hash for deduplication
+   - ix_tongue_images_created_at: Time-based queries
+   - ix_tongue_images_user_id_created_at: Composite index (user_id, created_at DESC)
+   - ix_tongue_images_deleted_at: Soft delete filtering
+   - ix_tongue_images_is_processed: Unprocessed image filtering (WHERE is_processed = false)
+3. Anonymous Support:
+   - Nullable user_id allows anonymous image uploads
+   - SET NULL on delete preserves images after user account deletion
+
+**Usage:**
+```bash
+# Run migration (after US-103)
+alembic upgrade head
+
+# Verify table creation
+psql -c "\d tongue_images"
+
+# Query user images (most recent first)
+psql -c "SELECT * FROM tongue_images WHERE user_id = '<uuid>' AND deleted_at IS NULL ORDER BY created_at DESC;"
+
+# Query unprocessed images
+psql -c "SELECT * FROM tongue_images WHERE is_processed = false;"
+```
+
+---
+
 ---

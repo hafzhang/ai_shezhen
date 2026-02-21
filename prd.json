@@ -497,15 +497,18 @@
       "title": "Create tongue_images table migration",
       "description": "As a backend engineer, I need to create the tongue_images table migration.",
       "priority": 104,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Migration file contains complete tongue_images table structure",
         "Foreign key to users table",
         "Add indexes (user_id, file_hash, created_at)",
         "Migration executes successfully",
         "Typecheck passes"
+      ],
+      "files": [
+        "alembic/versions/20260221_us104_create_tongue_images_table.py"
       ]
     },
     {
