@@ -15,31 +15,17 @@
         <text class="section-title">上传舌部照片</text>
         <text class="section-desc">请拍摄清晰的舌部照片，确保光线充足</text>
 
-        <!-- Image Preview -->
-        <view class="image-preview" v-if="selectedImage" @click="previewImage">
-          <image
-            class="preview-image"
-            :src="selectedImage"
-            mode="aspectFill"
-          />
-          <view class="image-actions">
-            <button class="btn-action" @click.stop="removeImage">
-              <text class="action-icon">✕</text>
-            </button>
-          </view>
-        </view>
-
-        <!-- Upload Buttons (shown when no image selected) -->
-        <view class="upload-buttons" v-else>
-          <button class="btn-upload" @click="takePhoto">
-            <view class="btn-icon">📷</view>
-            <text class="btn-text">拍照上传</text>
-          </button>
-          <button class="btn-upload btn-secondary" @click="selectFromAlbum">
-            <view class="btn-icon">🖼️</view>
-            <text class="btn-text">从相册选择</text>
-          </button>
-        </view>
+        <!-- Image Preview Component -->
+        <image-preview
+          :image-src="selectedImage"
+          :show-actions="true"
+          :show-info="false"
+          :show-preview-hint="true"
+          empty-text="请拍摄或选择舌部照片"
+          @delete="removeImage"
+          @reselect="selectFromAlbum"
+          @empty-click="takePhoto"
+        />
 
         <!-- Photo Tips -->
         <view class="photo-tips">
@@ -124,6 +110,7 @@
 import { ref, computed } from 'vue'
 import { useDiagnosisStore } from '@/store'
 import type { DiagnosisResult } from '@/store/modules/diagnosis'
+import ImagePreview from '@/components/image-preview/image-preview.vue'
 
 const diagnosisStore = useDiagnosisStore()
 
@@ -225,15 +212,6 @@ function handleSelectedImage(filePath: string) {
 
 function removeImage() {
   selectedImage.value = ''
-}
-
-function previewImage() {
-  if (!selectedImage.value) return
-
-  uni.previewImage({
-    urls: [selectedImage.value],
-    current: 0
-  })
 }
 
 async function submitDiagnosis() {
@@ -350,81 +328,6 @@ async function submitDiagnosis() {
   color: #999999;
   display: block;
   margin-bottom: 15px;
-}
-
-.image-preview {
-  position: relative;
-  width: 100%;
-  height: 280px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 15px;
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-}
-
-.image-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.btn-action {
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  padding: 0;
-}
-
-.action-icon {
-  font-size: 20px;
-  color: #ffffff;
-}
-
-.upload-buttons {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
-}
-
-.btn-upload {
-  flex: 1;
-  height: 100px;
-  border-radius: 8px;
-  border: 2px dashed #d0d0d0;
-  background: #fafafa;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0;
-}
-
-.btn-upload:active {
-  background: #f0f0f0;
-}
-
-.btn-icon {
-  font-size: 32px;
-}
-
-.btn-text {
-  font-size: 13px;
-  color: #666666;
-}
-
-.btn-secondary {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
 }
 
 .photo-tips {

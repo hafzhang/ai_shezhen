@@ -1333,9 +1333,13 @@
       "title": "Create image preview component",
       "description": "As a frontend engineer, I need to create image preview component.",
       "priority": 145,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
+      "files": [
+        "uni-app_frontend/src/components/image-preview/image-preview.vue",
+        "uni-app_frontend/src/pages/diagnosis/index.vue"
+      ],
       "acceptance_criteria": [
         "Create components/image-preview/image-preview.vue",
         "Display selected image",
@@ -2146,8 +2150,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 57,
-    "pending_stories": 73,
+    "completed_stories": 58,
+    "pending_stories": 72,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
