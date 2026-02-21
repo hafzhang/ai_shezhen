@@ -1524,9 +1524,9 @@
       "title": "Create settings page",
       "description": "As a frontend engineer, I need to create application settings page.",
       "priority": 154,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/settings/settings.vue",
         "Privacy policy entry",
@@ -1534,6 +1534,10 @@
         "About us",
         "Clear cache",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/settings/index.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -1760,14 +1764,18 @@
       "title": "Create privacy policy page",
       "description": "As a frontend engineer, I need to create privacy policy display page.",
       "priority": 169,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/privacy/privacy.vue",
         "Privacy policy content",
         "Back button",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/privacy/index.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -1775,14 +1783,18 @@
       "title": "Create user agreement page",
       "description": "As a frontend engineer, I need to create user agreement display page.",
       "priority": 170,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/terms/terms.vue",
         "User agreement content",
         "Back button",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/terms/index.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2178,8 +2190,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 64,
-    "pending_stories": 66,
+    "completed_stories": 67,
+    "pending_stories": 63,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
