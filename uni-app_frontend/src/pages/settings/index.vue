@@ -197,12 +197,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store'
+import { useDarkMode } from '@/composables'
 
 const userStore = useUserStore()
+const { isDark, setDarkMode } = useDarkMode()
 
 // State
 const isLoggedIn = computed(() => userStore.isLoggedIn)
-const darkModeEnabled = ref(false)
+const darkModeEnabled = computed(() => isDark.value)
 const cacheSize = ref('0 MB')
 const appVersion = ref('3.0.0')
 const showAboutModal = ref(false)
@@ -228,10 +230,10 @@ function changePassword() {
 }
 
 function toggleDarkMode(e: any) {
-  darkModeEnabled.value = e.detail.value
-  // TODO: Implement dark mode
+  const newMode = e.detail.value ? 'dark' : 'auto'
+  setDarkMode(newMode)
   uni.showToast({
-    title: darkModeEnabled.value ? '深色模式开发中' : '浅色模式',
+    title: e.detail.value ? '已开启深色模式' : '已关闭深色模式',
     icon: 'none'
   })
 }
@@ -547,6 +549,98 @@ onMounted(() => {
 
 .btn-secondary {
   background: #f0f0f0;
+  color: #666666;
+}
+
+/* Dark mode styles */
+:global(.dark-mode) .container {
+  background: #1a1a1a;
+}
+
+:global(.dark-mode) .header {
+  background: #2a2a2a;
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .back-icon,
+:global(.dark-mode) .header-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .section {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .section-title {
+  color: #888888;
+}
+
+:global(.dark-mode) .menu-item {
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .item-label {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .item-value {
+  color: #888888;
+}
+
+:global(.dark-mode) .arrow {
+  color: #666666;
+}
+
+:global(.dark-mode) .btn-logout {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: #ff6b6b;
+}
+
+:global(.dark-mode) .about-modal,
+:global(.dark-mode) .confirm-modal {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .about-title,
+:global(.dark-mode) .confirm-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .about-close {
+  color: #888888;
+}
+
+:global(.dark-mode) .about-name {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .about-version {
+  color: #888888;
+}
+
+:global(.dark-mode) .about-divider {
+  background: #3a3a3a;
+}
+
+:global(.dark-mode) .about-desc {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .info-item {
+  color: #888888;
+}
+
+:global(.dark-mode) .confirm-message {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .btn-secondary {
+  background: #3a3a3a;
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .version-text {
   color: #666666;
 }
 </style>

@@ -7,7 +7,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useUserStore } from '@/store'
+import { useDarkMode } from '@/composables'
 import { initializeRouteGuard } from '@/utils/routeGuard'
+
+// Initialize dark mode
+useDarkMode()
 
 onMounted(async () => {
   console.log('App Mounted')
@@ -46,6 +50,18 @@ html, body {
   background-color: #f5f5f5;
   font-size: 16px;
   line-height: 1.5;
+  color: #333;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+:global(.dark-mode) .app {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+:global(.light-mode) .app {
+  background-color: #f5f5f5;
   color: #333;
 }
 </style>

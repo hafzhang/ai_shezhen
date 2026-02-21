@@ -1,0 +1,318 @@
+/**
+ * Dark Mode Styles
+ * Global dark mode theme styles for the application
+ */
+
+/* Dark mode color variables */
+$dark-bg-primary: #1a1a1a;
+$dark-bg-secondary: #2a2a2a;
+$dark-bg-tertiary: #3a3a3a;
+$dark-text-primary: #e0e0e0;
+$dark-text-secondary: #aaaaaa;
+$dark-text-tertiary: #888888;
+$dark-border: #3a3a3a;
+$dark-shadow: rgba(0, 0, 0, 0.3);
+
+/* Apply dark mode styles when .dark-mode class is present on html element */
+:global(.dark-mode) {
+  /* Background colors */
+  background-color: $dark-bg-primary;
+
+  /* Text colors */
+  color: $dark-text-primary;
+
+  /* Links */
+  a {
+    color: #8b9cf5;
+    &:hover {
+      color: #a5b4ff;
+    }
+  }
+
+  /* Buttons */
+  .btn {
+    &-primary {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a5a92 100%);
+      color: #ffffff;
+    }
+
+    &-secondary {
+      background: $dark-bg-tertiary;
+      color: $dark-text-secondary;
+    }
+
+    &-text {
+      color: #8b9cf5;
+    }
+  }
+
+  /* Cards */
+  .card,
+  .user-card,
+  .welcome-card,
+  .feature-item {
+    background: $dark-bg-secondary;
+    color: $dark-text-primary;
+  }
+
+  /* Inputs */
+  input,
+  textarea {
+    background: $dark-bg-secondary;
+    color: $dark-text-primary;
+    border-color: $dark-border;
+
+    &::placeholder {
+      color: $dark-text-tertiary;
+    }
+  }
+
+  /* Headers */
+  .header {
+    background: $dark-bg-secondary;
+    border-bottom-color: $dark-border;
+  }
+
+  /* Sections */
+  .section {
+    background: $dark-bg-secondary;
+  }
+
+  /* Menu items */
+  .menu-item {
+    border-bottom-color: $dark-border;
+  }
+
+  .item-label {
+    color: $dark-text-primary;
+  }
+
+  .item-value {
+    color: $dark-text-tertiary;
+  }
+
+  /* Titles and text */
+  h1, h2, h3, h4, h5, h6 {
+    color: $dark-text-primary;
+  }
+
+  .title {
+    color: $dark-text-primary;
+  }
+
+  .subtitle {
+    color: $dark-text-secondary;
+  }
+
+  .description {
+    color: $dark-text-secondary;
+  }
+
+  /* Modals */
+  .modal,
+  .popup {
+    background: $dark-bg-secondary;
+    color: $dark-text-primary;
+  }
+
+  /* Switches and toggles */
+  switch {
+    &::after {
+      background: $dark-bg-secondary;
+    }
+  }
+
+  /* Progress bars */
+  .progress {
+    background: $dark-bg-tertiary;
+  }
+
+  /* Badges and tags */
+  .badge,
+  .tag {
+    background: $dark-bg-tertiary;
+    color: $dark-text-secondary;
+  }
+
+  /* Dividers */
+  .divider,
+  hr {
+    border-color: $dark-border;
+  }
+
+  /* Borders */
+  .bordered {
+    border-color: $dark-border;
+  }
+
+  /* Shadows (darker for dark mode) */
+  .shadow {
+    box-shadow: 0 2px 8px $dark-shadow;
+  }
+
+  /* Scrollbars (Webkit) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $dark-bg-primary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $dark-bg-tertiary;
+    border-radius: 4px;
+
+    &:hover {
+      background: #4a4a4a;
+    }
+  }
+
+  /* Toast notifications */
+  .toast {
+    background: $dark-bg-secondary;
+    color: $dark-text-primary;
+
+    &.success {
+      background: #1a3a1a;
+      color: #7ccc7c;
+    }
+
+    &.error {
+      background: #3a1a1a;
+      color: #cc7c7c;
+    }
+
+    &.warning {
+      background: #3a2a1a;
+      color: #ccac7c;
+    }
+
+    &.info {
+      background: #1a2a3a;
+      color: #7caacc;
+    }
+  }
+
+  /* Loading indicator */
+  .loading {
+    background: $dark-shadow;
+  }
+
+  /* Spinner */
+  .spinner {
+    border-color: $dark-bg-tertiary;
+    border-top-color: #8b9cf5;
+  }
+
+  /* Form elements */
+  .form-group {
+    label {
+      color: $dark-text-secondary;
+    }
+  }
+
+  /* Tables */
+  table {
+    background: $dark-bg-secondary;
+    color: $dark-text-primary;
+
+    th {
+      background: $dark-bg-tertiary;
+      color: $dark-text-secondary;
+    }
+
+    tr {
+      border-bottom-color: $dark-border;
+
+      &:hover {
+        background: $dark-bg-tertiary;
+      }
+    }
+  }
+
+  /* Code blocks */
+  code,
+  pre {
+    background: $dark-bg-tertiary;
+    color: #e0e0e0;
+  }
+
+  /* Tabs */
+  .tab {
+    &-active {
+      color: #8b9cf5;
+      border-bottom-color: #8b9cf5;
+    }
+  }
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition-property: background-color, color, border-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Prevent transition on page load */
+.no-transition * {
+  transition: none !important;
+}
+
+/* Dark mode specific component overrides */
+:global(.dark-mode) {
+  /* Home page */
+  .container {
+    background: linear-gradient(135deg, #4a5a9a 0%, #5a4a7a 100%);
+  }
+
+  .user-card,
+  .welcome-card,
+  .feature-item {
+    background: rgba(42, 42, 42, 0.95);
+  }
+
+  .nickname,
+  .feature-title {
+    color: #e0e0e0;
+  }
+
+  .phone,
+  .feature-desc {
+    color: #888888;
+  }
+
+  .action-link {
+    color: #8b9cf5;
+  }
+
+  .info-section {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  /* Profile page */
+  .profile-card {
+    background: $dark-bg-secondary;
+  }
+
+  /* History page */
+  .history-item {
+    background: $dark-bg-secondary;
+    border-color: $dark-border;
+  }
+
+  /* Result page */
+  .result-card {
+    background: $dark-bg-secondary;
+  }
+
+  .syndrome-card {
+    background: $dark-bg-tertiary;
+  }
+
+  /* Login/Register pages */
+  .form-container {
+    background: $dark-bg-secondary;
+  }
+}

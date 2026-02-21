@@ -391,4 +391,35 @@ function goToRegister() {
   color: #ffffff;
   font-size: 15px;
 }
+
+/* Dark mode styles */
+:global(.dark-mode) .container {
+  background: linear-gradient(135deg, #4a5a9a 0%, #5a4a7a 100%);
+}
+
+:global(.dark-mode) .user-card,
+:global(.dark-mode) .welcome-card,
+:global(.dark-mode) .feature-item {
+  background: rgba(42, 42, 42, 0.95);
+}
+
+:global(.dark-mode) .nickname,
+:global(.dark-mode) .welcome-text,
+:global(.dark-mode) .feature-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .phone,
+:global(.dark-mode) .description,
+:global(.dark-mode) .feature-desc {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .action-link {
+  color: #8b9cf5;
+}
+
+:global(.dark-mode) .info-section {
+  background: rgba(0, 0, 0, 0.2);
+}
 </style>
