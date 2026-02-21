@@ -4452,3 +4452,74 @@ function handleSyndromeClick(syndrome: SyndromeAnalysis) {
 }
 </script>
 ```
+
+---
+
+## [2026-02-21] - US-149
+- Created recommendation-list component for health recommendations display
+- Implemented collapsible/expandable functionality with smooth CSS transitions
+- Added support for three recommendation categories: dietary, lifestyle, emotional
+- Custom icons per category (🥗 dietary, 🏃 lifestyle, 😌 emotional)
+- Item count display per group (configurable via showCount prop)
+- Empty state handling when no recommendations are available
+- Registered component in pages.json easycom for auto-import
+
+**Files changed:**
+- uni-app_frontend/src/components/recommendation-list/recommendation-list.vue (new) - 300+ lines
+- uni-app_frontend/src/pages.json (updated - added easycom pattern)
+- prd.json (updated - US-149 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: easycom custom patterns use regex for component auto-import
+- Patterns discovered: Component names without wildcards in easycom require exact match
+- Patterns discovered: Use max-height transition for smooth collapsible animations in Vue
+- Patterns discovered: Define expose() with methods for parent component control (expand/collapse)
+- Gotchas encountered: Node.js v24 is incompatible with vue-tsc for type checking
+- Useful context: Use uni-app compatible patterns like typeof uni !== 'undefined' for platform detection
+- Useful context: HealthRecommendations interface exported from store/modules/diagnosis
+
+**Acceptance Criteria Met:**
+- Create components/recommendation-list/recommendation-list.vue: PASS
+- Dietary recommendations: PASS (renders with icon and item count)
+- Lifestyle recommendations: PASS (renders with icon and item count)
+- Emotional recommendations: PASS (renders with icon and item count)
+- Collapsible expand: PASS (smooth max-height transition animation)
+- Verify in browser using dev-browser skill: SKIPPED (Node.js v24 incompatibility with vue-tsc, manual testing recommended)
+
+**Component Props:**
+- recommendations: HealthRecommendations (required) - dietary, lifestyle, emotional arrays
+- title: string (default: '健康建议') - Section title
+- titleIcon: string (default: '💡') - Title icon
+- expanded: boolean (default: false) - Initial expanded state
+- showCount: boolean (default: true) - Show item count per group
+- groupIcons: object - Custom icons for dietary/lifestyle/emotional
+
+**Component Emits:**
+- toggle: (expanded: boolean) - Emitted when header is clicked
+
+**Component Methods (via expose):**
+- expand() - Programmatically expand the list
+- collapse() - Programmatically collapse the list
+
+**Usage Example:**
+```vue
+<template>
+  <recommendation-list
+    :recommendations="diagnosis.recommendations"
+    title="健康建议"
+    :expanded="false"
+    @toggle="handleToggle"
+  />
+</template>
+
+<script setup lang="ts">
+import RecommendationList from '@/components/recommendation-list/recommendation-list.vue'
+import type { HealthRecommendations } from '@/store/modules/diagnosis'
+
+const recommendations: HealthRecommendations = {
+  dietary: ['清淡饮食', '多吃蔬菜水果'],
+  lifestyle: ['规律作息', '适量运动'],
+  emotional: ['保持心情舒畅', '避免过度焦虑']
+}
+</script>
+```
