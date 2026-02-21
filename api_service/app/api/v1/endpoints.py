@@ -836,3 +836,21 @@ async def upload_diagnosis(
 
     # Call diagnosis endpoint
     return await diagnosis_tongue(request)
+
+
+# ============================================================================
+# Model Reference Setter
+# ============================================================================
+
+def set_model_references(pipeline=None, segmentor=None, classifier=None):
+    """Set global model references (called by main.py on startup)
+
+    Args:
+        pipeline: End-to-end pipeline instance
+        segmentor: Segmentation predictor instance
+        classifier: Classification predictor instance
+    """
+    global _pipeline, _segmentor, _classifier
+    _pipeline = pipeline
+    _segmentor = segmentor
+    _classifier = classifier

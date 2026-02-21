@@ -143,6 +143,30 @@ def initialize_models():
             )
             logger.info("End-to-end pipeline initialized successfully")
 
+        # Set model references in v1 endpoints module
+        try:
+            from api_service.app.api.v1 import endpoints as v1_endpoints
+            v1_endpoints.set_model_references(
+                pipeline=pipeline_instance,
+                segmentor=segmentor_instance,
+                classifier=classifier_instance
+            )
+            logger.info("v1 endpoints model references set")
+        except ImportError as e:
+            logger.warning(f"Could not set v1 endpoints model references: {e}")
+
+        # Set model references in v2 diagnosis module
+        try:
+            from api_service.app.api.v2 import diagnosis as v2_diagnosis
+            v2_diagnosis.set_model_references(
+                pipeline=pipeline_instance,
+                segmentor=segmentor_instance,
+                classifier=classifier_instance
+            )
+            logger.info("v2 diagnosis model references set")
+        except ImportError as e:
+            logger.warning(f"Could not set v2 diagnosis model references: {e}")
+
         # task-5-2: Update Prometheus metrics for model status
         update_model_status("segmentation", segmentor_instance is not None)
         update_model_status("classification", classifier_instance is not None)
@@ -271,6 +295,15 @@ try:
     logger.info("API v2 authentication endpoints registered")
 except ImportError as e:
     logger.warning(f"API v2 authentication endpoints not available: {e}")
+
+# Include API v2 diagnosis router (US-121 - Diagnosis with database integration)
+# Note: Model references will be set after initialization in initialize_models()
+try:
+    from api_service.app.api.v2 import diagnosis
+    app.include_router(diagnosis.router, prefix="/api/v2/diagnosis", tags=["Diagnosis"])
+    logger.info("API v2 diagnosis endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 diagnosis endpoints not available: {e}")
 
 
 # Root endpoint

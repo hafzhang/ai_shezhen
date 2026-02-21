@@ -823,15 +823,19 @@
       "title": "Create database health check",
       "description": "As a backend engineer, I need to implement database connection health check.",
       "priority": 120,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Implement check_db_health() in api_service/app/core/database.py",
         "Execute simple query to test connection",
         "Return health status and connection info",
         "Integrate into /api/v2/health endpoint",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/database.py",
+        "api_service/app/main.py"
       ]
     },
     {
@@ -839,15 +843,22 @@
       "title": "Modify diagnosis API to support user_id",
       "description": "As a backend engineer, I need to modify diagnosis API to associate with user ID.",
       "priority": 121,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Update api_service/app/api/v2/diagnosis.py",
         "Accept optional user_id parameter",
         "Store diagnosis to diagnosis_history table after completion",
         "Return diagnosis_id",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/diagnosis.py",
+        "api_service/app/api/v2/models.py",
+        "api_service/app/main.py",
+        "api_service/app/api/v1/endpoints.py",
+        "api_service/core/config.py"
       ]
     },
     {

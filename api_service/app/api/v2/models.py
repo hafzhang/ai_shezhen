@@ -413,11 +413,197 @@ class LogoutResponse(APIResponse):
     message: str = Field(default="退出登录成功", description="响应消息")
 
 
+# ============================================================================
+# Diagnosis Request/Response Models (US-121)
+# ============================================================================
+
+class UserInfoRequest(BaseModel):
+    """
+    User information for diagnosis request.
+
+    Captures basic user demographics and chief complaint.
+
+    Attributes:
+        age: User age (optional)
+        gender: User gender (optional)
+        chief_complaint: Primary symptom or complaint (optional)
+
+    Example:
+        >>> user_info = UserInfoRequest(
+        ...     age=35,
+        ...     gender="male",
+        ...     chief_complaint="最近感觉疲劳"
+        ... )
+    """
+
+    age: Optional[int] = Field(None, ge=0, le=150, description="年龄")
+    gender: Optional[str] = Field(None, description="性别")
+    chief_complaint: Optional[str] = Field(None, description="主诉症状")
+
+
+class DiagnosisRequest(BaseModel):
+    """
+    Diagnosis request model.
+
+    Contains tongue image and optional user information for diagnosis.
+
+    Attributes:
+        image: Base64 encoded tongue image (required)
+        user_info: Optional user demographic information
+        enable_llm_diagnosis: Whether to enable LLM diagnosis (default: True)
+        enable_rule_fallback: Whether to enable rule-based fallback (default: True)
+
+    Example:
+        >>> request = DiagnosisRequest(
+        ...     image="data:image/png;base64,iVBORw0KG...",
+        ...     user_info=UserInfoRequest(age=35, gender="male")
+        ... )
+    """
+
+    image: str = Field(..., description="Base64编码的舌象图像")
+    user_info: Optional[UserInfoRequest] = Field(None, description="用户信息")
+    enable_llm_diagnosis: bool = Field(default=True, description="是否启用LLM诊断")
+    enable_rule_fallback: bool = Field(default=True, description="是否启用规则库兜底")
+
+
+class SegmentationResult(BaseModel):
+    """
+    Segmentation result model.
+
+    Contains tongue segmentation metrics.
+
+    Attributes:
+        tongue_area: Tongue area in pixels
+        tongue_ratio: Tongue area ratio (0-1)
+    """
+
+    tongue_area: int = Field(..., description="舌体区域像素数")
+    tongue_ratio: float = Field(..., description="舌体区域占比")
+
+
+class ClassificationFeature(BaseModel):
+    """
+    Individual classification feature model.
+
+    Contains prediction, confidence, and description for a single feature.
+
+    Attributes:
+        prediction: Predicted class name
+        confidence: Confidence score (0-1)
+        description: Feature description
+    """
+
+    prediction: str = Field(..., description="预测结果")
+    confidence: float = Field(..., ge=0, le=1, description="置信度")
+    description: Optional[str] = Field(None, description="特征描述")
+
+
+class SpecialFeatures(BaseModel):
+    """
+    Special features classification model.
+
+    Contains binary feature detection results.
+
+    Attributes:
+        red_dots: Red dot detection result
+        cracks: Crack detection result
+        teeth_marks: Teeth mark detection result
+    """
+
+    red_dots: dict = Field(default_factory=dict, description="红点特征")
+    cracks: dict = Field(default_factory=dict, description="裂纹特征")
+    teeth_marks: dict = Field(default_factory=dict, description="齿痕特征")
+
+
+class ClassificationResult(BaseModel):
+    """
+    Complete classification result model.
+
+    Contains all 6-dimension tongue features.
+
+    Attributes:
+        tongue_color: Tongue color classification
+        coating_color: Coating color classification
+        tongue_shape: Tongue shape classification
+        coating_quality: Coating quality classification
+        special_features: Special features detection
+        health_status: Overall health status classification
+    """
+
+    tongue_color: ClassificationFeature = Field(..., description="舌色分类")
+    coating_color: ClassificationFeature = Field(..., description="苔色分类")
+    tongue_shape: ClassificationFeature = Field(..., description="舌形分类")
+    coating_quality: ClassificationFeature = Field(..., description="苔质分类")
+    special_features: SpecialFeatures = Field(..., description="特殊特征")
+    health_status: ClassificationFeature = Field(..., description="健康状态")
+
+
+class DiagnosisResult(BaseModel):
+    """
+    LLM diagnosis result model.
+
+    Contains TCM syndrome analysis and recommendations.
+
+    Attributes:
+        primary_syndrome: Primary TCM syndrome
+        confidence: Syndrome confidence score
+        syndrome_analysis: Detailed syndrome analysis
+        tcm_theory: TCM theoretical basis (optional)
+        health_recommendations: Health recommendations
+        risk_alert: Risk warning (optional)
+    """
+
+    primary_syndrome: str = Field(..., description="主要证型")
+    confidence: float = Field(..., ge=0, le=1, description="置信度")
+    syndrome_analysis: str = Field(..., description="证型分析")
+    tcm_theory: Optional[str] = Field(None, description="中医理论基础")
+    health_recommendations: dict = Field(..., description="健康建议")
+    risk_alert: Optional[str] = Field(None, description="风险提示")
+
+
+class DiagnosisResponse(APIResponse):
+    """
+    Diagnosis response model.
+
+    Returns complete diagnosis results with database record ID.
+
+    Attributes:
+        diagnosis_id: Database record ID (for querying later)
+        user_id: User ID (None for anonymous diagnosis)
+        segmentation: Segmentation results
+        classification: 6-dimension classification results
+        diagnosis: TCM syndrome diagnosis
+        inference_time_ms: Total inference time in milliseconds
+        created_at: Diagnosis creation timestamp
+
+    Example:
+        >>> response = DiagnosisResponse(
+        ...     success=True,
+        ...     diagnosis_id="123e4567-e89b-12d3-a456-426614174000",
+        ...     user_id="user-uuid",
+        ...     segmentation=SegmentationResult(...),
+        ...     classification=ClassificationResult(...),
+        ...     diagnosis=DiagnosisResult(...),
+        ...     inference_time_ms=1500.0
+        ... )
+    """
+
+    diagnosis_id: str = Field(..., description="诊断记录ID")
+    user_id: Optional[str] = Field(None, description="用户ID（匿名诊断为空）")
+    segmentation: SegmentationResult = Field(..., description="分割结果")
+    classification: ClassificationResult = Field(..., description="分类结果")
+    diagnosis: DiagnosisResult = Field(..., description="诊断结果")
+    inference_time_ms: float = Field(..., description="总推理时间（毫秒）")
+    created_at: Optional[str] = Field(None, description="诊断时间（ISO 8601）")
+
+
 __all__ = [
     # Request models
     "UserRegister",
     "UserLogin",
     "RefreshRequest",
+    "UserInfoRequest",
+    "DiagnosisRequest",
     # Response models
     "UserInfo",
     "TokenResponse",
@@ -427,4 +613,11 @@ __all__ = [
     "LoginResponse",
     "RefreshResponse",
     "LogoutResponse",
+    # Diagnosis models
+    "SegmentationResult",
+    "ClassificationFeature",
+    "SpecialFeatures",
+    "ClassificationResult",
+    "DiagnosisResult",
+    "DiagnosisResponse",
 ]

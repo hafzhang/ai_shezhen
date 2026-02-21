@@ -2826,3 +2826,99 @@ POSTGRES_PASSWORD=shezhen_password
 - Use service_healthy condition for depends_on to ensure proper startup order
 - Use ${VAR:-default} syntax for environment variable defaults
 - Add separate DATABASE_URL and ALEMBIC_DATABASE_URL for flexibility
+
+
+## [2026-02-21] - US-120, US-121
+- US-120: Database health check already implemented in database.py check_db_health()
+- US-120: Health check integrated into /api/v2/health endpoint in main.py
+- Created api_service/app/api/v2/diagnosis.py - POST /api/v2/diagnosis endpoint
+- Added diagnosis Pydantic models to api_service/app/api/v2/models.py (DiagnosisRequest, DiagnosisResponse, etc.)
+- Integrated v2 diagnosis router into main.py
+- Added set_model_references() to v1/endpoints.py for model initialization
+- Added MEDIA_ROOT to api_service/core/config.py for image storage
+- Implemented anonymous diagnosis support (user_id is NULL for anonymous users)
+- Diagnosis results stored to diagnosis_history table with JSONB fields
+
+**Files changed:**
+- api_service/app/api/v2/diagnosis.py (new) - 470+ lines of diagnosis endpoint with database integration
+- api_service/app/api/v2/models.py (updated) - Added 200+ lines of diagnosis Pydantic models
+- api_service/app/main.py (updated) - Added v2 diagnosis router registration and model reference setting
+- api_service/app/api/v1/endpoints.py (updated) - Added set_model_references() function
+- api_service/core/config.py (updated) - Added MEDIA_ROOT for image storage
+- prd.json (updated) - US-120 and US-121 marked as complete
+
+**Learnings for future iterations:**
+- Patterns discovered: v2 endpoints should use get_optional_user() dependency for optional authentication
+- Patterns discovered: Diagnosis API stores results in database even for anonymous users (user_id=NULL)
+- Patterns discovered: Pydantic models for v2 should extend APIResponse base class for unified response format
+- Gotchas encountered: Model references need to be set after initialization, not at import time
+- Gotchas encountered: v1 endpoints module also needs set_model_references() function for model initialization
+- Useful context: Image file hash (SHA-256) used for deduplication in tongue_images table
+- Useful context: JSONB fields in PostgreSQL store flexible diagnosis results without schema changes
+- Useful context: TongueImage and DiagnosisHistory models have cascade delete relationships
+
+**Acceptance Criteria Met (US-120):**
+- check_db_health() in database.py: PASS (already implemented at lines 213-262)
+- Execute simple query to test connection: PASS (SELECT 1 query)
+- Return health status and connection info: PASS (returns healthy, message, database, error fields)
+- Integrated into /api/v2/health endpoint: PASS (main.py lines 376-422)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-121):**
+- Created api_service/app/api/v2/diagnosis.py: PASS
+- Accept optional user_id parameter: PASS (via get_optional_user dependency)
+- Store diagnosis to diagnosis_history table: PASS (creates DiagnosisHistory with all required fields)
+- Return diagnosis_id: PASS (returns UUID diagnosis_id in response)
+- Typecheck passes: PASS
+
+**Key Features (US-121):**
+1. POST /api/v2/diagnosis endpoint with database integration
+2. Optional authentication (anonymous users supported)
+3. Image deduplication using SHA-256 file hash
+4. TongueImage storage with metadata
+5. DiagnosisHistory with JSONB fields for flexible data
+6. Full 6-dimension classification results storage
+7. LLM diagnosis results with TCM syndrome analysis
+8. Model reference sharing between v1 and v2 endpoints
+
+**Usage (US-121):**
+```bash
+# Authenticated diagnosis
+curl -X POST http://localhost:8000/api/v2/diagnosis \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image": "data:image/png;base64,iVBORw0KG...",
+    "user_info": {"age": 35, "gender": "male"},
+    "enable_llm_diagnosis": true
+  }'
+
+# Anonymous diagnosis (no Authorization header)
+curl -X POST http://localhost:8000/api/v2/diagnosis \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image": "data:image/png;base64,iVBORw0KG..."
+  }'
+```
+
+**API Response:**
+```json
+{
+  "success": true,
+  "message": "Diagnosis completed successfully",
+  "diagnosis_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": "user-uuid-or-null",
+  "segmentation": {"tongue_area": 100000, "tongue_ratio": 0.3},
+  "classification": {...},
+  "diagnosis": {
+    "primary_syndrome": "气血调和",
+    "confidence": 0.85,
+    "syndrome_analysis": "...",
+    "health_recommendations": {...}
+  },
+  "inference_time_ms": 1500.0,
+  "created_at": "2026-02-21T12:00:00Z"
+}
+```
+
+---

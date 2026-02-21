@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     MODELS_DIR: Path = Path("models")
     API_SERVICE_DIR: Path = Path("api_service")
     PROMPTS_DIR: Path = API_SERVICE_DIR / "prompts"
+    MEDIA_ROOT: Path = Path("media")  # US-121: Storage for uploaded images
 
     # Prompt Configuration
     SYSTEM_PROMPT_PATH: Path = PROMPTS_DIR / "system_prompt.txt"
