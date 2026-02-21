@@ -1,0 +1,64 @@
+# Shezhen Health Monitor Service
+# Systemd service configuration for health monitoring
+#
+# 安装说明 / Installation Instructions:
+#   sudo cp scripts/systemd/shezhen-health-monitor.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable shezhen-health-monitor
+#   sudo systemctl start shezhen-health-monitor
+#
+# 查看状态 / Check status:
+#   systemctl status shezhen-health-monitor
+#
+# 查看日志 / View logs:
+#   journalctl -u shezhen-health-monitor -f
+#
+# Author: Ralph Agent
+# Date: 2026-02-21
+
+[Unit]
+Description=Shezhen AI Health Monitor Service
+Documentation=https://docs.shezhen.ai/disaster-recovery
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/shezhen
+
+# 环境变量
+Environment="PYTHONUNBUFFERED=1"
+Environment="PROJECT_DIR=/opt/shezhen"
+Environment="LOG_LEVEL=INFO"
+
+# 启动命令
+ExecStart=/usr/bin/python3 /opt/shezhen/scripts/backup/health_monitor.py \
+    --interval 30 \
+    --config /opt/shezhen/health_config.json
+
+# 重启配置
+Restart=always
+RestartSec=10s
+
+# 资源限制
+LimitNOFILE=65536
+MemoryMax=512M
+
+# 安全设置
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log /tmp
+
+# 日志
+StandardOutput=append:/var/log/shezhen_health_monitor.log
+StandardError=append:/var/log/shezhen_health_monitor.log
+
+# 管理
+PIDFile=/var/run/shezhen-health-monitor.pid
+
+[Install]
+WantedBy=multi-user.target

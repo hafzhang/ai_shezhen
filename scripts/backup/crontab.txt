@@ -1,0 +1,87 @@
+# Shezhen AI Tongue Diagnosis System - Backup Cron Configuration
+#
+# 安装说明 / Installation Instructions:
+#   sudo crontab -u root scripts/backup/crontab.txt
+# 或 / Or:
+#   sudo cp scripts/backup/crontab.txt /etc/cron.d/shezhen-backups
+#
+# 查看任务 / View jobs:
+#   sudo crontab -l
+#
+# 日志位置 / Log location:
+#   /var/log/shezhen_backup.log
+#   /var/log/shezhen_health_monitor.log
+#
+# Author: Ralph Agent
+# Date: 2026-02-21
+
+# 环境变量设置
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# 备份目录
+BACKUP_DIR=/data/backups
+PROJECT_DIR=/opt/shezhen
+
+# ============================================================================
+# 每日备份任务 / Daily Backup Tasks
+# ============================================================================
+
+# Redis 数据备份 - 每天凌晨 2:00
+0 2 * * * root $PROJECT_DIR/scripts/backup/backup_redis.sh >> /var/log/shezhen_backup.log 2>&1
+
+# 配置文件备份 - 每天凌晨 2:30
+30 2 * * * root $PROJECT_DIR/scripts/backup/backup_configs.sh >> /var/log/shezhen_backup.log 2>&1
+
+# ============================================================================
+# 每周备份任务 / Weekly Backup Tasks
+# ============================================================================
+
+# 模型文件备份 - 每周日凌晨 3:00
+0 3 * * 0 root $PROJECT_DIR/scripts/backup/backup_models.sh >> /var/log/shezhen_backup.log 2>&1
+
+# Elasticsearch 快照 - 每周日凌晨 4:00
+0 4 * * 0 root $PROJECT_DIR/scripts/backup/backup_elasticsearch.sh >> /var/log/shezhen_backup.log 2>&1
+
+# ============================================================================
+# 健康监控 / Health Monitoring
+# ============================================================================
+
+# 启动健康监控 (使用 systemd 服务更推荐)
+# @reboot root /usr/bin/python3 $PROJECT_DIR/scripts/backup/health_monitor.py >> /var/log/shezhen_health_monitor.log 2>&1
+
+# ============================================================================
+# 清理任务 / Cleanup Tasks
+# ============================================================================
+
+# 清理旧日志文件 - 每天凌晨 5:00
+0 5 * * * root find /var/log -name "shezhen*.log" -mtime +30 -exec gzip {} \;
+
+# 清理临时文件 - 每天凌晨 5:30
+30 5 * * * root find /tmp -name "shezhen*" -mtime +7 -delete
+
+# ============================================================================
+# 月度任务 / Monthly Tasks
+# ============================================================================
+
+# 月度系统检查报告 - 每月1日凌晨 1:00
+0 1 1 * * root $PROJECT_DIR/scripts/backup/monthly_health_check.sh >> /var/log/shezhen_monthly.log 2>&1
+
+# ============================================================================
+# 注释说明 / Comments
+# ============================================================================
+#
+# Cron 表达式格式:
+#   * * * * * command
+#   │ │ │ │ │
+#   │ │ │ │ └─ 星期几 (0-7, 0和7都是周日)
+#   │ │ │ └─── 月份 (1-12)
+#   │ │ └───── 日期 (1-31)
+#   │ └─────── 小时 (0-23)
+#   └───────── 分钟 (0-59)
+#
+# 特殊时间说明:
+#   @reboot  - 系统启动时执行
+#   @daily   - 每天 (相当于 0 0 * * *)
+#   @weekly  - 每周 (相当于 0 0 * * 0)
+#   @monthly - 每月 (相当于 0 0 1 * *)
