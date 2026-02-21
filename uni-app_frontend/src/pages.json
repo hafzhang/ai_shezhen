@@ -87,6 +87,14 @@
         "enablePullDownRefresh": false,
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/health-records/index",
+      "style": {
+        "navigationBarTitleText": "健康档案",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -184,6 +192,11 @@
       {
         "name": "用户协议",
         "path": "pages/terms/index",
+        "query": ""
+      },
+      {
+        "name": "健康档案",
+        "path": "pages/health-records/index",
         "query": ""
       }
     ]
