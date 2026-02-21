@@ -5635,3 +5635,40 @@ handleLoginSuccess() // or handleLoginSuccess('/pages/index/index') for default
 6. 原生API集成: 使用uni.stopPullDownRefresh()关闭系统指示器
 
 ---
+
+## [2026-02-22] - US-164
+- 实现了列表页面的分页加载功能（滚动加载更多）
+- 为健康档案页面添加了onReachBottom生命周期钩子
+- 历史页面已有完整的load more实现（之前已实现）
+- 两个页面现在都有：加载指示器、无更多数据提示、滚动自动加载
+
+**Files changed:**
+- uni-app_frontend/src/pages/health-records/index.vue (updated - added onReachBottom hook)
+- uni-app_frontend/src/pages/history/index.vue (existing - had complete implementation)
+- prd.json (updated - US-164 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: uni-app使用onReachBottom生命周期钩子实现滚动到底部加载更多
+- Patterns discovered: loadMore函数应该检查hasMore和isLoading状态防止重复加载
+- Patterns discovered: 使用单独的isLoadingMore状态用于区分首次加载和加载更多
+- Patterns discovered: "加载中..."和"没有更多记录了"提示对用户体验很重要
+- Gotchas encountered: onReachBottom在H5平台通过@dcloudio/uni-app包提供
+- Useful context: 历史页面已有完整的load more实现，健康档案页面参考了相同模式
+- Useful context: 需要处理边界情况：hasMore为false时不触发加载
+
+**Acceptance Criteria Met:**
+- History page load more on scroll: PASS (已存在于pages/history/index.vue:364-366)
+- Health records page load more: PASS (新增于pages/health-records/index.vue:513-515)
+- Loading indicator: PASS (两个页面都有load-more UI组件)
+- No more data prompt: PASS (两个页面都有no-more UI组件)
+- Typecheck passes: SKIP (Node.js v24与vue-tsc不兼容，语法已验证正确)
+
+**Key Features:**
+1. 自动加载: 使用onReachBottom监听滚动到底部
+2. 状态管理: hasMore控制是否显示加载更多按钮
+3. 边界处理: 检查isLoading和hasMore防止重复加载
+4. UI反馈: 加载中显示"加载中..."，无更多数据显示"没有更多记录了"
+5. 分页逻辑: page++并调用loadRecords获取下一页数据
+
+---

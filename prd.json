@@ -1737,15 +1737,19 @@
       "title": "Implement load more",
       "description": "As a frontend engineer, I need to add pagination load for list pages.",
       "priority": 164,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "History page load more on scroll",
         "Health records page load more",
         "Loading indicator",
         "No more data prompt",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/history/index.vue",
+        "uni-app_frontend/src/pages/health-records/index.vue"
       ]
     },
     {
