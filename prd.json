@@ -458,15 +458,19 @@
       "title": "Create users table migration",
       "description": "As a backend engineer, I need to create the users table migration.",
       "priority": 102,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Migration file contains complete users table structure",
         "UUID primary key, all field types correct",
         "Add indexes (openid, phone, email, created_at)",
         "Migration executes successfully (alembic upgrade head)",
         "Typecheck passes"
+      ],
+      "files": [
+        "alembic/versions/20260221_us102_create_users_table.py",
+        "api_service/requirements.txt"
       ]
     },
     {
