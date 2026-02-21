@@ -4364,3 +4364,91 @@ const features: TongueFeatures = {
 }
 </script>
 ```
+
+## [2026-02-21] - US-148
+- 实现了证型分析卡片组件（uni-app_frontend/src/components/syndrome-card/syndrome-card.vue）
+- 创建了证型卡片展示（证型名称、描述、置信度、中医理论）
+- 实现了置信度徽章（高/中/低三级颜色区分）
+- 添加了主要证型高亮样式（渐变背景、左侧边框）
+- 支持紧凑模式（隐藏描述和理论）
+- 支持可点击模式（带展开指示器）
+- 支持风险指示器（高置信度显示"需关注"）
+- 使用SyndromeAnalysis类型（与diagnosis store类型一致）
+- 修复了vite.config.ts中uview-plus theme.scss路径错误
+
+**Files changed:**
+- uni-app_frontend/src/components/syndrome-card/syndrome-card.vue (new) - 290+ lines of syndrome card component
+- uni-app_frontend/vite.config.ts (updated) - Fixed uview-plus theme.scss import path
+
+**Learnings for future iterations:**
+- Patterns discovered: 证型卡片使用条件class绑定实现不同样式状态（primary/compact/clickable）
+- Patterns discovered: 置信度分级使用computed属性动态返回字符串（high/medium/low）
+- Patterns discovered: 组件emit事件使用TypeScript类型定义defineEmits<{ click: [syndrome: SyndromeAnalysis] }>()
+- Gotchas encountered: vite.config.ts中uview-plus主题路径应使用"uview-plus/theme.scss"而非"@/uni_modules/uview-plus/theme.scss"
+- Gotchas encountered: Node.js v24与vue-tsc不兼容，类型检查需使用Node.js v20
+- Gotchas encountered: uni-app H5构建时uview-plus组件存在兼容性问题（不影响组件本身代码正确性）
+- Useful context: 证型置信度阈值默认0.6用于判断主要证型
+- Useful context: 组件props支持多种显示模式（compact、showIcon、showTheory、showRisk、clickable）
+- Useful context: 置信度颜色渐变区分：高（粉红）、中（紫色）、低（灰色）
+
+**Acceptance Criteria Met:**
+- Create components/syndrome-card/syndrome-card.vue: PASS (组件已创建)
+- Syndrome name: PASS (证型名称显示，支持图标和文本)
+- Syndrome description: PASS (证型描述显示，紧凑模式下可隐藏)
+- Confidence display: PASS (置信度徽章，三级颜色区分，百分比显示)
+- Verify in browser: PARTIAL (组件代码正确，但uview-plus构建问题影响H5构建)
+
+**Key Features:**
+1. Syndrome Card Display:
+   - 证型名称（带可选图标🩺）
+   - 证型描述（紧凑模式下隐藏）
+   - 置信度徽章（三级样式：高≥70%、中≥50%、低<50%）
+   - 中医理论（可选显示）
+2. Visual States:
+   - 主要证型高亮（confidence≥0.6时渐变背景）
+   - 左侧边框颜色区分（普通蓝色、主要紫色）
+   - 可点击模式带展开指示器
+3. Risk Indicator:
+   - 高置信度（≥70%）显示"需关注"标签
+   - 红色警告样式
+4. Configurable Props:
+   - compact: 紧凑模式
+   - showIcon: 显示图标
+   - showTheory: 显示中医理论
+   - showRisk: 显示风险指示器
+   - clickable: 可点击模式
+   - primaryThreshold: 主要证型阈值
+   - icon: 自定义图标emoji
+
+**Usage:**
+```vue
+<template>
+  <SyndromeCard
+    :syndrome="syndrome"
+    :compact="false"
+    :show-icon="true"
+    :show-theory="true"
+    :show-risk="true"
+    :clickable="true"
+    :primary-threshold="0.6"
+    icon="🩺"
+    @click="handleSyndromeClick"
+  />
+</template>
+
+<script setup lang="ts">
+import SyndromeCard from '@/components/syndrome-card/syndrome-card.vue'
+import type { SyndromeAnalysis } from '@/store/modules/diagnosis'
+
+const syndrome: SyndromeAnalysis = {
+  name: '脾胃虚弱',
+  confidence: 0.75,
+  description: '脾胃运化功能减弱，消化吸收能力下降',
+  tcm_theory: '脾主运化，胃主受纳。脾胃虚弱则运化无力，受纳失常。'
+}
+
+function handleSyndromeClick(syndrome: SyndromeAnalysis) {
+  console.log('Syndrome clicked:', syndrome.name)
+}
+</script>
+```

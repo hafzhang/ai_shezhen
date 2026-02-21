@@ -20,7 +20,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/uni_modules/uview-plus/theme.scss";@import "uni.scss";`
+        additionalData: `@import "uview-plus/theme.scss";@import "uni.scss";`
       }
     }
   },
