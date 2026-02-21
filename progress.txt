@@ -2486,3 +2486,94 @@ def create_diagnosis(
 - Use OAuth2PasswordBearer with auto_error=False for optional authentication support
 - FastAPI dependencies use async def and yield from to chain dependencies
 - Return None instead of raising exception for optional authentication paths
+
+## [2026-02-21] - US-117
+- Created api_service/app/api/v2/models.py with authentication Pydantic models
+- Created api_service/app/api/v2/__init__.py package initializer
+- Implemented UserRegister model with phone/password/nickname validation
+  - Phone validation: 11 digits, starts with 1, second digit 3-9
+  - Password validation: min 8 chars, must contain letters and numbers
+  - Email validation: standard email format (optional)
+- Implemented UserLogin model with phone/password fields
+- Implemented RefreshRequest model with refresh_token field
+- Implemented UserInfo response model (id, phone, email, nickname, avatar_url, openid, openid_type)
+- Implemented TokenResponse model (access_token, refresh_token, token_type, expires_in, user)
+- Implemented unified APIResponse model for consistent responses
+- Implemented response models: RegisterResponse, LoginResponse, RefreshResponse, LogoutResponse
+- All models support ORM mode (from_attributes=True) for SQLAlchemy compatibility
+
+**Files changed:**
+- api_service/app/api/v2/models.py (new) - 370+ lines of Pydantic models
+- api_service/app/api/v2/__init__.py (new) - Package initializer with exports
+- prd.json (updated - US-117 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use Pydantic Field() for detailed field descriptions and constraints
+- Patterns discovered: Use field_validator decorator for custom validation logic
+- Patterns discovered: Use model_config = {"from_attributes": True} for SQLAlchemy ORM compatibility
+- Patterns discovered: Use regex patterns in Field() for format validation (pattern parameter)
+- Gotchas encountered: Pydantic v2 uses field_validator instead of @validator decorator
+- Gotchas encountered: Use @classmethod on validators for proper Pydantic v2 compatibility
+- Useful context: Chinese mobile phone format: 11 digits, starts with 1, second digit 3-9
+- Useful context: Password should have mixed letters and numbers for security
+- Useful context: Response models should inherit from base APIResponse for consistency
+
+**Acceptance Criteria Met:**
+- Add UserRegister model (phone, password, nickname): PASS (models.py with full validation)
+- Add UserLogin model (phone, password): PASS (models.py UserLogin class)
+- Add TokenResponse model (access, refresh, user): PASS (models.py TokenResponse with UserInfo)
+- Add RefreshRequest model (refresh_token): PASS (models.py RefreshRequest class)
+- Typecheck passes: PASS (Python syntax check successful)
+
+**Key Features:**
+1. User Registration: UserRegister with phone, password, nickname, email (all validated)
+2. User Login: UserLogin with phone and password fields
+3. Token Refresh: RefreshRequest with refresh_token field
+4. User Info: UserInfo model with all user profile fields
+5. Token Response: TokenResponse with access_token, refresh_token, expires_in, user
+6. Unified Response: APIResponse base model for consistent API responses
+7. Specialized Responses: RegisterResponse, LoginResponse, RefreshResponse, LogoutResponse
+
+**Usage:**
+```python
+from api_service.app.api.v2.models import (
+    UserRegister,
+    UserLogin,
+    TokenResponse,
+    RefreshRequest,
+    UserInfo,
+)
+
+# Validate user registration
+user_data = UserRegister(
+    phone="13800138000",
+    password="abc12345",
+    nickname="张三",
+    email="user@example.com"
+)
+
+# Validate user login
+login_data = UserLogin(
+    phone="13800138000",
+    password="abc12345"
+)
+
+# Return token response
+response = TokenResponse(
+    access_token="eyJhbGci...",
+    refresh_token="eyJhbGci...",
+    token_type="bearer",
+    expires_in=1800,
+    user=UserInfo(
+        id="123e4567-e89b-12d3-a456-426614174000",
+        phone="13800138000",
+        nickname="张三"
+    )
+)
+```
+
+**Codebase Patterns Added:**
+- Use Field(min_length=X, max_length=Y) for string length constraints
+- Use Field(pattern=regex) for format validation in Pydantic v2
+- Use @field_validator with @classmethod for custom validation in Pydantic v2
+- Use model_config = {"from_attributes": True} to enable ORM mode

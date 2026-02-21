@@ -751,15 +751,19 @@
       "title": "Create auth Pydantic models",
       "description": "As a backend engineer, I need to create authentication-related Pydantic models.",
       "priority": 117,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Add UserRegister model (phone, password, nickname) to models.py",
         "Add UserLogin model (phone, password)",
         "Add TokenResponse model (access, refresh, user)",
         "Add RefreshRequest model (refresh_token)",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/models.py",
+        "api_service/app/api/v2/__init__.py"
       ]
     },
     {
