@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { request, getToken, setTokens, clearTokens, isUniApp } from '@/utils/request'
+import { request, getToken, setTokens, clearTokens, getUserInfo, setUserInfo as saveUserInfo, isUniApp } from '@/utils/request'
 
 interface UserInfo {
   id: string
@@ -14,12 +14,19 @@ interface UserInfo {
 }
 
 export const useUserStore = defineStore('user', () => {
+  // Initialize token from storage
   const token = ref(getToken())
-  const userInfo = ref<UserInfo | null>(null)
-  const isLoggedIn = ref(!!token.value)
+
+  // Initialize userInfo from storage (H5 auto-login)
+  const storedUserInfo = getUserInfo()
+  const userInfo = ref<UserInfo | null>(storedUserInfo)
+
+  const isLoggedIn = ref(!!token.value && !!userInfo.value)
 
   function setUserInfo(info: UserInfo) {
     userInfo.value = info
+    // Persist to localStorage for H5
+    saveUserInfo(info)
   }
 
   function setAccessToken(accessToken: string, refreshToken: string) {
@@ -33,6 +40,31 @@ export const useUserStore = defineStore('user', () => {
     token.value = ''
     userInfo.value = null
     isLoggedIn.value = false
+    // User info is cleared in clearTokens()
+  }
+
+  /**
+   * Initialize authentication state from storage
+   * Call this on app startup to restore user session
+   */
+  async function initializeAuth() {
+    const storedToken = getToken()
+    const storedUserInfo = getUserInfo()
+
+    if (storedToken && storedUserInfo) {
+      token.value = storedToken
+      userInfo.value = storedUserInfo
+      isLoggedIn.value = true
+
+      // Verify token is still valid by fetching fresh user info
+      try {
+        await fetchUserInfo()
+      } catch (error) {
+        // Token might be expired, clear storage
+        console.log('Token expired, clearing storage')
+        logout()
+      }
+    }
   }
 
   async function fetchUserInfo() {
@@ -215,6 +247,7 @@ export const useUserStore = defineStore('user', () => {
     setUserInfo,
     setAccessToken,
     logout,
+    initializeAuth,
     fetchUserInfo,
     login,
     register,

@@ -6,9 +6,14 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useUserStore } from '@/store'
 
-onMounted(() => {
+onMounted(async () => {
   console.log('App Mounted')
+
+  // Initialize authentication state from storage (H5 auto-login)
+  const userStore = useUserStore()
+  await userStore.initializeAuth()
 })
 </script>
 

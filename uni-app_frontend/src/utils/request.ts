@@ -69,6 +69,24 @@ function setTokens(accessToken: string, refreshToken: string) {
 function clearTokens() {
   storage.removeItem('access_token')
   storage.removeItem('refresh_token')
+  storage.removeItem('user_info')
+}
+
+// User info storage functions
+function getUserInfo(): any {
+  const info = storage.getItem('user_info')
+  if (info) {
+    try {
+      return JSON.parse(info)
+    } catch {
+      return null
+    }
+  }
+  return null
+}
+
+function setUserInfo(userInfo: any): void {
+  storage.setItem('user_info', JSON.stringify(userInfo))
 }
 
 let isRefreshing = false
@@ -231,5 +249,5 @@ const http = {
     request<T>({ ...config, url, method: 'DELETE' })
 }
 
-export { request, http, getToken, setTokens, clearTokens, isUniApp }
+export { request, http, getToken, setTokens, clearTokens, getUserInfo, setUserInfo, isUniApp }
 export type { RequestConfig, ApiResponse }
