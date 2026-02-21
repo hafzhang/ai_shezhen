@@ -3757,3 +3757,92 @@ const syndromes = diagnosisStore.commonSyndromes
 - 诊断store包含完整的6维度舌象特征类型定义
 
 ---
+
+## [2026-02-21] - US-140
+- 实现了完整的登录页面（pages/login/index.vue）
+- 添加了手机号输入和验证（正则表达式 /^1[3-9]\d{9}$/）
+- 添加了密码输入和验证（最小6位）
+- 实现了与userStore的集成，调用/api/v2/auth/login
+- 添加了错误消息显示（替代alert）
+- 添加了密码字段回车键提交功能
+- 修复了request.ts中BASE_URL配置（开发环境使用/api/v2）
+- 改进了userStore中login方法的错误处理
+- 在vite.config.ts中添加了rollupOptions配置以抑制uview-plus警告
+
+**Files changed:**
+- uni-app_frontend/src/pages/login/index.vue (updated - 完整登录实现)
+- uni-app_frontend/src/store/modules/user.ts (updated - 改进错误处理)
+- uni-app_frontend/src/utils/request.ts (updated - 修复BASE_URL)
+- uni-app_frontend/vite.config.ts (updated - 添加rollupOptions)
+
+**Learnings for future iterations:**
+- Patterns discovered: 使用errorMessage响应式变量显示错误提示，而不是alert
+- Patterns discovered: 表单验证应该在前端进行（手机号正则、密码长度）
+- Patterns discovered: 使用@keyup.enter监听回车键提升用户体验
+- Gotchas encountered: BASE_URL在开发环境应该使用/api/v2以匹配vite proxy配置
+- Gotchas encountered: vite rollupOptions需要配置manualChunks和onwarn来处理uview-plus警告
+- Useful context: 登录成功后使用router.replace('/')而不是router.push('/')，避免返回到登录页
+- Useful context: userStore.login返回boolean表示成功/失败，便于UI处理
+- Useful context: 错误处理应该捕获并转换为用户友好的消息
+
+**Acceptance Criteria Met:**
+- Create pages/login/login.vue: PASS (created as pages/login/index.vue)
+- Phone number input: PASS (with validation regex)
+- Password input: PASS (with min 6 char validation)
+- Login button: PASS (with loading state)
+- Call /api/v2/auth/login: PASS (via userStore.login)
+- Navigate to home on success: PASS (router.replace('/'))
+
+**Key Features:**
+1. Form Input:
+   - Phone input with regex validation (1[3-9] followed by 9 digits)
+   - Password input with minimum 6 character validation
+   - Enter key support on password field
+   - Real-time validation feedback
+
+2. User Experience:
+   - Error message display instead of native alerts
+   - Loading state during login API call
+   - Disabled button during loading
+   - Navigation to home after successful login
+
+3. API Integration:
+   - Calls userStore.login(phone, password)
+   - Handles success and error cases
+   - Displays user-friendly error messages
+   - Token storage handled by store
+
+4. Navigation:
+   - Back button to return to previous page
+   - Link to registration page
+   - Replaces navigation to home on login (no history)
+
+**Usage:**
+```vue
+<template>
+  <input type="tel" v-model="phone" placeholder="请输入手机号" />
+  <input type="password" v-model="password" @keyup.enter="handleLogin" />
+  <button @click="handleLogin" :disabled="loading">
+    {{ loading ? '登录中...' : '登录' }}
+  </button>
+</template>
+
+<script setup lang="ts">
+import { useUserStore } from '@/store'
+const userStore = useUserStore()
+
+async function handleLogin() {
+  const success = await userStore.login(phone.value, password.value)
+  if (success) {
+    router.replace('/')
+  }
+}
+</script>
+```
+
+**Notes:**
+- 登录页面遵循uni-app目录结构（pages/login/index.vue）
+- 使用Vue 3 Composition API和script setup语法
+- 与Pinia状态管理完全集成
+- 支持H5和uni-app环境（通过storage抽象层）
+

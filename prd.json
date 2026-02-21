@@ -1221,9 +1221,9 @@
       "title": "Create login page",
       "description": "As a frontend engineer, I need to create user login page.",
       "priority": 140,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/login/login.vue",
         "Phone number input",
@@ -1232,6 +1232,12 @@
         "Call /api/v2/auth/login",
         "Navigate to home on success",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/login/index.vue",
+        "uni-app_frontend/src/store/modules/user.ts",
+        "uni-app_frontend/src/utils/request.ts",
+        "uni-app_frontend/vite.config.ts"
       ]
     },
     {
@@ -2125,8 +2131,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 53,
-    "pending_stories": 77,
+    "completed_stories": 54,
+    "pending_stories": 76,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
