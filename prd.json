@@ -1041,15 +1041,19 @@
       "title": "Implement anonymous diagnosis compatibility",
       "description": "As a backend engineer, I need to support anonymous user diagnosis (without login).",
       "priority": 131,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "/api/v2/diagnosis endpoint supports optional auth",
         "user_id is NULL for anonymous diagnosis",
         "Return anonymous diagnosis ID",
         "Support later association to account",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/diagnosis.py",
+        "api_service/app/api/v2/users.py"
       ]
     },
     {

@@ -3291,3 +3291,82 @@ curl -X DELETE "http://localhost:8000/api/v2/users/me/avatar" \
 ```
 
 ---
+
+## [2026-02-21] - US-131
+- 验证了匿名诊断功能已实现 (api_service/app/api/v2/diagnosis.py)
+- POST /api/v2/diagnosis使用get_optional_user依赖
+- 匿名用户诊断时user_id存储为NULL
+- 返回diagnosis_id供后续引用
+- 新增POST /api/v2/users/me/associate-diagnoses端点
+- 允许用户将匿名诊断关联到自己的账户
+- 同时关联相关的tongue_images记录
+- 返回详细关联结果（成功数、失败数、失败ID列表）
+
+**Files changed:**
+- api_service/app/api/v2/users.py (updated) - Added 120+ lines for association endpoint
+- prd.json (updated) - US-131 marked as complete
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 可选认证使用get_optional_user而不是get_current_user
+- Patterns discovered: 匿名数据通过user_id IS NULL标识
+- Patterns discovered: 关联操作需要同时更新相关表（diagnosis_history和tongue_images）
+- Patterns discovered: 批量操作返回详细结果（成功数、失败数、失败列表）
+- Gotchas encountered: 关联操作前需要检查数据是否已被关联（user_id is not None）
+- Gotchas encountered: UUID格式验证使用uuid.UUID()捕获ValueError
+- Useful context: 匿名诊断允许用户先体验功能，注册后再关联数据
+- Useful context: 关联匿名数据时需要事务保证原子性
+
+**Acceptance Criteria Met:**
+- /api/v2/diagnosis endpoint supports optional auth: PASS (使用get_optional_user)
+- user_id is NULL for anonymous diagnosis: PASS (current_user is None时存储NULL)
+- Return anonymous diagnosis ID: PASS (返回diagnosis_id)
+- Support later association to account: PASS (新增associate-diagnoses端点)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. 匿名诊断:
+   - 可选认证（get_optional_user）
+   - user_id=NULL存储匿名诊断
+   - 返回diagnosis_id用于后续关联
+2. 账户关联:
+   - 批量关联匿名诊断
+   - 验证UUID格式
+   - 只关联匿名诊断（user_id IS NULL）
+   - 同时关联tongue_images记录
+   - 返回详细结果
+
+**Usage:**
+```bash
+# 匿名诊断（不携带Authorization头）
+curl -X POST "http://localhost:8000/api/v2/diagnosis" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image": "data:image/png;base64,iVBORw0KG...",
+    "user_info": {
+      "age": 35,
+      "gender": "male"
+    }
+  }'
+# 返回: {"diagnosis_id": "xxx", "user_id": null, ...}
+
+# 用户注册后，关联之前的匿名诊断
+curl -X POST "http://localhost:8000/api/v2/users/me/associate-diagnoses" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "diagnosis_ids": [
+      "123e4567-e89b-12d3-a456-426614174000",
+      "223e4567-e89b-12d3-a456-426614174001"
+    ]
+  }'
+
+# 返回: {
+#   "success": true,
+#   "associated_count": 2,
+#   "failed_count": 0,
+#   "failed_ids": []
+# }
+```
+
+---
