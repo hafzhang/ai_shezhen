@@ -39,6 +39,22 @@
         "enablePullDownRefresh": false,
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/history/index",
+      "style": {
+        "navigationBarTitleText": "诊断历史",
+        "enablePullDownRefresh": true,
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/detail/index",
+      "style": {
+        "navigationBarTitleText": "诊断详情",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -60,6 +76,12 @@
         "iconPath": "static/tabbar/home.png",
         "selectedIconPath": "static/tabbar/home-active.png",
         "text": "首页"
+      },
+      {
+        "pagePath": "pages/history/index",
+        "iconPath": "static/tabbar/history.png",
+        "selectedIconPath": "static/tabbar/history-active.png",
+        "text": "历史"
       }
     ]
   },
@@ -68,6 +90,7 @@
     "custom": {
       "^u-(.*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.vue",
       "^tongue-(.*)": "@/components/tongue-$1/tongue-$1.vue",
+      "^feature-display$": "@/components/feature-display/feature-display.vue",
       "^recommendation-list$": "@/components/recommendation-list/recommendation-list.vue"
     }
   },
@@ -98,6 +121,11 @@
       {
         "name": "诊断结果",
         "path": "pages/result/index",
+        "query": "id"
+      },
+      {
+        "name": "诊断详情",
+        "path": "pages/detail/index",
         "query": "id"
       }
     ]

@@ -9,7 +9,10 @@ export { useDiagnosisStore } from './modules/diagnosis'
 // Re-export types for convenience
 export type { UserInfo } from './modules/user'
 export type {
-  DiagnosisState,
+  TongueFeatures,
+  SyndromeAnalysis,
+  HealthRecommendations,
+  RiskAssessment,
   DiagnosisResult,
   DiagnosisHistory,
   DiagnosisFilters
