@@ -5,3 +5,6 @@
 
 export { useDarkMode } from './useDarkMode'
 export type { DarkModePreference } from './useDarkMode'
+
+export { useLanguage } from './useI18n'
+export type { SupportedLocale } from '@/locales'

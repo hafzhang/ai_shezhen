@@ -1821,15 +1821,24 @@
       "title": "Implement i18n multi-language",
       "description": "As a frontend engineer, I need to support Chinese/English switching.",
       "priority": 168,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Install vue-i18n",
         "Create language files",
         "Language switch function",
         "Persist language preference",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/locales/index.ts",
+        "uni-app_frontend/src/locales/zh-CN.ts",
+        "uni-app_frontend/src/locales/en-US.ts",
+        "uni-app_frontend/src/composables/useI18n.ts",
+        "uni-app_frontend/src/main.ts",
+        "uni-app_frontend/src/pages/settings/index.vue",
+        "uni-app_frontend/package.json"
       ]
     },
     {

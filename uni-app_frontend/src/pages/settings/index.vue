@@ -53,13 +53,13 @@
             />
           </view>
         </view>
-        <view class="menu-item">
+        <view class="menu-item" @click="showLanguageModal = true">
           <view class="item-left">
             <text class="item-icon">🌐</text>
-            <text class="item-label">语言</text>
+            <text class="item-label">{{ t('settings.language') }}</text>
           </view>
           <view class="item-right">
-            <text class="item-value">简体中文</text>
+            <text class="item-value">{{ localeDisplayName }}</text>
             <text class="arrow">›</text>
           </view>
         </view>
@@ -180,14 +180,37 @@
     <u-popup v-model:show="showClearCacheModal" mode="center" :round="20">
       <view class="confirm-modal">
         <view class="confirm-header">
-          <text class="confirm-title">清除缓存</text>
+          <text class="confirm-title">{{ t('settings.clearCache') }}</text>
         </view>
         <view class="confirm-content">
           <text class="confirm-message">确定要清除所有缓存吗？</text>
         </view>
         <view class="confirm-actions">
-          <button class="btn btn-secondary" @click="showClearCacheModal = false">取消</button>
-          <button class="btn btn-primary" @click="confirmClearCache">确定</button>
+          <button class="btn btn-secondary" @click="showClearCacheModal = false">{{ t('common.cancel') }}</button>
+          <button class="btn btn-primary" @click="confirmClearCache">{{ t('common.confirm') }}</button>
+        </view>
+      </view>
+    </u-popup>
+
+    <!-- Language selection modal -->
+    <u-popup v-model:show="showLanguageModal" mode="bottom" :round="20">
+      <view class="language-modal">
+        <view class="language-header">
+          <text class="language-header-close" @click="showLanguageModal = false">{{ t('common.cancel') }}</text>
+          <text class="language-header-title">{{ t('settings.language') }}</text>
+          <view class="language-header-spacer"></view>
+        </view>
+        <view class="language-list">
+          <view
+            v-for="locale in availableLocalesList"
+            :key="locale.code"
+            class="language-item"
+            :class="{ active: currentLocale === locale.code }"
+            @click="handleLanguageChange(locale.code)"
+          >
+            <text class="language-item-name">{{ locale.name }}</text>
+            <text v-if="currentLocale === locale.code" class="language-item-check">✓</text>
+          </view>
         </view>
       </view>
     </u-popup>
@@ -196,11 +219,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store'
-import { useDarkMode } from '@/composables'
+import { useDarkMode, useLanguage } from '@/composables'
 
+const { t } = useI18n()
 const userStore = useUserStore()
 const { isDark, setDarkMode } = useDarkMode()
+const { currentLocale, localeDisplayName, setLanguage, availableLocalesList } = useLanguage()
 
 // State
 const isLoggedIn = computed(() => userStore.isLoggedIn)
@@ -209,6 +235,7 @@ const cacheSize = ref('0 MB')
 const appVersion = ref('3.0.0')
 const showAboutModal = ref(false)
 const showClearCacheModal = ref(false)
+const showLanguageModal = ref(false)
 
 // Functions
 function goBack() {
@@ -283,13 +310,13 @@ function openFeedback() {
 
 function handleLogout() {
   uni.showModal({
-    title: '退出登录',
-    content: '确定要退出登录吗？',
+    title: t('settings.logout'),
+    content: t('profile.logoutConfirm'),
     success: (res) => {
       if (res.confirm) {
         userStore.logout()
         uni.showToast({
-          title: '已退出登录',
+          title: t('auth.logoutSuccess'),
           icon: 'success'
         })
         setTimeout(() => {
@@ -297,6 +324,15 @@ function handleLogout() {
         }, 1500)
       }
     }
+  })
+}
+
+function handleLanguageChange(localeCode: string) {
+  setLanguage(localeCode as any)
+  showLanguageModal.value = false
+  uni.showToast({
+    title: t('settings.language') + ': ' + localeDisplayName.value,
+    icon: 'success'
   })
 }
 
@@ -642,5 +678,102 @@ onMounted(() => {
 
 :global(.dark-mode) .version-text {
   color: #666666;
+}
+
+/* Language modal styles */
+.language-modal {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+}
+
+.language-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.language-header-close,
+.language-header-title {
+  font-size: 15px;
+  color: #333333;
+  font-weight: 500;
+}
+
+.language-header-close {
+  color: #667eea;
+}
+
+.language-header-spacer {
+  width: 60px;
+}
+
+.language-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.language-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background-color 0.2s;
+}
+
+.language-item:last-child {
+  border-bottom: none;
+}
+
+.language-item.active {
+  background: #f0f4ff;
+}
+
+.language-item-name {
+  font-size: 15px;
+  color: #333333;
+}
+
+.language-item.active .language-item-name {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.language-item-check {
+  font-size: 18px;
+  color: #667eea;
+}
+
+/* Dark mode styles for language modal */
+:global(.dark-mode) .language-modal {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .language-header {
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .language-header-close,
+:global(.dark-mode) .language-header-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .language-item {
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .language-item.active {
+  background: #1a2540;
+}
+
+:global(.dark-mode) .language-item-name {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .language-item.active .language-item-name {
+  color: #667eea;
 }
 </style>
