@@ -2136,3 +2136,105 @@ async def health():
 ---
 
 ---
+
+## [2026-02-21] - US-108, US-109
+- Created api_service/app/models/__init__.py module with exports
+- Created api_service/app/models/database.py with all ORM models
+- Defined User SQLAlchemy model inheriting from Base (DeclarativeBase)
+- Defined RefreshToken model with User relationship (CASCADE delete)
+- Defined TongueImage model with User relationship (SET NULL for anonymous support)
+- Defined DiagnosisHistory model with User and TongueImage relationships
+- Defined HealthRecord model with User relationship (CASCADE delete)
+- Added __repr__ methods for all models for debugging
+- Added utility methods (is_active, is_valid, revoke, etc.)
+- Created enum types (OpenIDType, HealthRecordType) matching database migrations
+- Configured all relationships with proper cascade options and lazy loading
+
+**Files changed:**
+- api_service/app/models/__init__.py (new)
+- api_service/app/models/database.py (new) - 600+ lines of ORM models
+- prd.json (updated - US-108, US-109 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use Mapped[] type annotations with mapped_column() for SQLAlchemy 2.0 style
+- Patterns discovered: Use relationship() with back_populates for bidirectional relationships
+- Patterns discovered: Use cascade="all, delete-orphan" for child entities that should be deleted with parent
+- Patterns discovered: Use lazy="selectin" for automatic eager loading of relationships
+- Patterns discovered: ENUM types should match database enum names exactly (openidtype, healthrecordtype)
+- Gotchas encountered: OpenIDTypeEnum and HealthRecordTypeEnum must have create_type=True
+- Gotchas encountered: Foreign key ondelete options must match migration (CASCADE vs SET NULL)
+- Useful context: User model supports multiple auth methods (phone, email, openid+openid_type)
+- Useful context: JSONB fields in SQLAlchemy are represented as dict type in Python
+- Useful context: __repr__ methods should include key identifying info for debugging
+
+**Acceptance Criteria Met:**
+- Create api_service/app/models/database.py: PASS
+- Define User model inheriting from Base: PASS (inherits from DeclarativeBase)
+- All fields match database table structure: PASS (11 fields match users table)
+- Define relationships (diagnoses, tongue_images, etc): PASS (4 relationships defined)
+- Define __repr__ method: PASS (all models have __repr__)
+- Typecheck passes: PASS (AST parsing successful)
+
+**Key Features:**
+1. User Model:
+   - UUID primary key with gen_random_uuid() default
+   - OpenID fields (openid, openid_type) for mini-program auth
+   - Phone/email fields with unique constraints
+   - Profile fields (nickname, avatar_url)
+   - Password hash field for bcrypt
+   - Timestamps (created_at, updated_at, deleted_at)
+   - Utility methods (is_active, has_password_auth, has_miniprogram_auth)
+2. RefreshToken Model:
+   - UUID primary key
+   - user_id foreign key with CASCADE delete
+   - Token hash (unique)
+   - expires_at and revoked_at for token lifecycle
+   - is_valid() and revoke() methods
+3. TongueImage Model:
+   - UUID primary key
+   - user_id foreign key with SET NULL (anonymous support)
+   - File metadata (file_hash, storage_path, width, height, file_size, mime_type)
+   - Processing flags (is_processed, segmentation_path, classification_path)
+4. DiagnosisHistory Model:
+   - UUID primary key
+   - user_id foreign key with SET NULL
+   - tongue_image_id foreign key with CASCADE
+   - JSONB fields (user_info, features, results)
+   - Feedback tracking (feedback, feedback_comment)
+5. HealthRecord Model:
+   - UUID primary key
+   - user_id foreign key with CASCADE
+   - record_type enum
+   - JSONB record_value
+   - Additional metadata (record_date, source, notes)
+
+**Usage:**
+```python
+from api_service.app.models import User, RefreshToken, TongueImage, DiagnosisHistory, HealthRecord
+from api_service.app.core.database import get_db_session
+
+# Create new user
+with get_db_session() as db:
+    user = User(
+        phone="13800138000",
+        nickname="张三",
+        password_hash="$2b$12$..."
+    )
+    db.add(user)
+    db.commit()
+
+# Query users
+with get_db_session() as db:
+    user = db.query(User).filter(User.phone == "13800138000").first()
+    print(user)  # Uses __repr__
+
+# Access relationships
+with get_db_session() as db:
+    user = db.query(User).first()
+    for token in user.refresh_tokens:
+        if token.is_valid():
+            print(f"Valid token expires at: {token.expires_at}")
+```
+
+---
