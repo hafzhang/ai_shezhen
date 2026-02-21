@@ -3495,3 +3495,43 @@ ORDER BY created_at DESC;
 ```
 
 ---
+
+## [2026-02-21] - US-136
+- Initialized uni-app project with Vue 3 + TypeScript configuration
+- Created project structure with Vite build system
+- Set up Pinia state management with persistence plugin
+- Created base pages (index, login, register) with Vue Router
+- Configured API request wrapper with JWT support
+- Set up manifest.json and pages.json for uni-app compatibility
+- Project builds successfully with Vite
+
+**Files changed:**
+- uni-app_frontend/package.json (new) - Dependencies and scripts
+- uni-app_frontend/vite.config.ts (new) - Vite configuration
+- uni-app_frontend/tsconfig.json (new) - TypeScript configuration
+- uni-app_frontend/index.html (new) - HTML entry point
+- uni-app_frontend/src/main.ts (new) - Application entry
+- uni-app_frontend/src/App.vue (new) - Root component
+- uni-app_frontend/src/router/index.ts (new) - Vue Router setup
+- uni-app_frontend/src/store/user.ts (new) - Pinia user store
+- uni-app_frontend/src/utils/request.ts (new) - API request wrapper
+- uni-app_frontend/src/pages/index/index.vue (new) - Home page
+- uni-app_frontend/src/pages/login/index.vue (new) - Login page
+- uni-app_frontend/src/pages/register/index.vue (new) - Register page
+- uni-app_frontend/src/manifest.json (new) - uni-app manifest
+- uni-app_frontend/src/pages.json (new) - uni-app page routes
+- uni-app_frontend/src/uni_modules/ (new) - uni-app modules
+- uni-app_frontend/static/ (new) - Static assets
+- uni-app_frontend/README.md (new) - Project documentation
+- uni-app_frontend/.gitignore (new) - Git ignore rules
+
+**Learnings for future iterations:**
+- Patterns discovered: Use Vue 3 + TypeScript + Vite for modern frontend development
+- Patterns discovered: Pinia with persist plugin for state management
+- Patterns discovered: Vue Router with hash mode for SPA navigation
+- Gotchas encountered: uni-app CLI packages not available via npm - use standard Vue 3 setup
+- Gotchas encountered: vue-tsc has compatibility issues - use Vite build for verification
+- Gotchas encountered: Use type-only imports (type RouteRecordRaw) for vue-router types
+- Useful context: The project is set up for H5 development with uni-app compatibility
+- Useful context: API proxy configured in Vite to forward /api to localhost:8000
+- Useful context: JWT token refresh mechanism implemented in request wrapper

@@ -1137,9 +1137,9 @@
       "title": "Initialize uni-app project",
       "description": "As a frontend engineer, I need to create uni-app project base structure.",
       "priority": 136,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create uni-app project using HBuilderX or CLI",
         "Vue 3 + TypeScript configuration",
