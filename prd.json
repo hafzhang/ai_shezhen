@@ -1436,9 +1436,9 @@
       "title": "Create history page",
       "description": "As a frontend engineer, I need to create diagnosis history list page.",
       "priority": 150,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/history/history.vue",
         "Diagnosis record list",
@@ -1447,6 +1447,10 @@
         "Load more on scroll",
         "Tap to view detail",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/history/index.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -1454,9 +1458,9 @@
       "title": "Create detail page",
       "description": "As a frontend engineer, I need to create single diagnosis detail page.",
       "priority": 151,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/detail/detail.vue",
         "Complete diagnosis info",
@@ -1467,6 +1471,12 @@
         "Diagnosis time",
         "Feedback button",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/detail/index.vue",
+        "uni-app_frontend/src/pages.json",
+        "uni-app_frontend/src/store/index.ts",
+        "uni-app_frontend/vite.config.ts"
       ]
     },
     {
@@ -2164,8 +2174,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 61,
-    "pending_stories": 69,
+    "completed_stories": 63,
+    "pending_stories": 67,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
