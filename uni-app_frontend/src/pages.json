@@ -23,6 +23,14 @@
         "enablePullDownRefresh": false,
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/diagnosis/index",
+      "style": {
+        "navigationBarTitleText": "舌诊诊断",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -70,6 +78,11 @@
       {
         "name": "注册",
         "path": "pages/register/index",
+        "query": ""
+      },
+      {
+        "name": "诊断",
+        "path": "pages/diagnosis/index",
         "query": ""
       }
     ]
