@@ -866,15 +866,18 @@
       "title": "Implement diagnosis history storage",
       "description": "As a backend engineer, I need to persist diagnosis results to database.",
       "priority": 122,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create DiagnosisHistory instance",
         "Store all diagnosis data (user_info, features, results)",
         "Associate with tongue_images record",
         "Store inference time and model info",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/diagnosis.py"
       ]
     },
     {
@@ -882,9 +885,9 @@
       "title": "Implement GET /api/v2/history/diagnoses",
       "description": "As a backend engineer, I need to create diagnosis history query API endpoint.",
       "priority": 123,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/api/v2/history.py",
         "GET /api/v2/history/diagnoses requires authentication",
@@ -892,6 +895,10 @@
         "Support filtering (start_date, end_date)",
         "Return ordered by created_at DESC",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/history.py",
+        "api_service/app/main.py"
       ]
     },
     {
@@ -899,9 +906,9 @@
       "title": "Implement GET /api/v2/history/statistics",
       "description": "As a backend engineer, I need to create health statistics API endpoint.",
       "priority": 124,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "GET /api/v2/history/statistics requires authentication",
         "Return total diagnosis count",
@@ -909,6 +916,9 @@
         "Return most common tongue features",
         "Return diagnosis time distribution",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/history.py"
       ]
     },
     {
@@ -916,15 +926,18 @@
       "title": "Implement GET /api/v2/history/trends",
       "description": "As a backend engineer, I need to create health trends API endpoint.",
       "priority": 125,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "GET /api/v2/history/trends requires authentication",
         "Calculate syndrome changes over time",
         "Calculate feature changes over time",
         "Return trend chart data",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/history.py"
       ]
     },
     {

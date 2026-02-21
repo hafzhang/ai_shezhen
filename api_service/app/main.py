@@ -305,6 +305,14 @@ try:
 except ImportError as e:
     logger.warning(f"API v2 diagnosis endpoints not available: {e}")
 
+# Include API v2 history router (US-123 - Diagnosis history query)
+try:
+    from api_service.app.api.v2 import history
+    app.include_router(history.router, prefix="/api/v2/history", tags=["History"])
+    logger.info("API v2 history endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 history endpoints not available: {e}")
+
 
 # Root endpoint
 @app.get("/", tags=["Root"])

@@ -2922,3 +2922,73 @@ curl -X POST http://localhost:8000/api/v2/diagnosis \
 ```
 
 ---
+
+## [2026-02-21] - US-122, US-123, US-124, US-125
+- US-122: Diagnosis history storage already implemented in US-121
+- Created api_service/app/api/v2/history.py with history query endpoints
+- Implemented GET /api/v2/history/diagnoses with pagination and date filtering
+- Implemented GET /api/v2/history/statistics with aggregated statistics
+- Implemented GET /api/v2/history/trends with time-series trend data
+- Added PostgreSQL JSONB queries for syndrome and feature aggregation
+- Integrated history router into main.py
+
+**Files changed:**
+- api_service/app/api/v2/history.py (new) - 400+ lines of history query endpoints
+- api_service/app/main.py (updated) - Added v2 history router registration
+- prd.json (updated) - US-122, US-123, US-124, US-125 marked as complete
+
+**Learnings for future iterations:**
+- Patterns discovered: PostgreSQL JSONB queries use ->> operator for text extraction
+- Patterns discovered: Use has_key() to check JSONB key existence in SQLAlchemy
+- Patterns discovered: Group by date using func.date() for daily aggregation
+- Patterns discovered: Use defaultdict for grouping data by date or category
+- Gotchas encountered: JSONB field access in SQLAlchemy requires .astext for string comparison
+- Useful context: Syndromes stored in results JSONB, features in features JSONB
+- Useful context: Pagination uses offset/limit with 1-indexed page numbers
+
+**Acceptance Criteria Met (US-123):**
+- Created api_service/app/api/v2/history.py: PASS
+- GET /api/v2/history/diagnoses requires authentication: PASS (uses get_current_user)
+- Support pagination: PASS (page, page_size parameters)
+- Support date filtering: PASS (start_date, end_date parameters)
+- Return ordered by created_at DESC: PASS
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-124):**
+- GET /api/v2/history/statistics requires authentication: PASS
+- Return total diagnosis count: PASS
+- Return most common syndromes: PASS (top 10)
+- Return most common tongue features: PASS (5 dimensions × top 5)
+- Return diagnosis time distribution: PASS (last 30 days)
+- Typecheck passes: PASS
+
+**Acceptance Criteria Met (US-125):**
+- GET /api/v2/history/trends requires authentication: PASS
+- Calculate syndrome changes over time: PASS
+- Calculate feature changes over time: PASS
+- Return trend chart data: PASS
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Paginated diagnosis history list with date filtering
+2. Aggregated health statistics (syndromes, features, timing)
+3. Time-series trend analysis for health patterns
+4. JSONB aggregation queries for flexible data extraction
+5. Response models extend APIResponse for consistency
+
+**Usage:**
+```bash
+# Get diagnosis history
+curl -X GET "http://localhost:8000/api/v2/history/diagnoses?page=1&page_size=20" \
+  -H "Authorization: Bearer <access_token>"
+
+# Get statistics
+curl -X GET "http://localhost:8000/api/v2/history/statistics" \
+  -H "Authorization: Bearer <access_token>"
+
+# Get trends
+curl -X GET "http://localhost:8000/api/v2/history/trends?period_days=30" \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
