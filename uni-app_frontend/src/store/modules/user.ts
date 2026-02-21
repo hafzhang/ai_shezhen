@@ -115,3 +115,6 @@ export const useUserStore = defineStore('user', () => {
 }, {
   persist: true
 })
+
+// Export UserInfo type for use in other modules
+export type { UserInfo }
