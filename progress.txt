@@ -64,6 +64,10 @@
 - easycom in pages.json enables automatic component import (no manual import needed)
 - Node.js v24 is incompatible with vue-tsc; use Node.js v20 for type checking
 - uview-plus requires uni-app runtime (@dcloudio/* packages) for full functionality
+- Use `typeof uni !== 'undefined'` to detect uni-app environment
+- Create abstraction layers for platform-specific APIs (storage, request, navigation)
+- fetch API timeout requires AbortController; use with setTimeout
+- Token refresh queue prevents multiple concurrent refresh requests
 
 ## [2026-02-12] - task-4-5
 - 实现了完整的FastAPI应用（api_service/app/main.py）
