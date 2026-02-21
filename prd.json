@@ -783,15 +783,18 @@
       "title": "Integrate database into main.py",
       "description": "As a backend engineer, I need to integrate database initialization into FastAPI startup.",
       "priority": 118,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Update api_service/app/main.py",
         "Add startup event to initialize database",
         "Add database health check",
         "Add /v2/health endpoint to check database status",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/main.py"
       ]
     },
     {

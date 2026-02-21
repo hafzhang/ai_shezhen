@@ -158,12 +158,32 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting AI舌诊智能诊断系统 API...")
+
+    # Initialize database first (US-118)
+    try:
+        from api_service.app.core.database import init_db, close_db
+        logger.info("Initializing database...")
+        init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        logger.warning("API will start without database connection")
+
     initialize_middleware()  # task-4-8: Initialize middleware before models
     initialize_models()
     logger.info("API service ready")
     yield
     # Shutdown
     logger.info("Shutting down API service...")
+
+    # Close database connections (US-118)
+    try:
+        from api_service.app.core.database import close_db
+        close_db()
+        logger.info("Database connections closed")
+    except Exception as e:
+        logger.warning(f"Error closing database: {e}")
+
     if redis_client:
         try:
             redis_client.close()
@@ -243,6 +263,14 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Include API v2 router (US-118 - Authentication endpoints)
+try:
+    from api_service.app.api.v2 import auth
+    app.include_router(auth.router, prefix="/api/v2/auth", tags=["Authentication"])
+    logger.info("API v2 authentication endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 authentication endpoints not available: {e}")
 
 
 # Root endpoint
@@ -342,6 +370,56 @@ async def prometheus_metrics():
     """Prometheus metrics endpoint for scraping"""
     from api_service.app.middleware import metrics_endpoint
     return await metrics_endpoint()
+
+
+# API v2 Health check endpoint with database status (US-118)
+@app.get("/api/v2/health", tags=["Health"])
+async def health_check_v2():
+    """
+    Health check endpoint with database status.
+
+    Returns service health status including:
+    - Model loading status
+    - Database connection status
+    - Overall service status
+    """
+    models_loaded = {
+        "segmentation": segmentor_instance is not None,
+        "classification": classifier_instance is not None,
+        "pipeline": pipeline_instance is not None
+    }
+
+    # Check database health (US-118)
+    db_health = None
+    try:
+        from api_service.app.core.database import check_db_health
+        db_health = await check_db_health()
+    except Exception as e:
+        logger.warning(f"Database health check failed: {e}")
+        db_health = {
+            "healthy": False,
+            "message": "Database health check failed",
+            "database": "unknown",
+            "error": str(e)
+        }
+
+    # Determine overall status
+    models_ok = any(models_loaded.values())
+    db_ok = db_health.get("healthy", False) if db_health else False
+    overall_healthy = models_ok and db_ok
+
+    status_code = status.HTTP_200_OK if overall_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
+
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "success": True,
+            "status": "healthy" if overall_healthy else "degraded",
+            "models": models_loaded,
+            "database": db_health,
+            "api_version": settings.API_VERSION
+        }
+    )
 
 
 def main():

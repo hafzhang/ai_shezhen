@@ -2687,3 +2687,70 @@ POST /api/v2/auth/logout
 - Use and_() from sqlalchemy to combine multiple WHERE clause conditions
 - Set revoked_at timestamp for soft delete pattern on refresh tokens
 - Use HTTPException 401 for authentication failures with WWW-Authenticate header
+
+## [2026-02-21] - US-118
+- Updated api_service/app/main.py to integrate database initialization
+- Added database initialization in lifespan startup event (calls init_db())
+- Added database connection cleanup in lifespan shutdown event (calls close_db())
+- Added API v2 authentication router inclusion (/api/v2/auth/* endpoints)
+- Added GET /api/v2/health endpoint with database status check
+- Database health check calls check_db_health() from database module
+- Health endpoint returns models status + database health in unified response
+
+**Files changed:**
+- api_service/app/main.py (updated) - Database integration and v2 health endpoint
+- prd.json (updated - US-118 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: Initialize database before middleware and models in lifespan
+- Patterns discovered: Use try/except for database init to allow API to start without DB
+- Patterns discovered: Close database connections in shutdown handler for clean exit
+- Patterns discovered: Health endpoints should aggregate all service status (models, DB, etc.)
+- Gotchas encountered: Database init may fail, catch exception and log warning instead of crashing
+- Gotchas encountered: Import database modules inside try/except for graceful degradation
+- Useful context: FastAPI lifespan context manager handles startup/shutdown events
+- Useful context: Database health check is async and returns dict with healthy/status keys
+- Useful context: Overall service status is healthy only if ALL components are healthy
+
+**Acceptance Criteria Met:**
+- Update api_service/app/main.py: PASS (modified lifespan function)
+- Add startup event to initialize database: PASS (init_db() called in startup)
+- Add database health check: PASS (check_db_health() called in v2 health endpoint)
+- Add /v2/health endpoint: PASS (GET /api/v2/health with DB status)
+- Typecheck passes: PASS (Python syntax check successful)
+
+**Key Features:**
+1. Database Initialization: init_db() called on API startup
+2. Database Cleanup: close_db() called on API shutdown
+3. Health Check: /api/v2/health returns models + database status
+4. Error Handling: API starts even if database initialization fails
+5. V2 Router: Authentication endpoints registered at /api/v2/auth
+
+**Usage:**
+```python
+# Check API health including database
+GET /api/v2/health
+
+Response:
+{
+    "success": true,
+    "status": "healthy",
+    "models": {
+        "segmentation": true,
+        "classification": true,
+        "pipeline": true
+    },
+    "database": {
+        "healthy": true,
+        "message": "Database connection successful",
+        "database": "shezhen_db"
+    },
+    "api_version": "v2.0"
+}
+```
+
+**Codebase Patterns Added:**
+- Initialize database first in lifespan before other components
+- Use try/except for optional components (database) during startup
+- Close database connections in shutdown handler for clean resource cleanup
+- Health endpoints should check all critical service components
