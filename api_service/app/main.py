@@ -21,6 +21,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from redis import Redis
 import uvicorn
 
@@ -225,6 +226,12 @@ app = FastAPI(
     redoc_url="/redoc" if settings.ENABLE_API_DOCS else None,
     lifespan=lifespan
 )
+
+# Mount static files for media uploads (US-130)
+media_dir = settings.BASE_DIR / settings.MEDIA_ROOT
+media_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=str(media_dir)), name="media")
+logger.info(f"Static files mounted at /media -> {media_dir}")
 
 # Configure CORS
 app.add_middleware(

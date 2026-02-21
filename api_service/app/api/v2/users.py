@@ -18,8 +18,11 @@ Usage:
 """
 
 import logging
+import hashlib
+import base64
 from datetime import datetime
 from typing import Optional
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, EmailStr, field_validator
@@ -29,6 +32,7 @@ from uuid import UUID
 from api_service.app.api.deps import get_db, get_current_user
 from api_service.app.models.database import User
 from api_service.app.api.v2.models import APIResponse
+from api_service.core.config import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -312,3 +316,212 @@ async def delete_current_user_account(
 __all__ = [
     "router",
 ]
+
+
+# ============================================================================
+# Avatar Upload Endpoints (US-130)
+# ============================================================================
+
+class AvatarUploadRequest(BaseModel):
+    """Avatar upload request"""
+
+    image_data: str = Field(..., description="Base64 encoded image data (without data URL prefix)")
+
+
+class AvatarUploadResponse(APIResponse):
+    """Avatar upload response"""
+
+    avatar_url: str = Field(..., description="URL of the uploaded avatar")
+
+
+class AvatarInfoResponse(APIResponse):
+    """Avatar info response"""
+
+    avatar_url: Optional[str] = None
+    has_avatar: bool
+
+
+# Helper function to save avatar image
+def save_avatar_image(user_id: str, image_data: str) -> str:
+    """
+    Save avatar image to filesystem.
+
+    Args:
+        user_id: User UUID
+        image_data: Base64 encoded image data (without data URL prefix)
+
+    Returns:
+        Relative URL path to the saved avatar
+    """
+    try:
+        # Decode base64 image data
+        image_bytes = base64.b64decode(image_data)
+
+        # Calculate SHA-256 hash for unique filename
+        file_hash = hashlib.sha256(image_bytes).hexdigest()[:16]
+
+        # Create avatar filename
+        filename = f"avatar_{user_id}_{file_hash}.png"
+
+        # Create avatar directory if not exists
+        avatar_dir = settings.BASE_DIR / settings.MEDIA_ROOT / "avatars"
+        avatar_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save image file
+        file_path = avatar_dir / filename
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+
+        # Return relative URL path
+        return f"/media/avatars/{filename}"
+
+    except Exception as e:
+        logger.error(f"Error saving avatar image: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to save avatar image: {str(e)}"
+        )
+
+
+@router.get("/me/avatar", response_model=AvatarInfoResponse, tags=["Users"])
+async def get_avatar_info(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get current user's avatar information.
+
+    Returns whether the user has an avatar and the avatar URL.
+
+    Args:
+        current_user: Authenticated user (injected via dependency)
+
+    Returns:
+        AvatarInfoResponse with avatar URL and status
+
+    Raises:
+        HTTPException 401: If not authenticated
+    """
+    try:
+        return AvatarInfoResponse(
+            success=True,
+            avatar_url=current_user.avatar_url,
+            has_avatar=current_user.avatar_url is not None
+        )
+    except Exception as e:
+        logger.error(f"Error getting avatar info: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve avatar info: {str(e)}"
+        )
+
+
+@router.put("/me/avatar", response_model=AvatarUploadResponse, tags=["Users"])
+async def upload_avatar(
+    avatar_request: AvatarUploadRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Upload or update current user's avatar.
+
+    Accepts a base64 encoded image and saves it to the filesystem.
+    The avatar URL is stored in the user's profile.
+
+    Args:
+        avatar_request: Avatar upload request with base64 image data
+        db: Database session (injected)
+        current_user: Authenticated user (injected)
+
+    Returns:
+        AvatarUploadResponse with avatar URL
+
+    Raises:
+        HTTPException 400: If image data is invalid
+        HTTPException 401: If not authenticated
+        HTTPException 500: If save fails
+
+    Example:
+        PUT /api/v2/users/me/avatar
+        {
+            "image_data": "iVBORw0KGgoAAAANSUhEUgAA..."
+        }
+    """
+    try:
+        # Remove data URL prefix if present
+        image_data = avatar_request.image_data
+        if image_data.startswith("data:"):
+            # Extract base64 data after comma
+            image_data = image_data.split(",", 1)[1]
+
+        # Save avatar image
+        avatar_url = save_avatar_image(str(current_user.id), image_data)
+
+        # Update user's avatar_url
+        current_user.avatar_url = avatar_url
+        current_user.updated_at = datetime.now()
+        db.commit()
+        db.refresh(current_user)
+
+        logger.info(f"Avatar uploaded for user: {current_user.id}")
+
+        return AvatarUploadResponse(
+            success=True,
+            message="Avatar uploaded successfully",
+            avatar_url=avatar_url
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading avatar: {e}", exc_info=True)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload avatar: {str(e)}"
+        )
+
+
+@router.delete("/me/avatar", response_model=APIResponse, tags=["Users"])
+async def delete_avatar(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete current user's avatar.
+
+    Removes the avatar URL from the user's profile.
+    The image file is not deleted from filesystem.
+
+    Args:
+        db: Database session (injected)
+        current_user: Authenticated user (injected)
+
+    Returns:
+        APIResponse confirming deletion
+
+    Raises:
+        HTTPException 401: If not authenticated
+
+    Example:
+        DELETE /api/v2/users/me/avatar
+    """
+    try:
+        # Clear avatar_url
+        current_user.avatar_url = None
+        current_user.updated_at = datetime.now()
+        db.commit()
+
+        logger.info(f"Avatar deleted for user: {current_user.id}")
+
+        return APIResponse(
+            success=True,
+            message="Avatar deleted successfully"
+        )
+
+    except Exception as e:
+        logger.error(f"Error deleting avatar: {e}", exc_info=True)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete avatar: {str(e)}"
+        )
