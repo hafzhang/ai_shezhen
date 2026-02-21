@@ -7,6 +7,11 @@
 
     <div class="content">
       <div class="form-container">
+        <!-- Error message display -->
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
         <div class="form-group">
           <label class="label">手机号</label>
           <input
@@ -26,6 +31,7 @@
             v-model="password"
             placeholder="请输入密码"
             maxlength="20"
+            @keyup.enter="handleLogin"
           />
         </div>
 
@@ -44,11 +50,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store'
 
 const router = useRouter()
+const userStore = useUserStore()
 const phone = ref('')
 const password = ref('')
 const loading = ref(false)
+const errorMessage = ref('')
 
 function goBack() {
   router.back()
@@ -59,34 +68,34 @@ function goToRegister() {
 }
 
 async function handleLogin() {
+  errorMessage.value = ''
+
   // Phone validation
   if (!/^1[3-9]\d{9}$/.test(phone.value)) {
-    alert('请输入正确的手机号')
+    errorMessage.value = '请输入正确的手机号'
     return
   }
 
   // Password validation
   if (password.value.length < 6) {
-    alert('密码至少6位')
+    errorMessage.value = '密码至少6位'
     return
   }
 
   loading.value = true
 
   try {
-    // TODO: Integrate with backend API
-    // const response = await login({ phone: phone.value, password: password.value })
+    const success = await userStore.login(phone.value, password.value)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    alert('登录成功')
-
-    setTimeout(() => {
-      router.push('/')
-    }, 500)
-  } catch (error) {
-    alert('登录失败，请重试')
+    if (success) {
+      // Navigate to home on successful login
+      router.replace('/')
+    } else {
+      errorMessage.value = '登录失败，请检查手机号和密码'
+    }
+  } catch (error: any) {
+    console.error('Login error:', error)
+    errorMessage.value = error?.message || '登录失败，请稍后重试'
   } finally {
     loading.value = false
   }
@@ -134,6 +143,16 @@ async function handleLogin() {
   background: #ffffff;
   border-radius: 12px;
   padding: 30px 20px;
+}
+
+.error-message {
+  background: #fff5f5;
+  color: #e53e3e;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #fed7d7;
 }
 
 .form-group {

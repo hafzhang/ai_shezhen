@@ -70,9 +70,13 @@ export const useUserStore = defineStore('user', () => {
       }
 
       return false
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error)
-      throw error
+      // Re-throw with more user-friendly message
+      if (error?.message) {
+        throw error
+      }
+      throw new Error('登录失败，请稍后重试')
     }
   }
 

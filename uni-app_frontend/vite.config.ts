@@ -38,6 +38,22 @@ export default defineConfig({
     sourcemap: false,
     commonjsOptions: {
       transformMixedEsModules: true
+    },
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Ignore warnings about uview-plus components
+        if (warning.code === 'CIRCULAR_DEPENDENCY' ||
+            warning.message?.includes('uview-plus')) {
+          return
+        }
+        warn(warning)
+      },
+      output: {
+        // Suppress the "Identifier 'currentIndex' has already been declared" warning
+        manualChunks: {
+          'uview-plus': ['uview-plus']
+        }
+      }
     }
   }
 })
