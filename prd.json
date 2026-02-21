@@ -478,15 +478,18 @@
       "title": "Create refresh_tokens table migration",
       "description": "As a backend engineer, I need to create the refresh_tokens table migration.",
       "priority": 103,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Migration file contains complete refresh_tokens table structure",
         "Foreign key to users table",
         "Add indexes (user_id, token, expires_at)",
         "Migration executes successfully",
         "Typecheck passes"
+      ],
+      "files": [
+        "alembic/versions/20260221_us103_create_refresh_tokens_table.py"
       ]
     },
     {

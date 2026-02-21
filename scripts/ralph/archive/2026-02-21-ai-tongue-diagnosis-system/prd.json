@@ -1,0 +1,1248 @@
+{
+  "project": "AI舌诊系统重构 - uni-app + PostgreSQL",
+  "branchName": "ralph/refactor-uni-app-postgresql",
+  "description": "Refactor AI Tongue Diagnosis System with uni-app frontend (Vue 3), PostgreSQL database, SQLAlchemy ORM, and JWT authentication",
+  "userStories": [
+    {
+      "id": "US-101",
+      "title": "Create database migration config",
+      "description": "As a backend engineer, I need to set up Alembic database migration tool.",
+      "acceptanceCriteria": [
+        "Install alembic and psycopg2-binary dependencies",
+        "Create alembic.ini configuration file",
+        "Create alembic/env.py environment configuration",
+        "Typecheck passes"
+      ],
+      "priority": 101,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-102",
+      "title": "Create users table migration",
+      "description": "As a backend engineer, I need to create the users table migration.",
+      "acceptanceCriteria": [
+        "Migration file contains complete users table structure",
+        "UUID primary key, all field types correct",
+        "Add indexes (openid, phone, email, created_at)",
+        "Migration executes successfully (alembic upgrade head)",
+        "Typecheck passes"
+      ],
+      "priority": 102,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-103",
+      "title": "Create refresh_tokens table migration",
+      "description": "As a backend engineer, I need to create the refresh_tokens table migration.",
+      "acceptanceCriteria": [
+        "Migration file contains complete refresh_tokens table structure",
+        "Foreign key to users table",
+        "Add indexes (user_id, token, expires_at)",
+        "Migration executes successfully",
+        "Typecheck passes"
+      ],
+      "priority": 103,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-104",
+      "title": "Create tongue_images table migration",
+      "description": "As a backend engineer, I need to create the tongue_images table migration.",
+      "acceptanceCriteria": [
+        "Migration file contains complete tongue_images table structure",
+        "Foreign key to users table",
+        "Add indexes (user_id, file_hash, created_at)",
+        "Migration executes successfully",
+        "Typecheck passes"
+      ],
+      "priority": 104,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-105",
+      "title": "Create diagnosis_history table migration",
+      "description": "As a backend engineer, I need to create the diagnosis_history table migration.",
+      "acceptanceCriteria": [
+        "Migration file contains complete diagnosis_history table structure",
+        "JSONB fields for user_info/features/results",
+        "Foreign keys to users and tongue_images tables",
+        "Add composite index (user_id, created_at DESC)",
+        "Migration executes successfully",
+        "Typecheck passes"
+      ],
+      "priority": 105,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-106",
+      "title": "Create health_records table migration",
+      "description": "As a backend engineer, I need to create the health_records table migration.",
+      "acceptanceCriteria": [
+        "Migration file contains complete health_records table structure",
+        "JSONB field for record_value",
+        "Foreign key to users table",
+        "Add composite index (user_id, record_type)",
+        "Migration executes successfully",
+        "Typecheck passes"
+      ],
+      "priority": 106,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-107",
+      "title": "Create database.py configuration",
+      "description": "As a backend engineer, I need to create SQLAlchemy database configuration.",
+      "acceptanceCriteria": [
+        "Create api_service/app/core/database.py",
+        "Define database_url from environment variable",
+        "Create engine with connection pool configuration",
+        "Create get_db() session generator",
+        "Create init_db() initialization function",
+        "Typecheck passes"
+      ],
+      "priority": 107,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-108",
+      "title": "Create User ORM model",
+      "description": "As a backend engineer, I need to create the User SQLAlchemy model.",
+      "acceptanceCriteria": [
+        "Create api_service/app/models/database.py",
+        "Define User model inheriting from Base",
+        "All fields match database table structure",
+        "Define relationships (diagnoses, tongue_images, etc)",
+        "Define __repr__ method",
+        "Typecheck passes"
+      ],
+      "priority": 108,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-109",
+      "title": "Create other ORM models",
+      "description": "As a backend engineer, I need to create RefreshToken, TongueImage, DiagnosisHistory, HealthRecord models.",
+      "acceptanceCriteria": [
+        "Define RefreshToken model with User relationship",
+        "Define TongueImage model with User relationship",
+        "Define DiagnosisHistory model with User and TongueImage relationships",
+        "Define HealthRecord model with User relationship",
+        "All field types correct",
+        "Typecheck passes"
+      ],
+      "priority": 109,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-110",
+      "title": "Create security.py utilities",
+      "description": "As a backend engineer, I need to create JWT and password handling utilities.",
+      "acceptanceCriteria": [
+        "Create api_service/app/core/security.py",
+        "Implement hash_password() using bcrypt",
+        "Implement verify_password()",
+        "Implement create_access_token()",
+        "Implement create_refresh_token()",
+        "Implement decode_token()",
+        "Typecheck passes"
+      ],
+      "priority": 110,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-111",
+      "title": "Create auth.py business logic",
+      "description": "As a backend engineer, I need to create authentication business logic functions.",
+      "acceptanceCriteria": [
+        "Create api_service/app/core/auth.py",
+        "Implement authenticate_user() to verify credentials",
+        "Implement create_user() for new user registration",
+        "Implement get_user_by_phone()",
+        "Implement get_user_by_openid() for mini-programs",
+        "Typecheck passes"
+      ],
+      "priority": 111,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-112",
+      "title": "Create deps.py dependency injection",
+      "description": "As a backend engineer, I need to create FastAPI dependency injection for authentication.",
+      "acceptanceCriteria": [
+        "Create api_service/app/api/deps.py",
+        "Implement get_db() database session dependency",
+        "Implement get_current_user() to get user from JWT",
+        "Implement get_optional_user() for optional auth (anonymous support)",
+        "Configure OAuth2PasswordBearer",
+        "Typecheck passes"
+      ],
+      "priority": 112,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-113",
+      "title": "Implement POST /api/v2/auth/register",
+      "description": "As a backend engineer, I need to create user registration API endpoint.",
+      "acceptanceCriteria": [
+        "Create api_service/app/api/v2/auth.py",
+        "POST /api/v2/auth/register accepts phone/password/nickname",
+        "Hash password before storage",
+        "Return access_token and refresh_token",
+        "Validate phone/email uniqueness",
+        "Unified response format",
+        "Typecheck passes"
+      ],
+      "priority": 113,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-114",
+      "title": "Implement POST /api/v2/auth/login",
+      "description": "As a backend engineer, I need to create user login API endpoint.",
+      "acceptanceCriteria": [
+        "POST /api/v2/auth/login accepts phone/password",
+        "Verify password correctness",
+        "Generate access_token (30 min) and refresh_token (7 days)",
+        "Store refresh_token in database",
+        "Return user info and tokens",
+        "Error handling (user not found/wrong password)",
+        "Typecheck passes"
+      ],
+      "priority": 114,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-115",
+      "title": "Implement POST /api/v2/auth/refresh",
+      "description": "As a backend engineer, I need to create refresh token API endpoint.",
+      "acceptanceCriteria": [
+        "POST /api/v2/auth/refresh accepts refresh_token",
+        "Validate token validity",
+        "Check if revoked (revoked_at)",
+        "Check if expired",
+        "Generate new access_token",
+        "Typecheck passes"
+      ],
+      "priority": 115,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-116",
+      "title": "Implement POST /api/v2/auth/logout",
+      "description": "As a backend engineer, I need to create user logout API endpoint.",
+      "acceptanceCriteria": [
+        "POST /api/v2/auth/logout requires authentication",
+        "Revoke refresh_token (set revoked_at)",
+        "Clear client-side token storage",
+        "Return success response",
+        "Typecheck passes"
+      ],
+      "priority": 116,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-117",
+      "title": "Create auth Pydantic models",
+      "description": "As a backend engineer, I need to create authentication-related Pydantic models.",
+      "acceptanceCriteria": [
+        "Add UserRegister model (phone, password, nickname) to models.py",
+        "Add UserLogin model (phone, password)",
+        "Add TokenResponse model (access, refresh, user)",
+        "Add RefreshRequest model (refresh_token)",
+        "Typecheck passes"
+      ],
+      "priority": 117,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-118",
+      "title": "Integrate database into main.py",
+      "description": "As a backend engineer, I need to integrate database initialization into FastAPI startup.",
+      "acceptanceCriteria": [
+        "Update api_service/app/main.py",
+        "Add startup event to initialize database",
+        "Add database health check",
+        "Add /v2/health endpoint to check database status",
+        "Typecheck passes"
+      ],
+      "priority": 118,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-119",
+      "title": "Add PostgreSQL to docker-compose",
+      "description": "As a backend engineer, I need to add PostgreSQL service to docker-compose.yml.",
+      "acceptanceCriteria": [
+        "Add postgres service definition",
+        "Configure environment variables (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)",
+        "Configure data volume for persistence",
+        "Update api service to depend on postgres",
+        "Add database connection environment variables",
+        "Typecheck passes"
+      ],
+      "priority": 119,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-120",
+      "title": "Create database health check",
+      "description": "As a backend engineer, I need to implement database connection health check.",
+      "acceptanceCriteria": [
+        "Implement check_db_health() in api_service/app/core/database.py",
+        "Execute simple query to test connection",
+        "Return health status and connection info",
+        "Integrate into /api/v2/health endpoint",
+        "Typecheck passes"
+      ],
+      "priority": 120,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-121",
+      "title": "Modify diagnosis API to support user_id",
+      "description": "As a backend engineer, I need to modify diagnosis API to associate with user ID.",
+      "acceptanceCriteria": [
+        "Update api_service/app/api/v2/diagnosis.py",
+        "Accept optional user_id parameter",
+        "Store diagnosis to diagnosis_history table after completion",
+        "Return diagnosis_id",
+        "Typecheck passes"
+      ],
+      "priority": 121,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-122",
+      "title": "Implement diagnosis history storage",
+      "description": "As a backend engineer, I need to persist diagnosis results to database.",
+      "acceptanceCriteria": [
+        "Create DiagnosisHistory instance",
+        "Store all diagnosis data (user_info, features, results)",
+        "Associate with tongue_images record",
+        "Store inference time and model info",
+        "Typecheck passes"
+      ],
+      "priority": 122,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-123",
+      "title": "Implement GET /api/v2/history/diagnoses",
+      "description": "As a backend engineer, I need to create diagnosis history query API endpoint.",
+      "acceptanceCriteria": [
+        "Create api_service/app/api/v2/history.py",
+        "GET /api/v2/history/diagnoses requires authentication",
+        "Support pagination (page, page_size)",
+        "Support filtering (start_date, end_date)",
+        "Return ordered by created_at DESC",
+        "Typecheck passes"
+      ],
+      "priority": 123,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-124",
+      "title": "Implement GET /api/v2/history/statistics",
+      "description": "As a backend engineer, I need to create health statistics API endpoint.",
+      "acceptanceCriteria": [
+        "GET /api/v2/history/statistics requires authentication",
+        "Return total diagnosis count",
+        "Return most common syndromes",
+        "Return most common tongue features",
+        "Return diagnosis time distribution",
+        "Typecheck passes"
+      ],
+      "priority": 124,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-125",
+      "title": "Implement GET /api/v2/history/trends",
+      "description": "As a backend engineer, I need to create health trends API endpoint.",
+      "acceptanceCriteria": [
+        "GET /api/v2/history/trends requires authentication",
+        "Calculate syndrome changes over time",
+        "Calculate feature changes over time",
+        "Return trend chart data",
+        "Typecheck passes"
+      ],
+      "priority": 125,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-126",
+      "title": "Implement GET /api/v2/diagnosis/{id}",
+      "description": "As a backend engineer, I need to create single diagnosis detail API endpoint.",
+      "acceptanceCriteria": [
+        "GET /api/v2/diagnosis/{id} requires authentication",
+        "Verify diagnosis belongs to current user",
+        "Return complete diagnosis info",
+        "Include tongue image info",
+        "Typecheck passes"
+      ],
+      "priority": 126,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-127",
+      "title": "Implement POST /api/v2/diagnosis/{id}/feedback",
+      "description": "As a backend engineer, I need to create diagnosis feedback API endpoint.",
+      "acceptanceCriteria": [
+        "POST /api/v2/diagnosis/{id}/feedback requires authentication",
+        "Accept feedback value (1/-1)",
+        "Update diagnosis_history feedback field",
+        "Typecheck passes"
+      ],
+      "priority": 127,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-128",
+      "title": "Create health records API",
+      "description": "As a backend engineer, I need to create health records management API endpoints.",
+      "acceptanceCriteria": [
+        "Create api_service/app/api/v2/health_records.py",
+        "GET /api/v2/health-records to get records",
+        "POST /api/v2/health-records to add record",
+        "PUT /api/v2/health-records/{id} to update record",
+        "DELETE /api/v2/health-records/{id} to delete record",
+        "Typecheck passes"
+      ],
+      "priority": 128,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-129",
+      "title": "Implement user management API",
+      "description": "As a backend engineer, I need to create user info management API endpoints.",
+      "acceptanceCriteria": [
+        "Create api_service/app/api/v2/users.py",
+        "GET /api/v2/users/me to get current user info",
+        "PUT /api/v2/users/me to update user info",
+        "DELETE /api/v2/users/me to delete account (soft delete)",
+        "Typecheck passes"
+      ],
+      "priority": 129,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-130",
+      "title": "Implement avatar upload",
+      "description": "As a backend engineer, I need to create user avatar upload API endpoint.",
+      "acceptanceCriteria": [
+        "GET /api/v2/users/me/avatar to get upload URL",
+        "PUT /api/v2/users/me/avatar to upload avatar",
+        "Store to filesystem",
+        "Update user.avatar_url",
+        "Typecheck passes"
+      ],
+      "priority": 130,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-131",
+      "title": "Implement anonymous diagnosis compatibility",
+      "description": "As a backend engineer, I need to support anonymous user diagnosis (without login).",
+      "acceptanceCriteria": [
+        "/api/v2/diagnosis endpoint supports optional auth",
+        "user_id is NULL for anonymous diagnosis",
+        "Return anonymous diagnosis ID",
+        "Support later association to account",
+        "Typecheck passes"
+      ],
+      "priority": 131,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-132",
+      "title": "Create diagnosis history Pydantic models",
+      "description": "As a backend engineer, I need to create diagnosis history related Pydantic models.",
+      "acceptanceCriteria": [
+        "DiagnosisHistoryResponse model",
+        "DiagnosisListResponse model (paginated)",
+        "DiagnosisStatisticsResponse model",
+        "DiagnosisTrendsResponse model",
+        "Typecheck passes"
+      ],
+      "priority": 132,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-133",
+      "title": "Create health records Pydantic models",
+      "description": "As a backend engineer, I need to create health records related Pydantic models.",
+      "acceptanceCriteria": [
+        "HealthRecordCreate model",
+        "HealthRecordUpdate model",
+        "HealthRecordResponse model",
+        "HealthRecordListResponse model",
+        "Typecheck passes"
+      ],
+      "priority": 133,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-134",
+      "title": "Create user Pydantic models",
+      "description": "As a backend engineer, I need to create user related Pydantic models.",
+      "acceptanceCriteria": [
+        "UserResponse model",
+        "UserUpdate model",
+        "UserAvatarResponse model",
+        "Typecheck passes"
+      ],
+      "priority": 134,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-135",
+      "title": "Add database indexes for query optimization",
+      "description": "As a backend engineer, I need to add composite indexes for common queries.",
+      "acceptanceCriteria": [
+        "Add composite index (user_id, created_at DESC) on diagnosis_history",
+        "Add composite index (user_id, record_type) on health_records",
+        "Create new migration file",
+        "Migration executes successfully",
+        "Typecheck passes"
+      ],
+      "priority": 135,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-136",
+      "title": "Initialize uni-app project",
+      "description": "As a frontend engineer, I need to create uni-app project base structure.",
+      "acceptanceCriteria": [
+        "Create uni-app project using HBuilderX or CLI",
+        "Vue 3 + TypeScript configuration",
+        "Configure manifest.json app info",
+        "Configure pages.json page routes",
+        "Project runs on H5",
+        "Typecheck passes"
+      ],
+      "priority": 136,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-137",
+      "title": "Configure uView UI components",
+      "description": "As a frontend engineer, I need to integrate uView UI 2.x component library.",
+      "acceptanceCriteria": [
+        "Install uview-ui dependency",
+        "Import uView in main.js",
+        "Configure uni.scss to include uView styles",
+        "Configure pages.json easycom",
+        "Components work correctly",
+        "Typecheck passes"
+      ],
+      "priority": 137,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-138",
+      "title": "Create API request wrapper",
+      "description": "As a frontend engineer, I need to create unified API request wrapper.",
+      "acceptanceCriteria": [
+        "Create utils/request.js",
+        "Wrap uni.request()",
+        "Auto add Authorization header",
+        "Unified error handling",
+        "Token refresh logic",
+        "Typecheck passes"
+      ],
+      "priority": 138,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-139",
+      "title": "Create Pinia state management",
+      "description": "As a frontend engineer, I need to configure Pinia state management.",
+      "acceptanceCriteria": [
+        "Install pinia dependency",
+        "Create store/index.js",
+        "Create store/modules/user.js",
+        "Create store/modules/diagnosis.js",
+        "Configure persistence",
+        "Typecheck passes"
+      ],
+      "priority": 139,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-140",
+      "title": "Create login page",
+      "description": "As a frontend engineer, I need to create user login page.",
+      "acceptanceCriteria": [
+        "Create pages/login/login.vue",
+        "Phone number input",
+        "Password input",
+        "Login button",
+        "Call /api/v2/auth/login",
+        "Navigate to home on success",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 140,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-141",
+      "title": "Create registration page",
+      "description": "As a frontend engineer, I need to create user registration page.",
+      "acceptanceCriteria": [
+        "Create pages/register/register.vue",
+        "Phone input with validation",
+        "Password input with confirmation",
+        "Nickname input",
+        "Register button",
+        "Call /api/v2/auth/register",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 141,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-142",
+      "title": "Create home page",
+      "description": "As a frontend engineer, I need to create application home page.",
+      "acceptanceCriteria": [
+        "Create pages/index/index.vue",
+        "Welcome message",
+        "Start diagnosis button (navigate to diagnosis)",
+        "Login status display",
+        "History entry",
+        "Health records entry",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 142,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-143",
+      "title": "Create diagnosis page",
+      "description": "As a frontend engineer, I need to create tongue diagnosis function page.",
+      "acceptanceCriteria": [
+        "Create pages/diagnosis/diagnosis.vue",
+        "Camera button",
+        "Album button",
+        "Image preview",
+        "User info form (age/gender/chief_complaint)",
+        "Submit diagnosis button",
+        "Call /api/v2/diagnosis",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 143,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-144",
+      "title": "Create camera component",
+      "description": "As a frontend engineer, I need to create tongue photo capture component.",
+      "acceptanceCriteria": [
+        "Create components/tongue-camera/tongue-camera.vue",
+        "Camera preview",
+        "Photo guide frame",
+        "Take photo button",
+        "Album select button",
+        "Emit photo-confirm event",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 144,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-145",
+      "title": "Create image preview component",
+      "description": "As a frontend engineer, I need to create image preview component.",
+      "acceptanceCriteria": [
+        "Create components/image-preview/image-preview.vue",
+        "Display selected image",
+        "Delete button",
+        "Reselect button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 145,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-146",
+      "title": "Create result page",
+      "description": "As a frontend engineer, I need to create diagnosis result display page.",
+      "acceptanceCriteria": [
+        "Create pages/result/result.vue",
+        "Tongue image + mask overlay",
+        "6-dimension feature display",
+        "Syndrome analysis display",
+        "Health recommendations (collapsible)",
+        "Risk alert display",
+        "Feedback button",
+        "Save/Share button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 146,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-147",
+      "title": "Create feature display component",
+      "description": "As a frontend engineer, I need to create tongue feature display component.",
+      "acceptanceCriteria": [
+        "Create components/feature-display/feature-display.vue",
+        "6-dimension feature list",
+        "Confidence progress bars",
+        "Feature icons",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 147,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-148",
+      "title": "Create syndrome card component",
+      "description": "As a frontend engineer, I need to create syndrome analysis display card.",
+      "acceptanceCriteria": [
+        "Create components/syndrome-card/syndrome-card.vue",
+        "Syndrome name",
+        "Syndrome description",
+        "Confidence display",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 148,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-149",
+      "title": "Create recommendation list component",
+      "description": "As a frontend engineer, I need to create health recommendation list component.",
+      "acceptanceCriteria": [
+        "Create components/recommendation-list/recommendation-list.vue",
+        "Dietary recommendations",
+        "Lifestyle recommendations",
+        "Emotional recommendations",
+        "Collapsible expand",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 149,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-150",
+      "title": "Create history page",
+      "description": "As a frontend engineer, I need to create diagnosis history list page.",
+      "acceptanceCriteria": [
+        "Create pages/history/history.vue",
+        "Diagnosis record list",
+        "Ordered by time",
+        "Pull to refresh",
+        "Load more on scroll",
+        "Tap to view detail",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 150,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-151",
+      "title": "Create detail page",
+      "description": "As a frontend engineer, I need to create single diagnosis detail page.",
+      "acceptanceCriteria": [
+        "Create pages/detail/detail.vue",
+        "Complete diagnosis info",
+        "Tongue image",
+        "Feature details",
+        "Syndrome analysis",
+        "Health recommendations",
+        "Diagnosis time",
+        "Feedback button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 151,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-152",
+      "title": "Create profile page",
+      "description": "As a frontend engineer, I need to create user profile center page.",
+      "acceptanceCriteria": [
+        "Create pages/profile/profile.vue",
+        "User avatar",
+        "User nickname",
+        "Health records entry",
+        "Settings entry",
+        "Logout button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 152,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-153",
+      "title": "Create health records page",
+      "description": "As a frontend engineer, I need to create health records management page.",
+      "acceptanceCriteria": [
+        "Create pages/health-records/health-records.vue",
+        "Records list",
+        "Add record button",
+        "Edit record function",
+        "Delete record function",
+        "Call /api/v2/health-records",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 153,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-154",
+      "title": "Create settings page",
+      "description": "As a frontend engineer, I need to create application settings page.",
+      "acceptanceCriteria": [
+        "Create pages/settings/settings.vue",
+        "Privacy policy entry",
+        "User agreement entry",
+        "About us",
+        "Clear cache",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 154,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-155",
+      "title": "Implement auto token refresh",
+      "description": "As a frontend engineer, I need to implement auto access token refresh mechanism.",
+      "acceptanceCriteria": [
+        "Intercept 401 responses",
+        "Call refresh API",
+        "Retry original request",
+        "Navigate to login if refresh fails",
+        "Typecheck passes"
+      ],
+      "priority": 155,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-156",
+      "title": "Implement Base64 image encoding",
+      "description": "As a frontend engineer, I need to implement Base64 encoding for image upload.",
+      "acceptanceCriteria": [
+        "Read local image",
+        "Convert to Base64",
+        "Add to FormData",
+        "Typecheck passes"
+      ],
+      "priority": 156,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-157",
+      "title": "Create loading component",
+      "description": "As a frontend engineer, I need to create global loading state indicator.",
+      "acceptanceCriteria": [
+        "Create components/loading/loading.vue",
+        "Loading animation",
+        "Loading text",
+        "Background mask",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 157,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-158",
+      "title": "Create Toast component",
+      "description": "As a frontend engineer, I need to create global message toast component.",
+      "acceptanceCriteria": [
+        "Create components/toast/toast.vue",
+        "Success toast",
+        "Error toast",
+        "Auto dismiss",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 158,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-159",
+      "title": "Implement WeChat mini-program login",
+      "description": "As a frontend engineer, I need to integrate WeChat mini-program login.",
+      "acceptanceCriteria": [
+        "Call wx.login() to get code",
+        "Send code to /api/v2/auth/wechat",
+        "Backend exchanges for openid and session_key",
+        "Return JWT tokens",
+        "Typecheck passes"
+      ],
+      "priority": 159,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-160",
+      "title": "Implement Douyin mini-program login",
+      "description": "As a frontend engineer, I need to integrate Douyin mini-program login.",
+      "acceptanceCriteria": [
+        "Call tt.login() to get code",
+        "Send code to /api/v2/auth/douyin",
+        "Backend exchanges for openid",
+        "Return JWT tokens",
+        "Typecheck passes"
+      ],
+      "priority": 160,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-161",
+      "title": "Implement H5 local storage",
+      "description": "As a frontend engineer, I need to implement H5 local token storage.",
+      "acceptanceCriteria": [
+        "Use localStorage for access_token",
+        "Use localStorage for refresh_token",
+        "Use localStorage for user_info",
+        "Auto login check",
+        "Typecheck passes"
+      ],
+      "priority": 161,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-162",
+      "title": "Create route guards",
+      "description": "As a frontend engineer, I need to implement page route access control.",
+      "acceptanceCriteria": [
+        "Check token for pages requiring login",
+        "Navigate to login if not authenticated",
+        "Return to original page after login",
+        "Typecheck passes"
+      ],
+      "priority": 162,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-163",
+      "title": "Implement pull to refresh",
+      "description": "As a frontend engineer, I need to add pull-to-refresh for list pages.",
+      "acceptanceCriteria": [
+        "History page pull refresh",
+        "Health records page pull refresh",
+        "Refresh indicator",
+        "Typecheck passes"
+      ],
+      "priority": 163,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-164",
+      "title": "Implement load more",
+      "description": "As a frontend engineer, I need to add pagination load for list pages.",
+      "acceptanceCriteria": [
+        "History page load more on scroll",
+        "Health records page load more",
+        "Loading indicator",
+        "No more data prompt",
+        "Typecheck passes"
+      ],
+      "priority": 164,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-165",
+      "title": "Implement image compression",
+      "description": "As a frontend engineer, I need to compress images before upload.",
+      "acceptanceCriteria": [
+        "Use canvas to compress image",
+        "Control compression quality",
+        "Limit max size",
+        "Typecheck passes"
+      ],
+      "priority": 165,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-166",
+      "title": "Create share function",
+      "description": "As a frontend engineer, I need to implement diagnosis result sharing.",
+      "acceptanceCriteria": [
+        "Generate share image",
+        "Call share API",
+        "WeChat mini-program share",
+        "H5 share",
+        "Typecheck passes"
+      ],
+      "priority": 166,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-167",
+      "title": "Implement dark mode",
+      "description": "As a frontend engineer, I need to support system dark mode.",
+      "acceptanceCriteria": [
+        "Detect system theme",
+        "Switch to dark styles",
+        "Persist user preference",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 167,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-168",
+      "title": "Implement i18n multi-language",
+      "description": "As a frontend engineer, I need to support Chinese/English switching.",
+      "acceptanceCriteria": [
+        "Install vue-i18n",
+        "Create language files",
+        "Language switch function",
+        "Persist language preference",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 168,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-169",
+      "title": "Create privacy policy page",
+      "description": "As a frontend engineer, I need to create privacy policy display page.",
+      "acceptanceCriteria": [
+        "Create pages/privacy/privacy.vue",
+        "Privacy policy content",
+        "Back button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 169,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-170",
+      "title": "Create user agreement page",
+      "description": "As a frontend engineer, I need to create user agreement display page.",
+      "acceptanceCriteria": [
+        "Create pages/terms/terms.vue",
+        "User agreement content",
+        "Back button",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 170,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-171",
+      "title": "Write database unit tests",
+      "description": "As a backend engineer, I need to write unit tests for database models.",
+      "acceptanceCriteria": [
+        "Test User model CRUD",
+        "Test DiagnosisHistory model CRUD",
+        "Test relationships",
+        "Test coverage > 80%",
+        "Tests pass"
+      ],
+      "priority": 171,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-172",
+      "title": "Write auth API tests",
+      "description": "As a backend engineer, I need to write integration tests for auth APIs.",
+      "acceptanceCriteria": [
+        "Test registration flow",
+        "Test login flow",
+        "Test token refresh",
+        "Test logout flow",
+        "Test coverage > 80%",
+        "Tests pass"
+      ],
+      "priority": 172,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-173",
+      "title": "Write diagnosis API tests",
+      "description": "As a backend engineer, I need to write integration tests for diagnosis APIs.",
+      "acceptanceCriteria": [
+        "Test anonymous diagnosis",
+        "Test authenticated user diagnosis",
+        "Test history query",
+        "Test feedback submission",
+        "Test coverage > 80%",
+        "Tests pass"
+      ],
+      "priority": 173,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-174",
+      "title": "End-to-end test - H5",
+      "description": "As a QA engineer, I need to test H5 complete flow.",
+      "acceptanceCriteria": [
+        "User registration flow",
+        "User login flow",
+        "Complete diagnosis flow",
+        "History view",
+        "All functions work",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 174,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-175",
+      "title": "End-to-end test - WeChat mini-program",
+      "description": "As a QA engineer, I need to test WeChat mini-program complete flow.",
+      "acceptanceCriteria": [
+        "WeChat login flow",
+        "Complete diagnosis flow",
+        "History view",
+        "All functions work",
+        "Verify in WeChat DevTools"
+      ],
+      "priority": 175,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-176",
+      "title": "Performance test - database query",
+      "description": "As a backend engineer, I need to test database query performance.",
+      "acceptanceCriteria": [
+        "History query < 100ms",
+        "Statistics query < 500ms",
+        "100 concurrent requests without blocking",
+        "Typecheck passes"
+      ],
+      "priority": 176,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-177",
+      "title": "Performance test - API response",
+      "description": "As a backend engineer, I need to test API response times.",
+      "acceptanceCriteria": [
+        "Login API < 200ms",
+        "Diagnosis API < 5s",
+        "History query API < 300ms",
+        "Typecheck passes"
+      ],
+      "priority": 177,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-178",
+      "title": "Update deployment docs",
+      "description": "As a technical writer, I need to update deployment docs with new components.",
+      "acceptanceCriteria": [
+        "Update docs/deployment.md",
+        "Add PostgreSQL deployment steps",
+        "Add database migration steps",
+        "Add uni-app build steps",
+        "Typecheck passes"
+      ],
+      "priority": 178,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-179",
+      "title": "Update API documentation",
+      "description": "As a technical writer, I need to update API docs with new endpoints.",
+      "acceptanceCriteria": [
+        "Update docs/api_spec.yaml",
+        "Add all v2 endpoints",
+        "Add auth documentation",
+        "Add request examples",
+        "Typecheck passes"
+      ],
+      "priority": 179,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-180",
+      "title": "Create user manual",
+      "description": "As a technical writer, I need to create uni-app user manual.",
+      "acceptanceCriteria": [
+        "Create docs/user_manual.md",
+        "Registration/login instructions",
+        "Diagnosis function instructions",
+        "History instructions",
+        "Health records instructions",
+        "Typecheck passes"
+      ],
+      "priority": 180,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

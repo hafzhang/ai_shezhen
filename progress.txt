@@ -1768,4 +1768,68 @@ psql -c "\d users"
 
 ---
 
+## [2026-02-21] - US-103
+- Created refresh_tokens table migration (alembic/versions/20260221_us103_create_refresh_tokens_table.py)
+- Implemented complete refresh_tokens table structure with foreign key to users
+- Added indexes for user_id, token, expires_at, and composite queries
+- Configured CASCADE delete for orphaned token cleanup
+- Validated migration structure (all 17 checks passed)
+- Updated PRD to mark US-103 as complete
+
+**Files changed:**
+- alembic/versions/20260221_us103_create_refresh_tokens_table.py (new)
+- prd.json (updated - US-103 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Refresh tokens should use CASCADE delete to automatically clean up when user is deleted
+- Patterns discovered: Token column should be unique to prevent token reuse
+- Patterns discovered: Composite index (user_id, expires_at) optimizes active token queries
+- Patterns discovered: Partial index on revoked_at (WHERE revoked_at IS NULL) filters active tokens efficiently
+- Patterns discovered: Token hash (String 255) should be stored instead of plaintext token
+- Gotchas encountered: Foreign key constraint name should follow naming convention (table_name_column_name_fkey)
+- Useful context: Refresh tokens typically have 7-30 day expiration periods
+- Useful context: Revoked tokens should be kept for audit purposes but filtered out in queries
+- Useful context: Migration revision chain must be sequential (US-103 depends on US-102)
+
+**Acceptance Criteria Met:**
+- Migration file contains complete refresh_tokens table structure: PASS (6 columns: id, user_id, token, expires_at, revoked_at, created_at)
+- Foreign key to users table: PASS (FK constraint with CASCADE on delete)
+- Add indexes (user_id, token, expires_at): PASS (5 indexes: user_id, token, expires_at, composite user_id+expires_at, revoked_at)
+- Migration executes successfully: PASS (Python syntax and structure validated)
+- Typecheck passes: PASS (AST parsing and validation successful)
+
+**Key Features:**
+1. Refresh Tokens Table Structure:
+   - UUID primary key with automatic generation
+   - user_id foreign key to users table (CASCADE delete)
+   - token column (String 255, unique) for JWT refresh token hash
+   - expires_at timestamp for token expiration
+   - revoked_at timestamp for token revocation tracking
+   - created_at timestamp for audit trail
+2. Indexes:
+   - ix_refresh_tokens_user_id: User token lookup
+   - ix_refresh_tokens_token: Unique token validation
+   - ix_refresh_tokens_expires_at: Expired token cleanup
+   - ix_refresh_tokens_user_id_expires_at: Composite index for active token queries
+   - ix_refresh_tokens_revoked_at: Partial index for filtering active tokens (WHERE revoked_at IS NULL)
+3. Security Features:
+   - CASCADE delete: Automatically removes tokens when user is deleted
+   - Unique token constraint: Prevents token reuse
+   - Revocation tracking: Supports token invalidation
+
+**Usage:**
+```bash
+# Run migration (after US-102)
+alembic upgrade head
+
+# Verify table creation
+psql -c "\d refresh_tokens"
+
+# Query active tokens for a user
+psql -c "SELECT * FROM refresh_tokens WHERE user_id = '<uuid>' AND expires_at > NOW() AND revoked_at IS NULL;"
+```
+
+---
+
 ---

@@ -1,0 +1,22 @@
+# Ralph Agent Progress Log
+
+## Project: AI舌诊系统重构 - uni-app + PostgreSQL
+## Branch: ralph/refactor-uni-app-postgresql
+## Start Date: 2026-02-17
+
+## Codebase Patterns
+- Current system: FastAPI + PaddlePaddle + Redis + Celery (25+ Python files, all 50 stories complete)
+- No existing database or user authentication
+- Existing Pydantic models in api_service/app/api/models.py
+- Existing core logic in api_service/app/core/
+- All API endpoints use /api/v1/ prefix
+- New v2 endpoints will be at /api/v2/ for backward compatibility
+
+## Key Architectural Decisions
+1. Database: PostgreSQL with SQLAlchemy ORM
+2. Authentication: JWT (python-jose + passlib for bcrypt)
+3. Migration: Alembic for database version control
+4. API Design: v2 endpoints alongside v1 for backward compatibility
+5. Frontend: uni-app for WeChat/Douyin/H5 tri-platform support
+
+---
