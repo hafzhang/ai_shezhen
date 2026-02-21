@@ -802,9 +802,9 @@
       "title": "Add PostgreSQL to docker-compose",
       "description": "As a backend engineer, I need to add PostgreSQL service to docker-compose.yml.",
       "priority": 119,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Add postgres service definition",
         "Configure environment variables (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)",
@@ -812,6 +812,10 @@
         "Update api service to depend on postgres",
         "Add database connection environment variables",
         "Typecheck passes"
+      ],
+      "files": [
+        "docker-compose.yml",
+        "api_service/.env.example"
       ]
     },
     {

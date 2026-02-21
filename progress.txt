@@ -2754,3 +2754,75 @@ Response:
 - Use try/except for optional components (database) during startup
 - Close database connections in shutdown handler for clean resource cleanup
 - Health endpoints should check all critical service components
+
+## [2026-02-21] - US-119
+- Added PostgreSQL 15 service to docker-compose.yml
+- Configured postgres service with environment variables (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
+- Added postgres_data volume for data persistence
+- Updated api service to depend on postgres (with health check)
+- Added DATABASE_URL and ALEMBIC_DATABASE_URL environment variables to api service
+- Updated api_service/.env.example with database configuration section
+- Configured PostgreSQL health check (pg_isready)
+
+**Files changed:**
+- docker-compose.yml (updated) - Added postgres service and dependencies
+- api_service/.env.example (updated) - Added database configuration section
+- prd.json (updated - US-119 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use postgres:15-alpine for lightweight PostgreSQL image
+- Patterns discovered: Use pg_isready for PostgreSQL health check in docker
+- Patterns discovered: Add depends_on with service_healthy condition for proper startup order
+- Patterns discovered: Use ${VAR:-default} syntax for environment variable defaults in docker-compose
+- Gotchas encountered: PostgreSQL must be fully initialized before API tries to connect
+- Gotchas encountered: Use start_period in health check to give PostgreSQL time to initialize
+- Useful context: PostgreSQL default port is 5432
+- Useful context: Data volume is critical for persistence across container restarts
+- Useful context: In docker-compose, use service name (postgres) as hostname for DATABASE_URL
+
+**Acceptance Criteria Met:**
+- Add postgres service definition: PASS (postgres:15-alpine in docker-compose.yml)
+- Configure environment variables: PASS (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD set)
+- Configure data volume for persistence: PASS (postgres_data volume created)
+- Update api service to depend on postgres: PASS (postgres added to depends_on)
+- Add database connection environment variables: PASS (DATABASE_URL and ALEMBIC_DATABASE_URL)
+- Typecheck passes: PASS (docker-compose config validated)
+
+**Key Features:**
+1. PostgreSQL 15 Service: Alpine-based PostgreSQL image
+2. Data Persistence: postgres_data named volume
+3. Health Check: pg_isready to verify database is ready
+4. Environment Variables: Configurable database credentials
+5. API Integration: DATABASE_URL and ALEMBIC_DATABASE_URL configured
+6. Startup Order: API waits for postgres to be healthy
+7. Configuration: .env.example updated with database settings
+
+**Usage:**
+```yaml
+# Start PostgreSQL with API
+docker compose up -d postgres api
+
+# Start all services including PostgreSQL
+docker compose up -d
+
+# Connect to PostgreSQL
+docker exec -it shezhen-postgres psql -U shezhen -d shezhen_db
+```
+
+**Environment Variables:**
+```bash
+# Database connection
+DATABASE_URL=postgresql://shezhen:shezhen_password@postgres:5432/shezhen_db
+ALEMBIC_DATABASE_URL=postgresql://shezhen:shezhen_password@postgres:5432/shezhen_db
+
+# PostgreSQL configuration
+POSTGRES_DB=shezhen_db
+POSTGRES_USER=shezhen
+POSTGRES_PASSWORD=shezhen_password
+```
+
+**Codebase Patterns Added:**
+- Use pg_isready for PostgreSQL health check in docker-compose
+- Use service_healthy condition for depends_on to ensure proper startup order
+- Use ${VAR:-default} syntax for environment variable defaults
+- Add separate DATABASE_URL and ALEMBIC_DATABASE_URL for flexibility

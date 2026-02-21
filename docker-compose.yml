@@ -14,6 +14,31 @@
 
 services:
   # ============================================================================
+  # PostgreSQL - Database (US-119)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: shezhen-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-shezhen_db}
+      - POSTGRES_USER=${POSTGRES_USER:-shezhen}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-shezhen_password}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shezhen} -d ${POSTGRES_DB:-shezhen_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - shezhen-network
+
+  # ============================================================================
   # Redis - Message Broker & Result Backend
   # ============================================================================
   redis:
@@ -56,16 +81,20 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
       - LOG_LEVEL=INFO
+      # Database connection (US-119)
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-shezhen}:${POSTGRES_PASSWORD:-shezhen_password}@postgres:5432/${POSTGRES_DB:-shezhen_db}
+      - ALEMBIC_DATABASE_URL=postgresql://${POSTGRES_USER:-shezhen}:${POSTGRES_PASSWORD:-shezhen_password}@postgres:5432/${POSTGRES_DB:-shezhen_db}
     env_file:
       - api_service/.env
     depends_on:
       - redis
+      - postgres
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     networks:
       - shezhen-network
 
@@ -412,6 +441,8 @@ services:
 # Volumes
 # ============================================================================
 volumes:
+  postgres_data:
+    driver: local
   redis_data:
     driver: local
   prometheus_data:
