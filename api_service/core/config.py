@@ -112,6 +112,17 @@ class Settings(BaseSettings):
     ENABLE_RATE_LIMIT: bool = True
     ENABLE_API_KEY_AUTH: bool = False
 
+    # JWT Authentication (US-110)
+    # Secret key for JWT token encoding/decoding
+    # WARNING: Change this in production! Use: openssl rand -hex 32
+    SECRET_KEY: str = "your-secret-key-change-in-production-use-openssl-rand-hex-32"
+    # JWT algorithm (HS256 = HMAC SHA-256)
+    JWT_ALGORITHM: str = "HS256"
+    # Access token expiration time (minutes)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # Refresh token expiration time (days)
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
     # Circuit Breaker Configuration (task-4-8)
     CIRCUIT_BREAKER_FAILURE_THRESHOLD: int = 5
     CIRCUIT_BREAKER_SUCCESS_THRESHOLD: int = 2

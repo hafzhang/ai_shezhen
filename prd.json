@@ -615,30 +615,13 @@
       ]
     },
     {
-      "id": "US-109",
-      "title": "Create other ORM models",
-      "description": "As a backend engineer, I need to create RefreshToken, TongueImage, DiagnosisHistory, HealthRecord models.",
-      "priority": 109,
-      "status": "pending",
-      "phase": "Phase 2: Database & Auth",
-      "passes": false,
-      "acceptance_criteria": [
-        "Define RefreshToken model with User relationship",
-        "Define TongueImage model with User relationship",
-        "Define DiagnosisHistory model with User and TongueImage relationships",
-        "Define HealthRecord model with User relationship",
-        "All field types correct",
-        "Typecheck passes"
-      ]
-    },
-    {
       "id": "US-110",
       "title": "Create security.py utilities",
       "description": "As a backend engineer, I need to create JWT and password handling utilities.",
       "priority": 110,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/core/security.py",
         "Implement hash_password() using bcrypt",
@@ -647,6 +630,11 @@
         "Implement create_refresh_token()",
         "Implement decode_token()",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/security.py",
+        "api_service/app/core/__init__.py",
+        "api_service/core/config.py"
       ]
     },
     {
