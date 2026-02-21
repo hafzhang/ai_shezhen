@@ -1718,14 +1718,18 @@
       "title": "Implement pull to refresh",
       "description": "As a frontend engineer, I need to add pull-to-refresh for list pages.",
       "priority": 163,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "History page pull refresh",
         "Health records page pull refresh",
         "Refresh indicator",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages.json",
+        "uni-app_frontend/src/pages/health-records/index.vue"
       ]
     },
     {

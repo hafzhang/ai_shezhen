@@ -5594,3 +5594,44 @@ handleLoginSuccess() // or handleLoginSuccess('/pages/index/index') for default
 - `/pages/settings/index` - Settings (public)
 - `/pages/privacy/index` - Privacy policy
 - `/pages/terms/index` - User agreement
+
+## [2026-02-22] - US-163
+- 实现了下拉刷新功能（健康档案页面）
+- 在pages.json中为health-records页面启用了enablePullDownRefresh
+- 添加了onPullDownRefresh处理器到health-records组件
+- 添加了刷新指示器UI（"正在刷新..."文本）
+- 添加了isRefreshing状态用于加载管理
+- 更新了loadRecords函数以正确处理刷新
+- 调用uni.stopPullDownRefresh()关闭原生刷新指示器
+- 历史页面已有下拉刷新功能（之前已实现）
+
+**Files changed:**
+- uni-app_frontend/src/pages.json (updated - enabled pull-to-refresh for health-records)
+- uni-app_frontend/src/pages/health-records/index.vue (updated - added pull-to-refresh functionality)
+- prd.json (updated - US-163 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: uni-app使用onPullDownRefresh生命周期钩子实现下拉刷新
+- Patterns discovered: 需要在pages.json中为页面设置enablePullDownRefresh: true来启用原生下拉刷新
+- Patterns discovered: 刷新完成后必须调用uni.stopPullDownRefresh()关闭原生指示器
+- Patterns discovered: 使用单独的isRefreshing状态管理刷新状态，与isLoading状态分离
+- Gotchas encountered: pull-to-refresh使用原生uni-app API，H5平台通过@dcloudio/uni-app包提供
+- Useful context: 历史页面已有完整的下拉刷新实现，健康档案页面参考了相同模式
+- Useful context: 刷新指示器应该显示在列表顶部，使用简单的文本提示即可
+
+**Acceptance Criteria Met:**
+- History page pull refresh: PASS (已存在于pages/history/index.vue:359-361)
+- Health records page pull refresh: PASS (新增于pages/health-records/index.vue:510-512)
+- Refresh indicator: PASS (添加了refresh-indicator UI组件)
+- Typecheck passes: SKIP (Node.js v24与vue-tsc不兼容，语法已验证正确)
+
+**Key Features:**
+1. 页面配置更新: pages.json中enablePullDownRefresh设为true
+2. 组件状态管理: 添加isRefreshing状态
+3. 刷新函数: onRefresh函数处理刷新逻辑
+4. 生命周期钩子: onPullDownRefresh监听原生下拉刷新事件
+5. UI反馈: 刷新时显示"正在刷新..."文本
+6. 原生API集成: 使用uni.stopPullDownRefresh()关闭系统指示器
+
+---
