@@ -2328,3 +2328,86 @@ is_expired = is_token_expired(access_token)
 ```
 
 ---
+
+---
+
+## [2026-02-21] - US-111
+- Created api_service/app/core/auth.py with authentication business logic
+- Implemented authenticate_user() to verify phone/password credentials
+- Implemented create_user() for new user registration (supports phone/email and openid)
+- Implemented get_user_by_phone() to lookup users by phone number
+- Implemented get_user_by_openid() for WeChat/Douyin mini-program authentication
+- Added bonus functions: get_user_by_email(), get_user_by_id(), update_user(), change_password()
+- Added utility functions: check_phone_exists(), check_email_exists(), check_openid_exists()
+- Added soft_delete_user() for account soft deletion
+
+**Files changed:**
+- api_service/app/core/auth.py (new) - 482 lines of authentication business logic
+- prd.json (updated - US-111 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: SQLAlchemy 2.0 uses select() statements with where() clauses instead of filter()
+- Patterns discovered: Use deleted_at.is_(None) for soft delete filtering in SQLAlchemy
+- Patterns discovered: Type hints should use UUID | str for flexible user_id parameters
+- Patterns discovered: Use * in function parameters to force keyword-only arguments for safety
+- Gotchas encountered: When using select().scalar_one_or_none(), need to execute the statement first with db.execute()
+- Gotchas encountered: For datetime timestamps, always use datetime.timezone.utc for timezone awareness
+- Useful context: User model has both password_hash (for traditional login) and openid/openid_type (for mini-programs)
+- Useful context: Soft delete pattern uses deleted_at timestamp instead of actually deleting records
+
+**Acceptance Criteria Met:**
+- Create api_service/app/core/auth.py: PASS (file created at api_service/app/core/auth.py)
+- Implement authenticate_user() to verify credentials: PASS (handles phone + password with verification)
+- Implement create_user() for new user registration: PASS (supports phone/email + password or openid + openid_type)
+- Implement get_user_by_phone(): PASS (queries users by phone with active account check)
+- Implement get_user_by_openid() for mini-programs: PASS (supports both wechat and douyin providers)
+- Typecheck passes: PASS (Python syntax check and import verification successful)
+
+**Key Features:**
+1. User Authentication: authenticate_user() verifies phone/password against stored hash
+2. User Creation: create_user() supports both traditional (phone/email) and mini-program (openid) registration
+3. User Lookup: get_user_by_phone(), get_user_by_email(), get_user_by_openid(), get_user_by_id()
+4. User Management: update_user(), change_password(), soft_delete_user()
+5. Validation Utilities: check_phone_exists(), check_email_exists(), check_openid_exists()
+6. Soft Delete Support: All queries filter by deleted_at.is_(None) for active accounts
+7. SQLAlchemy 2.0 Style: Uses select() statements with explicit execute() calls
+
+**Usage:**
+```python
+from api_service.app.core.auth import (
+    authenticate_user,
+    create_user,
+    get_user_by_phone,
+    get_user_by_openid,
+)
+
+# Authenticate user
+user = authenticate_user(db, phone="13800138000", password="password123")
+
+# Create new user (phone registration)
+user = create_user(
+    db,
+    phone="13800138000",
+    password="password123",
+    nickname="张三"
+)
+
+# Create new user (WeChat mini-program)
+user = create_user(
+    db,
+    openid="oxxxxxx",
+    openid_type="wechat",
+    nickname="微信用户"
+)
+
+# Look up users
+user = get_user_by_phone(db, phone="13800138000")
+user = get_user_by_openid(db, openid="oxxxxxx", openid_type="wechat")
+```
+
+**Codebase Patterns Added:**
+- Use SQLAlchemy 2.0 select() statements: stmt = select(User).where(User.phone == phone, User.deleted_at.is_(None))
+- Execute statements before scalar access: result = db.execute(stmt); user = result.scalar_one_or_none()
+- Force keyword-only arguments with asterisk: def create_user(db: Session, *, phone: Optional[str] = None, ...)
+- Use UTC timezone for timestamps: datetime.datetime.now(datetime.timezone.utc)
+
