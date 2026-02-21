@@ -1506,9 +1506,9 @@
       "title": "Create health records page",
       "description": "As a frontend engineer, I need to create health records management page.",
       "priority": 153,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/health-records/health-records.vue",
         "Records list",
@@ -1517,6 +1517,10 @@
         "Delete record function",
         "Call /api/v2/health-records",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/health-records/index.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2190,8 +2194,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 67,
-    "pending_stories": 63,
+    "completed_stories": 68,
+    "pending_stories": 62,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
