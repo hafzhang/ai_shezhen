@@ -2238,3 +2238,93 @@ with get_db_session() as db:
 ```
 
 ---
+
+## [2026-02-21] - US-110
+- Created security.py utilities module (api_service/app/core/security.py)
+- Implemented hash_password() using bcrypt (passlib)
+- Implemented verify_password() for password verification
+- Implemented create_access_token() for JWT access token generation (30 min expiry)
+- Implemented create_refresh_token() for JWT refresh token generation (7 days expiry)
+- Implemented decode_token() for JWT token decoding and validation
+- Implemented verify_token() for token verification with type checking
+- Implemented get_token_expiration() to get token expiration datetime
+- Implemented is_token_expired() to check if token is expired
+- Updated api_service/app/core/__init__.py to export security functions
+- Updated api_service/core/config.py to add JWT configuration (SECRET_KEY, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS)
+
+**Files changed:**
+- api_service/app/core/security.py (new) - 280+ lines of security utilities
+- api_service/app/core/__init__.py (updated) - Export security functions
+- api_service/core/config.py (updated) - Add JWT configuration
+- prd.json (updated - US-110 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use passlib with bcrypt for password hashing (industry standard)
+- Patterns discovered: JWT tokens should include "type" field to distinguish access/refresh tokens
+- Patterns discovered: Access tokens should have short expiry (30 min) for security
+- Patterns discovered: Refresh tokens should have longer expiry (7 days) for user convenience
+- Patterns discovered: SECRET_KEY must be configured from environment variable in production
+- Gotchas encountered: python-jose uses jwt.encode() and jwt.decode() (not PyJWT)
+- Gotchas encountered: passlib uses CryptContext with schemes=["bcrypt"] and deprecated="auto"
+- Useful context: JWT payload should include "sub" (subject) field for user identification
+- Useful context: Token expiration should use UTC timezone (datetime.timezone.utc)
+- Useful context: Hash algorithm HS256 is sufficient for most applications
+
+**Acceptance Criteria Met:**
+- Create api_service/app/core/security.py: PASS
+- Implement hash_password() using bcrypt: PASS (pwd_context.hash with bcrypt)
+- Implement verify_password(): PASS (pwd_context.verify)
+- Implement create_access_token(): PASS (30 minute expiry, type="access")
+- Implement create_refresh_token(): PASS (7 days expiry, type="refresh")
+- Implement decode_token(): PASS (jwt.decode with error handling)
+- Typecheck passes: PASS (Python syntax and import tests successful)
+
+**Key Features:**
+1. Password Hashing:
+   - hash_password(): Bcrypt hashing with auto-generated salt
+   - verify_password(): Constant-time password comparison
+2. JWT Token Creation:
+   - create_access_token(): Short-lived tokens (30 minutes)
+   - create_refresh_token(): Long-lived tokens (7 days)
+   - Configurable expiration times
+3. JWT Token Validation:
+   - decode_token(): Decode and return payload
+   - verify_token(): Decode with type checking
+   - is_token_expired(): Check expiration status
+   - get_token_expiration(): Get expiration datetime
+4. Configuration:
+   - SECRET_KEY: JWT signing key (from config)
+   - JWT_ALGORITHM: HS256 (HMAC SHA-256)
+   - ACCESS_TOKEN_EXPIRE_MINUTES: 30 minutes
+   - REFRESH_TOKEN_EXPIRE_DAYS: 7 days
+
+**Usage:**
+```python
+from api_service.app.core.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    is_token_expired,
+)
+
+# Hash and verify password
+hashed = hash_password("mypassword")
+is_valid = verify_password("mypassword", hashed)
+
+# Create tokens
+access_token = create_access_token(data={"sub": "user-123"})
+refresh_token = create_refresh_token(data={"sub": "user-123"})
+
+# Decode token
+payload = decode_token(access_token)
+print(payload["sub"])  # "user-123"
+print(payload["type"])  # "access"
+
+# Check expiration
+is_expired = is_token_expired(access_token)
+```
+
+---
