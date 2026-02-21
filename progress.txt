@@ -57,6 +57,14 @@
 - Use `db.rollback()` on database errors before re-raising
 - Return structured error responses with `detail` field
 
+### Frontend - uni-app & uView Plus
+- uView Plus 3.x is for Vue 3 (not uView UI 2.x which is for Vue 2)
+- uni.scss is the global styles file for uni-app theme variables
+- Configure `css.preprocessorOptions.scss.additionalData` in vite.config.ts for auto-imports
+- easycom in pages.json enables automatic component import (no manual import needed)
+- Node.js v24 is incompatible with vue-tsc; use Node.js v20 for type checking
+- uview-plus requires uni-app runtime (@dcloudio/* packages) for full functionality
+
 ## [2026-02-12] - task-4-5
 - 实现了完整的FastAPI应用（api_service/app/main.py）
 - 创建了API v1端点（api_service/app/api/v1/endpoints.py）
