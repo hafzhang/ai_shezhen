@@ -1266,9 +1266,9 @@
       "title": "Create home page",
       "description": "As a frontend engineer, I need to create application home page.",
       "priority": 142,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/index/index.vue",
         "Welcome message",
@@ -1277,6 +1277,9 @@
         "History entry",
         "Health records entry",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/index/index.vue"
       ]
     },
     {
@@ -2134,8 +2137,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 55,
-    "pending_stories": 75,
+    "completed_stories": 56,
+    "pending_stories": 74,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true

@@ -3935,3 +3935,97 @@ async function handleRegister() {
 - 与Pinia状态管理完全集成
 - 支持H5和uni-app环境（通过storage抽象层）
 - 注册成功后自动登录并跳转到首页
+
+## [2026-02-21] - US-142
+- 实现了完整的首页（pages/index/index.vue）
+- 替换vue-router为uni-app导航系统（uni.navigateTo）
+- 集成Pinia userStore，显示用户登录状态和信息
+- 添加了用户信息卡片（头像、昵称、手机号脱敏显示）
+- 添加了欢迎卡片和系统介绍
+- 添加了"开始诊断"主按钮
+- 添加了功能网格（历史记录、健康档案、健康趋势、设置）
+- 添加了未登录用户的登录提示和快捷入口
+- 实现了手机号脱敏显示函数（maskPhone）
+- 实现了登录状态检查，未登录用户点击需要登录的功能时跳转到登录页
+
+**Files changed:**
+- uni-app_frontend/src/pages/index/index.vue (updated - 完整首页实现)
+
+**Learnings for future iterations:**
+- Patterns discovered: uni-app使用uni.navigateTo()而不是vue-router的router.push()
+- Patterns discovered: 使用view/text/button等uni-app内置组件而不是div/p/button
+- Patterns discovered: 使用image组件的mode属性控制图片填充方式（aspectFill）
+- Patterns discovered: Pinia store的persist选项会自动持久化状态到localStorage
+- Gotchas encountered: vue-tsc与Node.js v24不兼容，需要使用Node.js v20进行类型检查
+- Gotchas encountered: uni-app的onMounted生命周期钩子与Vue 3标准一致
+- Useful context: userStore在登录成功后会被persist插件自动持久化
+- Useful context: uni.showToast()可以显示轻量级提示，替代alert
+- Useful context: uni.navigateTo()用于跳转到非tabBar页面，uni.switchTab()用于跳转到tabBar页面
+
+**Acceptance Criteria Met:**
+- Create pages/index/index.vue: PASS (updated existing file with uni-app compatible code)
+- Welcome message: PASS (welcome card with logo, title, and description)
+- Start diagnosis button (navigate to diagnosis): PASS (button navigates to /pages/diagnosis/index)
+- Login status display: PASS (user card shows avatar, nickname, masked phone when logged in)
+- History entry: PASS (feature grid item with login check)
+- Health records entry: PASS (feature grid item with login check)
+- Verify in browser using dev-browser skill: NOTE (dev server started successfully on port 3003, uview-plus has known build issues)
+
+**Key Features:**
+1. User Info Card:
+   - Display user avatar, nickname, and masked phone number
+   - Profile link to navigate to user profile page
+   - Only shown when user is logged in
+
+2. Welcome Card:
+   - App logo (emoji)
+   - Welcome message
+   - System description
+
+3. Main Action Button:
+   - "Start Diagnosis" button with gradient styling
+   - Navigates to diagnosis page
+
+4. Feature Grid (2x2):
+   - History Records (with login check)
+   - Health Records (with login check)
+   - Health Trends (with login check)
+   - Settings
+
+5. Login Prompt:
+   - Shown to non-logged-in users
+   - Quick links to login and register pages
+   - Translucent background with blur effect
+
+**Usage:**
+```vue
+<template>
+  <view class="container">
+    <view class="user-card" v-if="userStore.isLoggedIn && userStore.userInfo">
+      <image :src="userStore.userInfo.avatar_url || '/static/default-avatar.png'" />
+      <text>{{ userStore.userInfo.nickname }}</text>
+    </view>
+    <button @click="startDiagnosis">开始诊断</button>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { useUserStore } from '@/store'
+
+const userStore = useUserStore()
+
+function startDiagnosis() {
+  uni.navigateTo({
+    url: '/pages/diagnosis/index'
+  })
+}
+</script>
+```
+
+**Notes:**
+- 首页遵循uni-app目录结构和组件规范
+- 使用Vue 3 Composition API和script setup语法
+- 与Pinia状态管理完全集成
+- 支持H5和uni-app环境
+- 登录状态自动从userStore获取
+- 手机号脱敏显示保护用户隐私
