@@ -5756,3 +5756,136 @@ const compressedBase64 = result.dataUrl
 7. 图片预览组件显示压缩信息
 
 ---
+
+## [2026-02-22] - US-166
+- 实现了诊断结果分享功能（uni-app_frontend/src/utils/share.ts）
+- 创建了generateShareImage()函数，使用HTML5 Canvas生成分享图片（H5平台）
+- 创建了generateShareImageH5()函数，实现完整的Canvas图片绘制逻辑
+- 创建了saveImageToAlbum()函数，支持保存图片到相册（小程序平台）
+- 创建了shareToWeChat()函数，支持微信小程序原生分享
+- 创建了shareWithSystem()函数，支持系统分享面板
+- 创建了copyToClipboard()函数，支持复制分享链接到剪贴板
+- 创建了generateShareLink()函数，生成可分享的诊断结果链接
+- 创建了downloadImage()函数，支持从URL下载图片
+- 创建了getPlatform()函数，检测当前运行平台（H5/微信/抖音/App）
+- 更新了结果页面（uni-app_frontend/src/pages/result/index.vue），集成分享功能
+- 实现了saveImage()函数，支持保存图片到本地/相册
+- 实现了shareToFriend()函数，支持分享给朋友
+- 实现了copyLink()函数，支持复制诊断链接
+- 更新了分享菜单和操作按钮，调用实际的分享功能
+- 平台检测和条件编译，确保跨平台兼容性
+
+**Files changed:**
+- uni-app_frontend/src/utils/share.ts (new) - 690+ lines of comprehensive share utility
+- uni-app_frontend/src/pages/result/index.vue (updated) - Integrated share functions
+- prd.json (updated - US-166 marked as complete, metadata updated)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 使用Canvas API生成分享图片是H5平台的最佳实践，支持自定义布局和样式
+- Patterns discovered: 微信小程序使用uni.share()API进行原生分享，需要provider参数指定平台
+- Patterns discovered: 小程序保存图片需要用户授权相册权限，需要处理授权失败的场景
+- Patterns discovered: 使用uni.canvasToTempFilePath()将Canvas内容转换为临时文件路径用于分享
+- Patterns discovered: 分享功能需要平台检测（H5/小程序/App），不同平台使用不同的API
+- Gotchas encountered: Canvas图片需要设置crossOrigin='anonymous'才能处理跨域图片
+- Gotchas encountered: H5平台使用document.createElement('a')下载图片，小程序使用saveImageToPhotosAlbum
+- Gotchas encountered: canvas.toBlob()是异步的，需要使用Promise包装
+- Gotchas encountered: TypeScript中Canvas 2D Context类型需要正确声明，避免类型错误
+- Useful context: 分享图片应该包含关键信息：舌象图片、主要证型、置信度、健康建议
+- Useful context: 分享链接应该使用完整的URL（包括协议、域名、路径），便于跨平台访问
+- Useful context: 图片生成可能耗时较长，需要显示loading提示提升用户体验
+- Useful context: 分享功能需要降级方案，Canvas不支持时应该提示用户使用其他方式分享
+
+**Acceptance Criteria Met:**
+- Generate share image: PASS (generateShareImage()使用Canvas API生成图片)
+- Call share API: PASS (shareToWeChat()使用uni.share()API)
+- WeChat mini-program share: PASS (支持微信小程序原生分享)
+- H5 share: PASS (支持H5平台图片下载和系统分享)
+- Typecheck passes: PASS (share.ts通过tsc --noEmit --skipLibCheck验证)
+
+**Key Features:**
+1. 图片生成: 使用Canvas API绘制诊断结果分享图片
+   - 背景渐变头部
+   - 舌象图片（带圆角）
+   - 主要证型（带置信度）
+   - 健康建议（最多显示3条）
+   - 底部品牌标识
+2. 平台检测: 自动检测H5/微信/抖音/App平台
+3. 图片保存: H5平台下载到本地，小程序保存到相册
+4. 微信分享: 使用uni.share()API进行微信原生分享
+5. 系统分享: 使用uni.showShareSheet()调用系统分享面板
+6. 链接复制: 复制诊断结果链接到剪贴板
+7. 链接生成: 生成包含diagnosis_id的分享链接
+8. 权限处理: 处理相册权限请求和拒绝场景
+9. 错误处理: 完善的错误处理和用户提示
+
+**Usage:**
+```typescript
+import {
+  shareDiagnosis,
+  generateShareImage,
+  saveImageToAlbum,
+  shareToWeChat,
+  copyToClipboard,
+  generateShareLink
+} from '@/utils/share'
+
+// Quick share (handles everything)
+const result = await shareDiagnosis({
+  diagnosisId: 'diagnosis-123',
+  title: 'AI舌诊诊断结果',
+  imageUrl: 'https://example.com/tongue.jpg',
+  primarySyndrome: '脾胃虚弱',
+  confidence: 0.85,
+  recommendations: ['饮食清淡', '规律作息', '适当运动'],
+  baseUrl: 'https://your-app.com'
+})
+
+// Generate share image only
+const imageResult = await generateShareImage({
+  title: 'AI舌诊诊断结果',
+  imageUrl: 'https://example.com/tongue.jpg',
+  primarySyndrome: '脾胃虚弱',
+  confidence: 0.85,
+  recommendations: ['饮食清淡', '规律作息']
+})
+
+// Save to album
+await saveImageToAlbum(imageResult.filePath)
+
+// Copy share link
+const link = generateShareLink('diagnosis-123', 'https://your-app.com')
+await copyToClipboard(link)
+```
+
+**Share Image Layout:**
+```
+┌─────────────────────────────┐
+│     [Gradient Header]       │
+│    AI舌诊诊断结果            │
+├─────────────────────────────┤
+│                             │
+│    [Tongue Image]           │
+│     (400x400, rounded)      │
+│                             │
+├─────────────────────────────┤
+│ 主要证型                    │
+│ 脾胃虚弱                    │
+│ 置信度: 85%                 │
+├─────────────────────────────┤
+│ 健康建议                    │
+│ • 饮食清淡                   │
+│ • 规律作息                   │
+│ • 适当运动                   │
+├─────────────────────────────┤
+│   AI舌诊智能诊断系统          │
+└─────────────────────────────┘
+```
+
+**Platform Support:**
+- H5: Canvas图片生成 + 浏览器下载
+- WeChat Mini-Program: Canvas图片生成 + uni.share()
+- Douyin Mini-Program: Canvas图片生成 + uni.share()
+- Native App: Canvas图片生成 + 系统分享
+
+---
