@@ -1,0 +1,82 @@
+/**
+ * uni.scss - uView Plus Styles Configuration
+ * This file contains uView Plus theme variables and styles
+ */
+
+@import 'uview-plus/theme.scss';
+
+// uView Plus Theme Customization
+// Override default uView Plus variables here if needed
+
+// Primary color
+$u-primary: #3cc51f;
+$u-primary-dark: #2fa415;
+$u-primary-disabled: #7cd689;
+
+// Warning color
+$u-warning: #ff9900;
+$u-warning-dark: #cc7a00;
+$u-warning-disabled: #ffcc66;
+
+// Error color
+$u-error: #f56c6c;
+$u-error-dark: #c23636;
+$u-error-disabled: #f8b2b2;
+
+// Info color
+$u-info: #909399;
+$u-info-dark: #73767a;
+$u-info-disabled: #c5c7cb;
+
+// Success color
+$u-success: #67c23a;
+$u-success-dark: #4e9a2c;
+$u-success-disabled: #a5e075;
+
+// Content color
+$u-main-color: #303133;
+$u-content-color: #606266;
+$u-tips-color: #909193;
+$u-light-color: #c0c4cc;
+
+// Border color
+$u-border-color: #e4e7ed;
+
+// Background color
+$u-bg-color: #f3f4f6;
+
+// Font sizes
+$u-font-size-xs: 24rpx;
+$u-font-size-sm: 26rpx;
+$u-font-size-base: 28rpx;
+$u-font-size-lg: 30rpx;
+$u-font-size-xl: 32rpx;
+
+// Spacing
+$u-padding-base: 30rpx;
+$u-padding-lg: 40rpx;
+$u-padding-sm: 20rpx;
+$u-margin-base: 30rpx;
+$u-margin-lg: 40rpx;
+$u-margin-sm: 20rpx;
+
+// Border radius
+$u-border-radius-base: 8rpx;
+$u-border-radius-lg: 16rpx;
+$u-border-radius-sm: 4rpx;
+
+// Box shadow
+$u-box-shadow-base: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+$u-box-shadow-light: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+$u-box-shadow-heavy: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+
+// Transition
+$u-transition-base: all 0.3s ease;
+$u-transition-fast: all 0.15s ease;
+$u-transition-slow: all 0.45s ease;
+
+// Z-index
+$u-z-index-overlay: 999;
+$u-z-index-popup: 1000;
+$u-z-index-modal: 1100;
+$u-z-index-toast: 9999;

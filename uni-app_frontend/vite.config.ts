@@ -9,6 +9,17 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/uni_modules/uview-plus/theme.scss";@import "uni.scss";`
+      }
+    }
+  },
+  optimizeDeps: {
+    exclude: ['uview-plus'],
+    include: []
+  },
   server: {
     port: 3000,
     host: '0.0.0.0',
@@ -24,6 +35,9 @@ export default defineConfig({
     target: 'es6',
     outDir: 'dist',
     assetsDir: 'static',
-    sourcemap: false
+    sourcemap: false,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
   }
 })
