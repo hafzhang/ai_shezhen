@@ -1606,15 +1606,19 @@
       "title": "Create Toast component",
       "description": "As a frontend engineer, I need to create global message toast component.",
       "priority": 158,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create components/toast/toast.vue",
         "Success toast",
         "Error toast",
         "Auto dismiss",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/components/toast/toast.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
