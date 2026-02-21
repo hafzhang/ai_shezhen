@@ -2051,4 +2051,88 @@ psql -c "SELECT * FROM health_records WHERE record_value->>'systolic'::int > 120
 
 ---
 
+## [2026-02-21] - US-107
+- Created database.py configuration module (api_service/app/core/database.py)
+- Implemented get_database_url() with environment variable support
+- Created create_db_engine() with connection pool configuration (pool_size=5, max_overflow=10)
+- Implemented init_db() for database initialization with scoped_session
+- Created get_db() FastAPI dependency for endpoint injection
+- Created get_db_session() context manager for manual session management
+- Implemented check_db_health() async function for health monitoring
+- Added close_db() for proper shutdown cleanup
+- Created __init__.py with proper exports
+- Validated configuration (all 20 checks passed)
+- Updated PRD to mark US-107 as complete
+
+**Files changed:**
+- api_service/app/core/database.py (new)
+- api_service/app/core/__init__.py (new)
+- prd.json (updated - US-107 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use pool_pre_ping=True to verify connections before using them
+- Patterns discovered: scoped_session provides thread-safe session management
+- Patterns discovered: FastAPI dependencies should be generators that yield sessions
+- Patterns discovered: Context managers (get_db_session) simplify session lifecycle management
+- Patterns discovered: Connection pool settings should match application load (pool_size=5, max_overflow=10)
+- Gotchas encountered: SQLAlchemy 2.0 requires future=True for new-style Session behavior
+- Gotchas encountered: close_db() should call ScopedSession.remove() to clean up thread-local sessions
+- Useful context: pool_recycle=3600 prevents stale connections from long-running processes
+- Useful context: check_db_health() returns structured dict for monitoring systems
+- Useful context: DATABASE_URL should support multiple fallback environment variables
+
+**Acceptance Criteria Met:**
+- Create api_service/app/core/database.py: PASS
+- Define database_url from environment variable: PASS (DATABASE_URL with ALEMBIC_DATABASE_URL fallback)
+- Create engine with connection pool configuration: PASS (pool_size=5, max_overflow=10, pool_pre_ping=True)
+- Create get_db() session generator: PASS (FastAPI dependency with proper cleanup)
+- Create init_db() initialization function: PASS (engine, SessionLocal, ScopedSession)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Database Configuration:
+   - get_database_url(): Reads DATABASE_URL env var (fallback: ALEMBIC_DATABASE_URL)
+   - create_db_engine(): Creates engine with pool configuration
+   - init_db(): Initializes engine, SessionLocal, and ScopedSession
+2. Session Management:
+   - get_db(): FastAPI dependency for endpoint injection
+   - get_db_session(): Context manager for manual session management
+   - get_session_factory(): Returns the sessionmaker instance
+3. Health Monitoring:
+   - check_db_health(): Async health check function
+4. Lifecycle Management:
+   - close_db(): Properly closes all connections and cleans up
+
+**Usage:**
+```python
+# Application startup
+from api_service.app.core.database import init_db
+
+engine = init_db()
+
+# FastAPI endpoint
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from api_service.app.core.database import get_db
+
+@app.get("/users/{user_id}")
+def read_user(user_id: str, db: Session = Depends(get_db)):
+    return db.query(User).filter(User.id == user_id).first()
+
+# Manual session management
+from api_service.app.core.database import get_db_session
+
+with get_db_session() as db:
+    user = db.query(User).first()
+
+# Health check
+@app.get("/health")
+async def health():
+    from api_service.app.core.database import check_db_health
+    return await check_db_health()
+```
+
+---
+
 ---

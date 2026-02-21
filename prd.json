@@ -556,9 +556,9 @@
       "title": "Create database.py configuration",
       "description": "As a backend engineer, I need to create SQLAlchemy database configuration.",
       "priority": 107,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/core/database.py",
         "Define database_url from environment variable",
@@ -566,6 +566,10 @@
         "Create get_db() session generator",
         "Create init_db() initialization function",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/database.py",
+        "api_service/app/core/__init__.py"
       ]
     },
     {
