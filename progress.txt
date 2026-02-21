@@ -1902,4 +1902,80 @@ psql -c "SELECT * FROM tongue_images WHERE is_processed = false;"
 
 ---
 
+## [2026-02-21] - US-105
+- Created diagnosis_history table migration (alembic/versions/20260221_us105_create_diagnosis_history_table.py)
+- Implemented complete diagnosis_history table with JSONB fields for flexible data storage
+- Added foreign keys to users (SET NULL) and tongue_images (CASCADE)
+- Added GIN indexes on JSONB columns for efficient JSON queries
+- Added composite index (user_id, created_at DESC) for user history queries
+- Added feedback tracking columns (feedback, feedback_comment)
+- Validated migration structure (all 25 checks passed)
+- Updated PRD to mark US-105 as complete
+
+**Files changed:**
+- alembic/versions/20260221_us105_create_diagnosis_history_table.py (new)
+- prd.json (updated - US-105 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: JSONB columns with GIN indexes enable efficient JSON queries (e.g., features->>'tongue_color')
+- Patterns discovered: CASCADE delete on tongue_image_id removes diagnoses when image is deleted
+- Patterns discovered: SET NULL on user_id preserves diagnosis history after user deletion
+- Patterns discovered: Composite index (user_id, created_at DESC) optimizes user history queries
+- Patterns discovered: Partial index on feedback (WHERE feedback IS NOT NULL) filters users with feedback
+- Gotchas encountered: JSONB GIN indexes are essential for query performance on large JSON datasets
+- Gotchas encountered: model_version should be tracked to enable model performance analysis over time
+- Useful context: JSONB is preferable to JSON for indexing and query performance
+- Useful context: Diagnosis history should be preserved even after user deletion for analytics
+- Useful context: Feedback tracking enables model improvement and quality assessment
+
+**Acceptance Criteria Met:**
+- Migration file contains complete diagnosis_history table structure: PASS (13 columns: id, user_id, tongue_image_id, user_info, features, results, model_version, inference_time_ms, feedback, feedback_comment, created_at, updated_at)
+- JSONB fields for user_info/features/results: PASS (3 JSONB columns with GIN indexes)
+- Foreign keys to users and tongue_images tables: PASS (users: SET NULL, tongue_images: CASCADE)
+- Add composite index (user_id, created_at DESC): PASS (ix_diagnosis_history_user_id_created_at)
+- Migration executes successfully: PASS (validated)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Diagnosis History Table Structure:
+   - UUID primary key with automatic generation
+   - user_id foreign key (nullable, SET NULL on delete)
+   - tongue_image_id foreign key (CASCADE on delete)
+   - JSONB fields: user_info, features, results
+   - Model metadata: model_version, inference_time_ms
+   - Feedback tracking: feedback (Integer), feedback_comment (Text)
+   - Timestamps: created_at, updated_at
+2. Indexes:
+   - ix_diagnosis_history_user_id_created_at: Composite index for user history
+   - ix_diagnosis_history_tongue_image_id: Image-to-diagnosis lookup
+   - ix_diagnosis_history_created_at: Time-based queries
+   - ix_diagnosis_history_model_version: Model version filtering
+   - ix_diagnosis_history_feedback: Feedback filtering
+   - GIN indexes on user_info, features, results JSONB columns
+3. JSONB Data Storage:
+   - user_info: {age, gender, chief_complaint}
+   - features: {tongue_color, coating_color, tongue_shape, ...}
+   - results: {syndrome, confidence, recommendations, ...}
+
+**Usage:**
+```bash
+# Run migration (after US-104)
+alembic upgrade head
+
+# Verify table creation
+psql -c "\d diagnosis_history"
+
+# Query user diagnosis history (most recent first)
+psql -c "SELECT * FROM diagnosis_history WHERE user_id = '<uuid>' ORDER BY created_at DESC;"
+
+# Query diagnoses with feedback
+psql -c "SELECT * FROM diagnosis_history WHERE feedback IS NOT NULL;"
+
+# JSONB query example: Find diagnoses with specific syndrome
+psql -c "SELECT * FROM diagnosis_history WHERE results->>'syndrome' = '肾气虚';"
+```
+
+---
+
 ---

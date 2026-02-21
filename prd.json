@@ -516,9 +516,9 @@
       "title": "Create diagnosis_history table migration",
       "description": "As a backend engineer, I need to create the diagnosis_history table migration.",
       "priority": 105,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Migration file contains complete diagnosis_history table structure",
         "JSONB fields for user_info/features/results",
@@ -526,6 +526,9 @@
         "Add composite index (user_id, created_at DESC)",
         "Migration executes successfully",
         "Typecheck passes"
+      ],
+      "files": [
+        "alembic/versions/20260221_us105_create_diagnosis_history_table.py"
       ]
     },
     {
