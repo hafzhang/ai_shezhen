@@ -227,7 +227,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { request } from '@/utils/request'
-import { onPullDownRefresh } from '@dcloudio/uni-app'
+import { onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app'
 
 interface HealthRecord {
   id: string
@@ -509,6 +509,11 @@ onMounted(() => {
 // Pull to refresh (uni-app API)
 onPullDownRefresh(() => {
   onRefresh()
+})
+
+// Load more on scroll (uni-app API)
+onReachBottom(() => {
+  loadMore()
 })
 </script>
 
