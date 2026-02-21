@@ -7,6 +7,11 @@
 
     <div class="content">
       <div class="form-container">
+        <!-- Error message display -->
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
         <div class="form-group">
           <label class="label">手机号</label>
           <input
@@ -48,6 +53,7 @@
             v-model="nickname"
             placeholder="请输入昵称"
             maxlength="20"
+            @keyup.enter="handleRegister"
           />
         </div>
 
@@ -66,13 +72,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store'
 
 const router = useRouter()
+const userStore = useUserStore()
 const phone = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const nickname = ref('')
 const loading = ref(false)
+const errorMessage = ref('')
 
 function goBack() {
   router.back()
@@ -83,50 +92,46 @@ function goToLogin() {
 }
 
 async function handleRegister() {
+  errorMessage.value = ''
+
   // Phone validation
   if (!/^1[3-9]\d{9}$/.test(phone.value)) {
-    alert('请输入正确的手机号')
+    errorMessage.value = '请输入正确的手机号'
     return
   }
 
   // Password validation
   if (password.value.length < 6 || password.value.length > 20) {
-    alert('密码长度应为6-20位')
+    errorMessage.value = '密码长度应为6-20位'
     return
   }
 
   // Confirm password validation
   if (password.value !== confirmPassword.value) {
-    alert('两次密码输入不一致')
+    errorMessage.value = '两次密码输入不一致'
     return
   }
 
   // Nickname validation
   if (!nickname.value.trim()) {
-    alert('请输入昵称')
+    errorMessage.value = '请输入昵称'
     return
   }
 
   loading.value = true
 
   try {
-    // TODO: Integrate with backend API
-    // const response = await register({
-    //   phone: phone.value,
-    //   password: password.value,
-    //   nickname: nickname.value
-    // })
+    const success = await userStore.register(phone.value, password.value, nickname.value)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    alert('注册成功')
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 500)
-  } catch (error) {
-    alert('注册失败，请重试')
+    if (success) {
+      // Navigate to home on successful registration
+      router.replace('/')
+    } else {
+      errorMessage.value = '注册失败，请稍后重试'
+    }
+  } catch (error: any) {
+    console.error('Register error:', error)
+    errorMessage.value = error?.message || '注册失败，请稍后重试'
   } finally {
     loading.value = false
   }
@@ -174,6 +179,16 @@ async function handleRegister() {
   background: #ffffff;
   border-radius: 12px;
   padding: 30px 20px;
+}
+
+.error-message {
+  background: #fff5f5;
+  color: #e53e3e;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #fed7d7;
 }
 
 .form-group {
