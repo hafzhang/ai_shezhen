@@ -1021,15 +1021,19 @@
       "title": "Implement avatar upload",
       "description": "As a backend engineer, I need to create user avatar upload API endpoint.",
       "priority": 130,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "GET /api/v2/users/me/avatar to get upload URL",
         "PUT /api/v2/users/me/avatar to upload avatar",
         "Store to filesystem",
         "Update user.avatar_url",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/users.py",
+        "api_service/app/main.py"
       ]
     },
     {

@@ -3218,3 +3218,76 @@ curl -X DELETE "http://localhost:8000/api/v2/users/me" \
 ```
 
 ---
+
+## [2026-02-21] - US-130
+- 实现了用户头像上传功能 (api_service/app/api/v2/users.py)
+- 实现了GET /api/v2/users/me/avatar - 获取头像信息
+- 实现了PUT /api/v2/users/me/avatar - 上传/更新头像
+- 实现了DELETE /api/v2/users/me/avatar - 删除头像
+- 实现了save_avatar_image()辅助函数（SHA-256哈希命名）
+- 在main.py中挂载/media静态文件目录
+- 支持Base64编码的图像数据
+- 自动处理data URL前缀
+- 头像URL存储在user.avatar_url字段
+
+**Files changed:**
+- api_service/app/api/v2/users.py (updated) - Added 150+ lines for avatar endpoints
+- api_service/app/main.py (updated) - Added StaticFiles mount for /media
+- prd.json (updated) - US-130 marked as complete
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 头像文件使用SHA-256哈希前16位作为唯一标识
+- Patterns discovered: 头像文件命名格式: avatar_{user_id}_{hash}.png
+- Patterns discovered: FastAPI使用StaticFiles挂载静态文件目录
+- Patterns discovered: Base64解码使用base64.b64decode()
+- Gotchas encountered: data URL需要去除前缀（data:image/xxx;base64,）
+- Gotchas encountered: 静态文件目录需要在应用启动前创建
+- Useful context: 头像URL使用相对路径（/media/avatars/xxx.png）便于迁移
+- Useful context: 删除头像仅清除URL引用，不删除物理文件（保留历史记录）
+
+**Acceptance Criteria Met:**
+- GET /api/v2/users/me/avatar to get upload URL: PASS (返回avatar_url和has_avatar)
+- PUT /api/v2/users/me/avatar to upload avatar: PASS (接受base64图像数据)
+- Store to filesystem: PASS (保存到media/avatars/目录)
+- Update user.avatar_url: PASS (数据库更新avatar_url字段)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. 头像上传:
+   - Base64图像数据解码
+   - 自动处理data URL前缀
+   - SHA-256哈希唯一文件名
+   - 文件系统存储
+2. 头像管理:
+   - 获取头像信息
+   - 上传/更新头像
+   - 删除头像（软删除）
+3. 静态文件服务:
+   - FastAPI StaticFiles挂载
+   - /media路径映射到media目录
+   - 自动创建目录
+
+**Usage:**
+```bash
+# 获取头像信息
+curl -X GET "http://localhost:8000/api/v2/users/me/avatar" \
+  -H "Authorization: Bearer <access_token>"
+
+# 上传头像（Base64编码）
+curl -X PUT "http://localhost:8000/api/v2/users/me/avatar" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_data": "iVBORw0KGgoAAAANSUhEUgAA..."
+  }'
+
+# 删除头像
+curl -X DELETE "http://localhost:8000/api/v2/users/me/avatar" \
+  -H "Authorization: Bearer <access_token>"
+
+# 访问头像文件（静态文件服务）
+# http://localhost:8000/media/avatars/avatar_{user_id}_{hash}.png
+```
+
+---
