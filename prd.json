@@ -682,9 +682,9 @@
       "title": "Implement POST /api/v2/auth/register",
       "description": "As a backend engineer, I need to create user registration API endpoint.",
       "priority": 113,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create api_service/app/api/v2/auth.py",
         "POST /api/v2/auth/register accepts phone/password/nickname",
@@ -693,6 +693,9 @@
         "Validate phone/email uniqueness",
         "Unified response format",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/auth.py"
       ]
     },
     {
@@ -700,9 +703,9 @@
       "title": "Implement POST /api/v2/auth/login",
       "description": "As a backend engineer, I need to create user login API endpoint.",
       "priority": 114,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "POST /api/v2/auth/login accepts phone/password",
         "Verify password correctness",
@@ -711,6 +714,9 @@
         "Return user info and tokens",
         "Error handling (user not found/wrong password)",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/auth.py"
       ]
     },
     {
@@ -718,9 +724,9 @@
       "title": "Implement POST /api/v2/auth/refresh",
       "description": "As a backend engineer, I need to create refresh token API endpoint.",
       "priority": 115,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "POST /api/v2/auth/refresh accepts refresh_token",
         "Validate token validity",
@@ -728,6 +734,9 @@
         "Check if expired",
         "Generate new access_token",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/auth.py"
       ]
     },
     {
@@ -735,15 +744,18 @@
       "title": "Implement POST /api/v2/auth/logout",
       "description": "As a backend engineer, I need to create user logout API endpoint.",
       "priority": 116,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Database & Auth",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "POST /api/v2/auth/logout requires authentication",
         "Revoke refresh_token (set revoked_at)",
         "Clear client-side token storage",
         "Return success response",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/api/v2/auth.py"
       ]
     },
     {

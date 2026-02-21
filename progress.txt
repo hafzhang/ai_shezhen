@@ -2577,3 +2577,113 @@ response = TokenResponse(
 - Use Field(pattern=regex) for format validation in Pydantic v2
 - Use @field_validator with @classmethod for custom validation in Pydantic v2
 - Use model_config = {"from_attributes": True} to enable ORM mode
+
+## [2026-02-21] - US-113, US-114, US-115, US-116
+- Created api_service/app/api/v2/auth.py with all authentication endpoints
+- Implemented POST /api/v2/auth/register endpoint (US-113)
+  - Validates phone/email uniqueness before creating user
+  - Password is hashed via create_user() which calls hash_password()
+  - Returns access_token (30 min) and refresh_token (7 days)
+  - Stores refresh_token in database with expires_at
+  - Returns unified RegisterResponse format
+- Implemented POST /api/v2/auth/login endpoint (US-114)
+  - Verifies user credentials using authenticate_user()
+  - Generates new access_token and refresh_token
+  - Stores refresh_token in database
+  - Revokes old refresh tokens (single session security)
+  - Returns LoginResponse with user info and tokens
+  - Error handling for invalid credentials (401)
+- Implemented POST /api/v2/auth/refresh endpoint (US-115)
+  - Validates refresh_token (signature, type, expiration)
+  - Checks if token is revoked (revoked_at is not None)
+  - Checks if token exists in database
+  - Generates new access_token
+  - Returns RefreshResponse with new access_token and expires_in
+- Implemented POST /api/v2/auth/logout endpoint (US-116)
+  - Accepts refresh_token in request body
+  - Sets revoked_at timestamp on refresh_token in database
+  - Returns success response (idempotent - succeeds even if token not found)
+
+**Files changed:**
+- api_service/app/api/v2/auth.py (new) - 340+ lines of authentication endpoints
+- prd.json (updated - US-113, US-114, US-115, US-116 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: Use UserInfo.model_validate(user) to convert SQLAlchemy model to Pydantic
+- Patterns discovered: Use HTTPException 400 for validation errors, 401 for auth failures
+- Patterns discovered: Revoke old refresh tokens on login to enforce single active session per user
+- Patterns discovered: Logout endpoint should be idempotent (succeed even if token already revoked)
+- Gotchas encountered: For logout, client must send refresh_token in request body (no auth header)
+- Gotchas encountered: Use and_() from sqlalchemy to combine multiple WHERE conditions
+- Useful context: Access token expires in 30 minutes, refresh token in 7 days
+- Useful context: Refresh tokens are stored in database to enable revocation
+- Useful context: Token type ("access"/"refresh") is validated using verify_token()
+
+**Acceptance Criteria Met:**
+- US-113: Create api_service/app/api/v2/auth.py: PASS (file created)
+- US-113: POST /api/v2/auth/register accepts phone/password/nickname: PASS (UserRegister model)
+- US-113: Hash password before storage: PASS (create_user calls hash_password)
+- US-113: Return access_token and refresh_token: PASS (returns in RegisterResponse)
+- US-113: Validate phone/email uniqueness: PASS (check_phone_exists, check_email_exists)
+- US-113: Typecheck passes: PASS
+- US-114: POST /api/v2/auth/login accepts phone/password: PASS (UserLogin model)
+- US-114: Verify password correctness: PASS (authenticate_user)
+- US-114: Generate tokens: PASS (create_access_token, create_refresh_token)
+- US-114: Store refresh_token: PASS (RefreshToken ORM instance saved)
+- US-114: Error handling: PASS (HTTPException 401 for invalid credentials)
+- US-115: Validate token validity: PASS (verify_token, is_token_expired)
+- US-115: Check if revoked: PASS (query RefreshToken.revoked_at.is_(None))
+- US-115: Generate new access_token: PASS (create_access_token)
+- US-116: Revoke refresh_token: PASS (set revoked_at = datetime.now())
+- US-116: Return success response: PASS (LogoutResponse)
+
+**Key Features:**
+1. User Registration: POST /api/v2/auth/register with validation and token generation
+2. User Login: POST /api/v2/auth/login with credential verification
+3. Token Refresh: POST /api/v2/auth/refresh for obtaining new access tokens
+4. User Logout: POST /api/v2/auth/logout to revoke refresh tokens
+5. Refresh Token Management: Database-backed with expiration and revocation
+6. Security Measures: Single active session per user, token revocation on logout
+7. Error Handling: Appropriate HTTP status codes and error messages
+
+**Usage:**
+```python
+from fastapi import FastAPI
+from api_service.app.api.v2 import auth
+
+app = FastAPI()
+app.include_router(auth.router, prefix="/api/v2/auth", tags=["Authentication"])
+
+# Registration
+POST /api/v2/auth/register
+{
+    "phone": "13800138000",
+    "password": "abc12345",
+    "nickname": "张三"
+}
+
+# Login
+POST /api/v2/auth/login
+{
+    "phone": "13800138000",
+    "password": "abc12345"
+}
+
+# Refresh Token
+POST /api/v2/auth/refresh
+{
+    "refresh_token": "eyJhbGci..."
+}
+
+# Logout
+POST /api/v2/auth/logout
+{
+    "refresh_token": "eyJhbGci..."
+}
+```
+
+**Codebase Patterns Added:**
+- Use UserInfo.model_validate(user) to convert SQLAlchemy ORM to Pydantic v2 model
+- Use and_() from sqlalchemy to combine multiple WHERE clause conditions
+- Set revoked_at timestamp for soft delete pattern on refresh tokens
+- Use HTTPException 401 for authentication failures with WWW-Authenticate header
