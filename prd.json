@@ -2194,8 +2194,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 68,
-    "pending_stories": 62,
+    "completed_stories": 103,
+    "pending_stories": 27,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
