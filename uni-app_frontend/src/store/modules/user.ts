@@ -1,13 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { request, getToken, setTokens, clearTokens } from '@/utils/request'
+import { request, getToken, setTokens, clearTokens, isUniApp } from '@/utils/request'
 
 interface UserInfo {
   id: string
-  phone: string
-  nickname: string
+  phone?: string
+  nickname?: string
   avatar_url?: string
-  created_at: string
+  openid?: string
+  openid_type?: string
+  email?: string
+  created_at?: string
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -105,6 +108,106 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  /**
+   * WeChat mini-program login
+   * Call wx.login() to get code, then exchange for JWT tokens
+   */
+  async function wechatLogin(nickname?: string, avatarUrl?: string) {
+    if (!isUniApp) {
+      throw new Error('WeChat login is only available in mini-program environment')
+    }
+
+    try {
+      // Call wx.login() to get code
+      const loginRes = await uni.login({
+        provider: 'weixin'
+      })
+
+      if (!loginRes.code) {
+        throw new Error('获取微信登录凭证失败')
+      }
+
+      // Send code to backend
+      const response = await request<{
+        access_token: string
+        refresh_token: string
+        user: UserInfo
+      }>({
+        url: '/auth/wechat',
+        method: 'POST',
+        data: {
+          code: loginRes.code,
+          nickname,
+          avatar_url: avatarUrl
+        }
+      })
+
+      if (response.success && response.data) {
+        setAccessToken(response.data.access_token, response.data.refresh_token)
+        setUserInfo(response.data.user)
+        return true
+      }
+
+      return false
+    } catch (error: any) {
+      console.error('WeChat login failed:', error)
+      if (error?.message) {
+        throw error
+      }
+      throw new Error('微信登录失败，请稍后重试')
+    }
+  }
+
+  /**
+   * Douyin mini-program login
+   * Call tt.login() to get code, then exchange for JWT tokens
+   */
+  async function douyinLogin(nickname?: string, avatarUrl?: string) {
+    if (!isUniApp) {
+      throw new Error('Douyin login is only available in mini-program environment')
+    }
+
+    try {
+      // Call tt.login() to get code
+      const loginRes = await uni.login({
+        provider: 'douyin'
+      })
+
+      if (!loginRes.code) {
+        throw new Error('获取抖音登录凭证失败')
+      }
+
+      // Send code to backend
+      const response = await request<{
+        access_token: string
+        refresh_token: string
+        user: UserInfo
+      }>({
+        url: '/auth/douyin',
+        method: 'POST',
+        data: {
+          code: loginRes.code,
+          nickname,
+          avatar_url: avatarUrl
+        }
+      })
+
+      if (response.success && response.data) {
+        setAccessToken(response.data.access_token, response.data.refresh_token)
+        setUserInfo(response.data.user)
+        return true
+      }
+
+      return false
+    } catch (error: any) {
+      console.error('Douyin login failed:', error)
+      if (error?.message) {
+        throw error
+      }
+      throw new Error('抖音登录失败，请稍后重试')
+    }
+  }
+
   return {
     token,
     userInfo,
@@ -114,7 +217,9 @@ export const useUserStore = defineStore('user', () => {
     logout,
     fetchUserInfo,
     login,
-    register
+    register,
+    wechatLogin,
+    douyinLogin
   }
 }, {
   persist: true

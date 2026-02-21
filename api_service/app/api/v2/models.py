@@ -199,6 +199,72 @@ class RefreshRequest(BaseModel):
     )
 
 
+class WeChatLoginRequest(BaseModel):
+    """
+    WeChat mini-program login request model.
+
+    Used for WeChat mini-program authentication.
+    The frontend calls wx.login() to get a code, then sends it to backend.
+    Backend exchanges code for openid and session_key via WeChat API.
+
+    Attributes:
+        code: WeChat login code from wx.login()
+        nickname: User nickname (optional, from wx.getUserInfo())
+        avatar_url: User avatar URL (optional, from wx.getUserInfo())
+
+    Example:
+        >>> wechat_login = WeChatLoginRequest(code="0x1234567890")
+    """
+
+    code: str = Field(
+        ...,
+        description="微信登录凭证（wx.login()获取）",
+        min_length=1
+    )
+    nickname: Optional[str] = Field(
+        None,
+        description="用户昵称",
+        max_length=50
+    )
+    avatar_url: Optional[str] = Field(
+        None,
+        description="用户头像URL"
+    )
+
+
+class DouyinLoginRequest(BaseModel):
+    """
+    Douyin mini-program login request model.
+
+    Used for Douyin mini-program authentication.
+    The frontend calls tt.login() to get a code, then sends it to backend.
+    Backend exchanges code for openid via Douyin API.
+
+    Attributes:
+        code: Douyin login code from tt.login()
+        nickname: User nickname (optional)
+        avatar_url: User avatar URL (optional)
+
+    Example:
+        >>> douyin_login = DouyinLoginRequest(code="1234567890")
+    """
+
+    code: str = Field(
+        ...,
+        description="抖音登录凭证（tt.login()获取）",
+        min_length=1
+    )
+    nickname: Optional[str] = Field(
+        None,
+        description="用户昵称",
+        max_length=50
+    )
+    avatar_url: Optional[str] = Field(
+        None,
+        description="用户头像URL"
+    )
+
+
 # ============================================================================
 # Authentication Response Models
 # ============================================================================

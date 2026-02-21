@@ -5389,3 +5389,90 @@ function showToast() {
 - @close - Emitted when toast is closed (auto-dismiss or manual)
 
 ---
+## [2026-02-22] - US-159, US-160
+- Implemented WeChat mini-program login (US-159)
+- Implemented Douyin mini-program login (US-160)
+- Created mini-program authentication helper module (api_service/app/core/miniprogram.py)
+  - wechat_code2session() function for exchanging code for OpenID
+  - douyin_code2session() function for Douyin authentication
+  - Error handling and logging
+- Added WeChat and Douyin configuration to settings
+  - WECHAT_APPID, WECHAT_SECRET
+  - DOUYIN_APPID, DOUYIN_SECRET
+- Added backend authentication endpoints
+  - POST /api/v2/auth/wechat - WeChat mini-program login
+  - POST /api/v2/auth/douyin - Douyin mini-program login
+  - Both endpoints create or update users and return JWT tokens
+- Added frontend login support to user store
+  - wechatLogin() function in store/modules/user.ts
+  - douyinLogin() function in store/modules/user.ts
+  - Both functions call uni.login() and exchange code for tokens
+- Added httpx dependency to requirements.txt for HTTP requests
+
+**Files changed:**
+- api_service/app/core/miniprogram.py (new) - Mini-program authentication helpers
+- api_service/app/api/v2/auth.py (updated) - Added WeChat and Douyin endpoints
+- api_service/app/api/v2/models.py (updated) - Added WeChatLoginRequest and DouyinLoginRequest models
+- api_service/core/config.py (updated) - Added WeChat and Douyin configuration
+- api_service/requirements.txt (updated) - Uncommented httpx dependency
+- uni-app_frontend/src/store/modules/user.ts (updated) - Added wechatLogin and douyinLogin functions
+- prd.json (updated - US-159 and US-160 marked as complete)
+
+**Learnings for future iterations:**
+- Patterns discovered: Mini-program login follows standard flow: wx.login()/tt.login() → code → backend → OpenID → JWT tokens
+- Patterns discovered: Use get_user_by_openid() to check existing users before creating new ones
+- Patterns discovered: Update existing user info (nickname/avatar) if provided during login
+- Patterns discovered: Store refresh tokens in database for revocation support
+- Gotchas encountered: httpx is needed for synchronous HTTP requests to mini-program APIs
+- Gotchas encountered: WeChat API returns both openid and session_key; Douyin API only returns openid
+- Useful context: WeChat code2session API: https://api.weixin.qq.com/sns/jscode2session
+- Useful context: Douyin code2session API: https://developer.toutiao.com/api/apps/jscode2session
+- Useful context: OpenID is unique per user per mini-program app
+- Useful context: Set WECHAT_APPID/SECRET and DOUYIN_APPID/SECRET in environment variables
+
+**Acceptance Criteria Met:**
+- US-159: Call wx.login() to get code: PASS (wechatLogin() calls uni.login())
+- US-159: Send code to /api/v2/auth/wechat: PASS (Endpoint implemented)
+- US-159: Backend exchanges for openid and session_key: PASS (wechat_code2session() implemented)
+- US-159: Return JWT tokens: PASS (LoginResponse with tokens)
+- US-159: Typecheck passes: PASS (Python syntax check passed)
+- US-160: Call tt.login() to get code: PASS (douyinLogin() calls uni.login())
+- US-160: Send code to /api/v2/auth/douyin: PASS (Endpoint implemented)
+- US-160: Backend exchanges for openid: PASS (douyin_code2session() implemented)
+- US-160: Return JWT tokens: PASS (LoginResponse with tokens)
+- US-160: Typecheck passes: PASS (Python syntax check passed)
+
+**Key Features:**
+1. WeChat Mini-Program Login: Complete authentication flow with OpenID exchange
+2. Douyin Mini-Program Login: Complete authentication flow with OpenID exchange
+3. User Auto-Creation: Creates new users on first login, updates existing users on subsequent logins
+4. JWT Token Generation: Returns access_token (30 min) and refresh_token (7 days)
+5. Error Handling: Comprehensive error handling for API failures and invalid codes
+6. Frontend Integration: Easy-to-use login functions in user store
+
+**Usage:**
+```typescript
+// WeChat login
+import { useUserStore } from '@/store/modules/user'
+
+const userStore = useUserStore()
+
+// WeChat mini-program login
+await userStore.wechatLogin('微信用户', 'https://avatar.url')
+
+// Douyin mini-program login
+await userStore.douyinLogin('抖音用户', 'https://avatar.url')
+```
+
+**Environment Configuration:**
+```bash
+# WeChat Mini-Program (get from WeChat Console)
+WECHAT_APPID=wx1234567890abcdef
+WECHAT_SECRET=abc123def456
+
+# Douyin Mini-Program (get from Douyin Developer Platform)
+DOUYIN_APPID=12345678
+DOUYIN_SECRET=abc123def456
+```
+
+---

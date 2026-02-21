@@ -35,12 +35,17 @@ from api_service.app.api.v2.models import (
     RefreshResponse,
     LogoutResponse,
     UserInfo,
+    WeChatLoginRequest,
+    DouyinLoginRequest,
 )
 from api_service.app.core.auth import (
     create_user,
     authenticate_user,
     check_phone_exists,
     check_email_exists,
+    get_user_by_openid,
+    check_openid_exists,
+    update_user,
 )
 from api_service.app.core.security import (
     hash_password,
@@ -377,6 +382,252 @@ async def logout(
     return LogoutResponse(
         success=True,
         message="退出登录成功",
+    )
+
+
+# ============================================================================
+# WeChat Mini-Program Login Endpoint (US-159)
+# ============================================================================
+
+@router.post("/wechat", response_model=LoginResponse)
+async def wechat_login(
+    wechat_data: WeChatLoginRequest,
+    db: Session = Depends(get_db),
+) -> LoginResponse:
+    """
+    WeChat mini-program login endpoint.
+
+    This endpoint handles WeChat mini-program authentication:
+    1. Receives WeChat login code from frontend (wx.login())
+    2. Exchanges code for OpenID via WeChat API
+    3. Finds or creates user account
+    4. Returns JWT tokens
+
+    Args:
+        wechat_data: WeChat login data (code, optional nickname, optional avatar_url)
+        db: Database session
+
+    Returns:
+        LoginResponse with access_token, refresh_token, and user info
+
+    Raises:
+        HTTPException 400: If WeChat API call fails
+        HTTPException 500: If server error occurs
+
+    Example:
+        POST /api/v2/auth/wechat
+        {
+            "code": "0x1234567890",
+            "nickname": "微信用户",
+            "avatar_url": "https://..."
+        }
+    """
+    # Import here to avoid circular imports
+    from api_service.app.core.miniprogram import wechat_code2session
+
+    try:
+        # Exchange code for OpenID
+        openid, session_key = wechat_code2session(wechat_data.code)
+    except ValueError as e:
+        logger.error(f"WeChat code2session failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"微信登录失败: {str(e)}",
+        )
+
+    # Check if user exists
+    user = get_user_by_openid(db, openid=openid, openid_type="wechat")
+
+    if user is None:
+        # Create new user
+        try:
+            nickname = wechat_data.nickname or "微信用户"
+            user = create_user(
+                db,
+                openid=openid,
+                openid_type="wechat",
+                nickname=nickname,
+                avatar_url=wechat_data.avatar_url,
+            )
+            logger.info(f"New WeChat user created: {user.id} (openid={openid})")
+        except Exception as e:
+            logger.error(f"Failed to create WeChat user: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="创建用户失败",
+            )
+    else:
+        # Update existing user info if provided
+        if wechat_data.nickname or wechat_data.avatar_url:
+            user = update_user(
+                db,
+                user,
+                nickname=wechat_data.nickname,
+                avatar_url=wechat_data.avatar_url,
+            )
+            logger.info(f"WeChat user info updated: {user.id}")
+
+    # Generate tokens
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+
+    # Store refresh token in database
+    # Revoke any existing active refresh tokens for this user
+    from sqlalchemy import select
+    from sqlalchemy import and_
+
+    existing_tokens_stmt = select(RefreshToken).where(
+        and_(
+            RefreshToken.user_id == user.id,
+            RefreshToken.revoked_at.is_(None),
+        )
+    )
+    existing_tokens = db.execute(existing_tokens_stmt).scalars().all()
+
+    # Revoke old tokens for security
+    for old_token in existing_tokens:
+        old_token.revoked_at = datetime.now()
+
+    # Add new refresh token
+    db_refresh_token = RefreshToken(
+        user_id=user.id,
+        token=refresh_token,
+        expires_at=datetime.now() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+    )
+    db.add(db_refresh_token)
+    db.commit()
+
+    logger.info(f"WeChat user logged in: {user.id}")
+
+    return LoginResponse(
+        success=True,
+        message="登录成功",
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user=UserInfo.model_validate(user),
+    )
+
+
+# ============================================================================
+# Douyin Mini-Program Login Endpoint (US-160)
+# ============================================================================
+
+@router.post("/douyin", response_model=LoginResponse)
+async def douyin_login(
+    douyin_data: DouyinLoginRequest,
+    db: Session = Depends(get_db),
+) -> LoginResponse:
+    """
+    Douyin mini-program login endpoint.
+
+    This endpoint handles Douyin mini-program authentication:
+    1. Receives Douyin login code from frontend (tt.login())
+    2. Exchanges code for OpenID via Douyin API
+    3. Finds or creates user account
+    4. Returns JWT tokens
+
+    Args:
+        douyin_data: Douyin login data (code, optional nickname, optional avatar_url)
+        db: Database session
+
+    Returns:
+        LoginResponse with access_token, refresh_token, and user info
+
+    Raises:
+        HTTPException 400: If Douyin API call fails
+        HTTPException 500: If server error occurs
+
+    Example:
+        POST /api/v2/auth/douyin
+        {
+            "code": "1234567890",
+            "nickname": "抖音用户",
+            "avatar_url": "https://..."
+        }
+    """
+    # Import here to avoid circular imports
+    from api_service.app.core.miniprogram import douyin_code2session
+
+    try:
+        # Exchange code for OpenID
+        openid = douyin_code2session(douyin_data.code)
+    except ValueError as e:
+        logger.error(f"Douyin code2session failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"抖音登录失败: {str(e)}",
+        )
+
+    # Check if user exists
+    user = get_user_by_openid(db, openid=openid, openid_type="douyin")
+
+    if user is None:
+        # Create new user
+        try:
+            nickname = douyin_data.nickname or "抖音用户"
+            user = create_user(
+                db,
+                openid=openid,
+                openid_type="douyin",
+                nickname=nickname,
+                avatar_url=douyin_data.avatar_url,
+            )
+            logger.info(f"New Douyin user created: {user.id} (openid={openid})")
+        except Exception as e:
+            logger.error(f"Failed to create Douyin user: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="创建用户失败",
+            )
+    else:
+        # Update existing user info if provided
+        if douyin_data.nickname or douyin_data.avatar_url:
+            user = update_user(
+                db,
+                user,
+                nickname=douyin_data.nickname,
+                avatar_url=douyin_data.avatar_url,
+            )
+            logger.info(f"Douyin user info updated: {user.id}")
+
+    # Generate tokens
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+
+    # Store refresh token in database
+    # Revoke any existing active refresh tokens for this user
+    from sqlalchemy import select
+    from sqlalchemy import and_
+
+    existing_tokens_stmt = select(RefreshToken).where(
+        and_(
+            RefreshToken.user_id == user.id,
+            RefreshToken.revoked_at.is_(None),
+        )
+    )
+    existing_tokens = db.execute(existing_tokens_stmt).scalars().all()
+
+    # Revoke old tokens for security
+    for old_token in existing_tokens:
+        old_token.revoked_at = datetime.now()
+
+    # Add new refresh token
+    db_refresh_token = RefreshToken(
+        user_id=user.id,
+        token=refresh_token,
+        expires_at=datetime.now() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+    )
+    db.add(db_refresh_token)
+    db.commit()
+
+    logger.info(f"Douyin user logged in: {user.id}")
+
+    return LoginResponse(
+        success=True,
+        message="登录成功",
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user=UserInfo.model_validate(user),
     )
 
 

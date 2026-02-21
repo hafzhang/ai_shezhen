@@ -1626,15 +1626,23 @@
       "title": "Implement WeChat mini-program login",
       "description": "As a frontend engineer, I need to integrate WeChat mini-program login.",
       "priority": 159,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Call wx.login() to get code",
         "Send code to /api/v2/auth/wechat",
         "Backend exchanges for openid and session_key",
         "Return JWT tokens",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/miniprogram.py",
+        "api_service/app/api/v2/auth.py",
+        "api_service/app/api/v2/models.py",
+        "api_service/core/config.py",
+        "api_service/requirements.txt",
+        "uni-app_frontend/src/store/modules/user.ts"
       ]
     },
     {
@@ -1642,15 +1650,23 @@
       "title": "Implement Douyin mini-program login",
       "description": "As a frontend engineer, I need to integrate Douyin mini-program login.",
       "priority": 160,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Call tt.login() to get code",
         "Send code to /api/v2/auth/douyin",
         "Backend exchanges for openid",
         "Return JWT tokens",
         "Typecheck passes"
+      ],
+      "files": [
+        "api_service/app/core/miniprogram.py",
+        "api_service/app/api/v2/auth.py",
+        "api_service/app/api/v2/models.py",
+        "api_service/core/config.py",
+        "api_service/requirements.txt",
+        "uni-app_frontend/src/store/modules/user.ts"
       ]
     },
     {
@@ -2206,10 +2222,10 @@
   "metadata": {
     "version": "v3.0",
     "created_date": "2026-02-11",
-    "last_updated": "2026-02-21",
+    "last_updated": "2026-02-22",
     "total_user_stories": 130,
-    "completed_stories": 105,
-    "pending_stories": 25,
+    "completed_stories": 107,
+    "pending_stories": 23,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true

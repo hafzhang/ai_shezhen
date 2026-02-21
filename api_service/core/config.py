@@ -124,6 +124,18 @@ class Settings(BaseSettings):
     # Refresh token expiration time (days)
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # WeChat Mini-Program Configuration (US-159)
+    # Get these from WeChat Mini Program Console
+    # https://mp.weixin.qq.com/
+    WECHAT_APPID: Optional[str] = None
+    WECHAT_SECRET: Optional[str] = None
+
+    # Douyin Mini-Program Configuration (US-160)
+    # Get these from Douyin Developer Platform
+    # https://developer.open-douyin.com/
+    DOUYIN_APPID: Optional[str] = None
+    DOUYIN_SECRET: Optional[str] = None
+
     # Circuit Breaker Configuration (task-4-8)
     CIRCUIT_BREAKER_FAILURE_THRESHOLD: int = 5
     CIRCUIT_BREAKER_SUCCESS_THRESHOLD: int = 2
