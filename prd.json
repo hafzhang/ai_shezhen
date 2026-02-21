@@ -1117,15 +1117,19 @@
       "title": "Add database indexes for query optimization",
       "description": "As a backend engineer, I need to add composite indexes for common queries.",
       "priority": 135,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 2: Data Persistence",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Add composite index (user_id, created_at DESC) on diagnosis_history",
         "Add composite index (user_id, record_type) on health_records",
         "Create new migration file",
         "Migration executes successfully",
         "Typecheck passes"
+      ],
+      "files": [
+        "alembic/versions/20260221_us105_create_diagnosis_history_table.py",
+        "alembic/versions/20260221_us106_create_health_records_table.py"
       ]
     },
     {

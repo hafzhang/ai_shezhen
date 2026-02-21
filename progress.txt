@@ -3439,3 +3439,59 @@ curl -X POST "http://localhost:8000/api/v2/users/me/associate-diagnoses" \
    - 头像上传/信息响应
 
 ---
+
+## [2026-02-21] - US-135
+- 验证了数据库索引已存在
+  - ix_diagnosis_history_user_id_created_at (user_id, created_at DESC)
+  - ix_health_records_user_id_record_type (user_id, record_type)
+- 索引在原始表迁移中创建 (US-105, US-106)
+- 无需创建新迁移文件
+
+**Files checked:**
+- alembic/versions/20260221_us105_create_diagnosis_history_table.py (verified)
+- alembic/versions/20260221_us106_create_health_records_table.py (verified)
+- prd.json (updated) - US-135 marked as complete
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: 复合索引格式为 (user_id, created_at DESC)
+- Patterns discovered: 索引命名约定: ix_{table}_{column1}_{column2}
+- Patterns discovered: DESC关键字用于降序索引
+- Useful context: 复合索引支持索引覆盖扫描优化查询
+- Useful context: (user_id, created_at DESC)索引优化用户历史查询
+
+**Acceptance Criteria Met:**
+- Composite index (user_id, created_at DESC) on diagnosis_history: PASS (已存在)
+- Composite index (user_id, record_type) on health_records: PASS (已存在)
+- Create new migration file: N/A (索引已存在)
+- Migration executes successfully: PASS (原始迁移已执行)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. 诊断历史索引:
+   - ix_diagnosis_history_user_id_created_at (user_id, created_at DESC)
+   - ix_diagnosis_history_tongue_image_id
+   - ix_diagnosis_history_created_at
+   - GIN索引用于JSONB字段
+2. 健康档案索引:
+   - ix_health_records_user_id_record_type (user_id, record_type)
+   - ix_health_records_user_id_record_date (user_id, record_date DESC)
+   - ix_health_records_record_date
+   - ix_health_records_created_at
+   - GIN索引用于JSONB字段
+
+**Index Usage:**
+```sql
+-- 用户诊断历史查询（使用ix_diagnosis_history_user_id_created_at）
+SELECT * FROM diagnosis_history 
+WHERE user_id = ? 
+ORDER BY created_at DESC 
+LIMIT 20;
+
+-- 用户健康档案按类型查询（使用ix_health_records_user_id_record_type）
+SELECT * FROM health_records 
+WHERE user_id = ? AND record_type = 'blood_pressure'
+ORDER BY created_at DESC;
+```
+
+---
