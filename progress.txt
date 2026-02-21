@@ -3606,3 +3606,67 @@ app.use(uviewPlus)
 - 建议后续使用HBuilderX创建标准uni-app项目，或配置@dcloudio/vite-plugin-uni
 
 ---
+
+## [2026-02-21] - US-138
+- 实现了统一的API请求封装（utils/request.ts）
+- 添加了存储抽象层，支持uni.getStorageSync和localStorage
+- 添加了fetch API后备方案，支持H5环境
+- 添加了便捷方法（http.get/post/put/delete）
+- 实现了Token刷新逻辑，支持并发请求队列
+- 自动重试机制，401错误时自动刷新token并重试
+- 统一错误处理，中文错误提示
+- 导出isUniApp标志用于环境检测
+
+**Files changed:**
+- uni-app_frontend/src/utils/request.ts (updated - dual-mode uni-app + web support)
+
+**Learnings for future iterations:**
+- Patterns discovered: 使用typeof uni !== "undefined"检测uni-app环境
+- Patterns discovered: 使用抽象层统一不同平台的API差异（storage、request、navigation）
+- Patterns discovered: Token刷新使用队列机制，避免多个请求同时刷新token
+- Gotchas encountered: fetch API不支持timeout，需要使用AbortController实现
+- Gotchas encountered: uni.request和fetch的响应结构不同，需要统一处理
+- Useful context: localStorage仅支持字符串，需要JSON.stringify/parse处理对象
+- Useful context: AbortController的abort()会触发Promise reject，需要特殊处理超时错误
+- Useful context: uni-app环境使用uni.getStorageSync，H5环境使用localStorage
+
+**Acceptance Criteria Met:**
+- Create utils/request.js: PASS (request.ts already existed, updated with dual-mode support)
+- Wrap uni.request(): PASS (wraps uni.request for uni-app environment)
+- Auto add Authorization header: PASS (Bearer token automatically added)
+- Unified error handling: PASS (with Chinese error messages)
+- Token refresh logic: PASS (with queue support for concurrent requests)
+- Typecheck passes: PARTIAL (code is valid TypeScript; vue-tsc has Node.js v24 compatibility issue)
+
+**Key Features:**
+1. Dual-Mode Support: 自动检测uni-app/web环境，使用对应API
+2. Storage Abstraction: 统一存储接口，自动选择存储方式
+3. Token Management: 自动刷新、并发请求队列、失败跳转登录
+4. Error Handling: 超时、网络错误、业务错误的统一处理
+5. Convenience Methods: http.get/post/put/delete 简化API调用
+
+**Usage:**
+```typescript
+import { http, getToken, setTokens, clearTokens } from "@/utils/request"
+
+// 使用便捷方法
+const response = await http.get<UserInfo>("/users/me")
+const result = await http.post("/auth/login", { phone, password })
+
+// 处理token
+setTokens(accessToken, refreshToken)
+clearTokens()
+
+// 检查环境
+import { isUniApp } from "@/utils/request"
+if (isUniApp) {
+  // uni-app specific code
+}
+```
+
+**Notes:**
+- 文件已存在（US-136时创建），本次更新增加了web环境支持
+- BASE_URL在开发环境使用/api（代理到localhost:8000），生产环境使用真实API地址
+- Token刷新使用队列机制，多个并发401请求只会触发一次刷新
+
+---
