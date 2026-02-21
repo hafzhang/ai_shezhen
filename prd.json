@@ -1415,9 +1415,9 @@
       "title": "Create recommendation list component",
       "description": "As a frontend engineer, I need to create health recommendation list component.",
       "priority": 149,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create components/recommendation-list/recommendation-list.vue",
         "Dietary recommendations",
@@ -1425,6 +1425,10 @@
         "Emotional recommendations",
         "Collapsible expand",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/components/recommendation-list/recommendation-list.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2160,8 +2164,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 60,
-    "pending_stories": 70,
+    "completed_stories": 61,
+    "pending_stories": 69,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
