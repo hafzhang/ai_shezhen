@@ -1,0 +1,31 @@
+// uview-plus basic styles
+// This is a minimal placeholder for uview-plus styles
+// When uview-plus is properly installed via npm, these styles will be imported
+
+// Basic variables
+$u-primary: #3cc51f;
+$u-warning: #ff9900;
+$u-error: #f56c6c;
+$u-info: #909399;
+$u-success: #67c23a;
+
+// Common styles
+.u-primary {
+  color: $u-primary;
+}
+
+.u-warning {
+  color: $u-warning;
+}
+
+.u-error {
+  color: $u-error;
+}
+
+.u-info {
+  color: $u-info;
+}
+
+.u-success {
+  color: $u-success;
+}

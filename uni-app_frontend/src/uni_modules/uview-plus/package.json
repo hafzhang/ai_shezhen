@@ -1,0 +1,22 @@
+{
+  "id": "uview-plus",
+  "displayName": "uview-plus UI组件库",
+  "version": "3.2.16",
+  "description": "uview-plus UI组件库，支持Vue3+TS",
+  "keywords": [
+    "uview-plus",
+    "uni-app",
+    "ui",
+    "vue3"
+  ],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^3.6.0"
+  },
+  "dcloudext": {
+    "category": [
+      "前端组件",
+      "通用组件"
+    ]
+  }
+}
