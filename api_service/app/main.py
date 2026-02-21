@@ -313,6 +313,22 @@ try:
 except ImportError as e:
     logger.warning(f"API v2 history endpoints not available: {e}")
 
+# Include API v2 health records router (US-128 - Health records management)
+try:
+    from api_service.app.api.v2 import health_records
+    app.include_router(health_records.router, prefix="/api/v2/health-records", tags=["Health Records"])
+    logger.info("API v2 health records endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 health records endpoints not available: {e}")
+
+# Include API v2 users router (US-129 - User management)
+try:
+    from api_service.app.api.v2 import users
+    app.include_router(users.router, prefix="/api/v2/users", tags=["Users"])
+    logger.info("API v2 users endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 users endpoints not available: {e}")
+
 
 # Root endpoint
 @app.get("/", tags=["Root"])
