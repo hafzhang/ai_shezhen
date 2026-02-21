@@ -1287,9 +1287,9 @@
       "title": "Create diagnosis page",
       "description": "As a frontend engineer, I need to create tongue diagnosis function page.",
       "priority": 143,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create pages/diagnosis/diagnosis.vue",
         "Camera button",
@@ -1299,6 +1299,11 @@
         "Submit diagnosis button",
         "Call /api/v2/diagnosis",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/pages/diagnosis/index.vue",
+        "uni-app_frontend/src/pages.json",
+        "uni-app_frontend/vite.config.ts"
       ]
     },
     {
@@ -1306,9 +1311,9 @@
       "title": "Create camera component",
       "description": "As a frontend engineer, I need to create tongue photo capture component.",
       "priority": 144,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Create components/tongue-camera/tongue-camera.vue",
         "Camera preview",
@@ -1317,6 +1322,10 @@
         "Album select button",
         "Emit photo-confirm event",
         "Verify in browser using dev-browser skill"
+      ],
+      "files": [
+        "uni-app_frontend/src/components/tongue-camera/tongue-camera.vue",
+        "uni-app_frontend/src/pages.json"
       ]
     },
     {
@@ -2137,8 +2146,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 56,
-    "pending_stories": 74,
+    "completed_stories": 57,
+    "pending_stories": 73,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true
