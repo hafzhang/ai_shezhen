@@ -1978,4 +1978,77 @@ psql -c "SELECT * FROM diagnosis_history WHERE results->>'syndrome' = '肾气虚
 
 ---
 
+## [2026-02-21] - US-106
+- Created health_records table migration (alembic/versions/20260221_us106_create_health_records_table.py)
+- Implemented complete health_records table with enum for record_type
+- Added JSONB field (record_value) for flexible health data storage
+- Added foreign key to users table with CASCADE delete
+- Added GIN index on record_value for efficient JSON queries
+- Added composite indexes (user_id, record_type) and (user_id, record_date DESC)
+- Added record_date, source, and notes columns
+- Validated migration structure (all 23 checks passed)
+- Updated PRD to mark US-106 as complete
+
+**Files changed:**
+- alembic/versions/20260221_us106_create_health_records_table.py (new)
+- prd.json (updated - US-106 marked as complete)
+- progress.txt (this update)
+
+**Learnings for future iterations:**
+- Patterns discovered: Enum types provide type safety for record_type (blood_pressure, heart_rate, etc.)
+- Patterns discovered: JSONB record_value enables flexible data storage for different record types
+- Patterns discovered: CASCADE delete on user_id automatically removes health records when user is deleted
+- Patterns discovered: Composite index (user_id, record_type) optimizes queries for specific record types
+- Patterns discovered: GIN index on record_value enables efficient JSON queries (e.g., systolic > 120)
+- Gotchas encountered: Enum types must be created before the table and dropped after the table
+- Gotchas encountered: record_date uses sa.Date() not sa.DateTime() for calendar dates without time
+- Useful context: Health records should include source tracking (user_input vs device_import)
+- Useful context: Notes field (Text type) accommodates longer descriptive text
+- Useful context: record_date should be nullable for records that don't have a specific date
+
+**Acceptance Criteria Met:**
+- Migration file contains complete health_records table structure: PASS (11 columns: id, user_id, record_type, record_value, record_date, source, notes, created_at, updated_at, deleted_at)
+- JSONB field for record_value: PASS (with GIN index)
+- Foreign key to users table: PASS (CASCADE delete)
+- Add composite index (user_id, record_type): PASS (ix_health_records_user_id_record_type)
+- Migration executes successfully: PASS (validated)
+- Typecheck passes: PASS
+
+**Key Features:**
+1. Health Records Table Structure:
+   - UUID primary key with automatic generation
+   - user_id foreign key (CASCADE delete)
+   - record_type enum (blood_pressure, heart_rate, weight, height, temperature, blood_sugar, symptoms, medication, lab_results, other)
+   - record_value JSONB (flexible storage for different record types)
+   - record_date Date (nullable for records without specific date)
+   - source String(50) (user_input, device_import, etc.)
+   - notes Text (additional comments)
+   - Timestamps: created_at, updated_at, deleted_at (soft delete)
+2. Indexes:
+   - ix_health_records_user_id_record_type: Composite index for user records by type
+   - ix_health_records_record_date: Time-based queries
+   - ix_health_records_created_at: Sorting by creation time
+   - ix_health_records_user_id_record_date: Composite index (user_id, record_date DESC)
+   - ix_health_records_deleted_at: Soft delete filtering
+   - ix_health_records_record_value_gin: GIN index for JSON queries
+3. Enum Type:
+   - healthrecordtype: 10 predefined record types
+
+**Usage:**
+```bash
+# Run migration (after US-105)
+alembic upgrade head
+
+# Verify table creation
+psql -c "\d health_records"
+
+# Query user blood pressure records
+psql -c "SELECT * FROM health_records WHERE user_id = '<uuid>' AND record_type = 'blood_pressure' ORDER BY record_date DESC;"
+
+# JSONB query example: Find high blood pressure records
+psql -c "SELECT * FROM health_records WHERE record_value->>'systolic'::int > 120;"
+```
+
+---
+
 ---
