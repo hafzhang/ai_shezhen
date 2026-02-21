@@ -21,6 +21,11 @@
 
       <!-- Records list -->
       <view class="records-list" v-else>
+        <!-- Pull to refresh indicator -->
+        <view class="refresh-indicator" v-if="isRefreshing">
+          <text class="refresh-text">正在刷新...</text>
+        </view>
+
         <!-- Loading state -->
         <view class="loading-state" v-if="isLoading">
           <text class="loading-text">加载中...</text>
@@ -222,6 +227,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { request } from '@/utils/request'
+import { onPullDownRefresh } from '@dcloudio/uni-app'
 
 interface HealthRecord {
   id: string
@@ -238,6 +244,7 @@ interface HealthRecord {
 // State
 const records = ref<HealthRecord[]>([])
 const isLoading = ref(false)
+const isRefreshing = ref(false)
 const hasMore = ref(false)
 const page = ref(1)
 const pageSize = 20
@@ -333,7 +340,7 @@ function resetForm() {
 }
 
 async function loadRecords(refresh = false) {
-  if (isLoading.value) return
+  if (isLoading.value && !refresh) return
 
   isLoading.value = true
   try {
@@ -370,6 +377,20 @@ async function loadRecords(refresh = false) {
     })
   } finally {
     isLoading.value = false
+  }
+}
+
+async function onRefresh() {
+  if (isRefreshing.value) return
+
+  isRefreshing.value = true
+  try {
+    await loadRecords(true)
+  } catch (error) {
+    console.error('Refresh failed:', error)
+  } finally {
+    isRefreshing.value = false
+    uni.stopPullDownRefresh()
   }
 }
 
@@ -484,6 +505,11 @@ function confirmDate() {
 onMounted(() => {
   loadRecords(true)
 })
+
+// Pull to refresh (uni-app API)
+onPullDownRefresh(() => {
+  onRefresh()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -559,6 +585,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.refresh-indicator {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.refresh-text {
+  font-size: 13px;
+  color: #999999;
 }
 
 .loading-state {

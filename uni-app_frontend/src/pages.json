@@ -92,7 +92,7 @@
       "path": "pages/health-records/index",
       "style": {
         "navigationBarTitleText": "健康档案",
-        "enablePullDownRefresh": false,
+        "enablePullDownRefresh": true,
         "navigationStyle": "custom"
       }
     }
