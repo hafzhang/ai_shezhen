@@ -55,6 +55,14 @@
         "enablePullDownRefresh": false,
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -67,7 +75,7 @@
   },
   "tabBar": {
     "color": "#7A7E83",
-    "selectedColor": "#3cc51f",
+    "selectedColor": "#667eea",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
     "list": [
@@ -82,6 +90,12 @@
         "iconPath": "static/tabbar/history.png",
         "selectedIconPath": "static/tabbar/history-active.png",
         "text": "历史"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "iconPath": "static/tabbar/profile.png",
+        "selectedIconPath": "static/tabbar/profile-active.png",
+        "text": "我的"
       }
     ]
   },
@@ -127,6 +141,11 @@
         "name": "诊断详情",
         "path": "pages/detail/index",
         "query": "id"
+      },
+      {
+        "name": "我的",
+        "path": "pages/profile/index",
+        "query": ""
       }
     ]
   }
