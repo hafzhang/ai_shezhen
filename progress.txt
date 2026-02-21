@@ -4291,3 +4291,76 @@ uni.redirectTo({
 await diagnosisStore.fetchDiagnosisDetail(diagnosisId.value)
 ```
 
+
+## [2026-02-21] - US-147
+- 实现了舌象特征显示组件（uni-app_frontend/src/components/feature-display/feature-display.vue）
+- 创建了6维度特征展示（舌色、舌形、苔色、苔质、舌下络脉、特殊特征）
+- 实现了置信度进度条（动态宽度、颜色区分）
+- 添加了特征图标（emoji图标：👅🔷🎨🧬🩸⭐）
+- 实现了可选摘要统计（主要特征数量、最高置信度）
+- 支持自定义高亮阈值（默认0.3）
+- 支持自定义颜色（活跃特征/非活跃特征）
+- 使用TongueFeatures类型（与diagnosis store类型一致）
+
+**Files changed:**
+- uni-app_frontend/src/components/feature-display/feature-display.vue (new) - 280+ lines of feature display component
+
+**Learnings for future iterations:**
+- Patterns discovered: uni-app组件使用<template> + <script setup lang="ts"> + <style lang="scss" scoped>结构
+- Patterns discovered: 组件Props使用interface定义，通过defineProps<Props>()和withDefaults()设置默认值
+- Patterns discovered: 进度条宽度使用style动态绑定:style="getBarStyle(value)"
+- Patterns discovered: 条件渲染使用v-if，条件class使用:class="{ active: condition }"
+- Gotchas encountered: 组件内部导入store类型时使用import type { TongueFeatures } from '@/store/modules/diagnosis'
+- Useful context: 特征值0-1范围，需要乘以100转换为百分比显示
+- Useful context: 活跃特征（高于阈值）使用不同颜色渐变突出显示
+- Useful context: 组件computed属性用于计算派生状态（如主要特征数量、最高置信度）
+
+**Acceptance Criteria Met:**
+- Create components/feature-display/feature-display.vue: PASS (组件已创建)
+- 6-dimension feature list: PASS (6个维度全部实现：舌色、舌形、苔色、苔质、舌下络脉、特殊特征)
+- Confidence progress bars: PASS (每个特征都有进度条，宽度按置信度百分比动态调整)
+- Feature icons: PASS (每个维度都有对应的emoji图标)
+
+**Key Features:**
+1. 6-Dimension Feature Display:
+   - 舌色（👅）: 淡红、红、绛、紫
+   - 舌形（🔷）: 胖大、瘦薄、齿痕、裂纹
+   - 苔色（🎨）: 白苔、黄苔、灰苔、黑苔
+   - 苔质（🧬）: 薄苔、厚苔、腻苔、剥苔
+   - 舌下络脉（🩸）: 正常、迂曲、扩张
+   - 特殊特征（⭐）: 瘀点、瘀斑、出血点
+2. Progress Bar Visualization:
+   - 动态宽度根据置信度（value * 100%）
+   - 活跃特征使用粉红渐变（#f093fb → #f5576c）
+   - 非活跃特征使用紫色渐变（#667eea → #764ba2）
+   - 支持自定义颜色
+3. Configurable Threshold:
+   - 默认阈值0.3，可通过props自定义
+   - 高于阈值的特征高亮显示
+   - 字体和颜色区分活跃状态
+4. Optional Summary Statistics:
+   - 主要特征数量统计
+   - 最高置信度显示
+   - 可通过showSummary prop控制
+
+**Usage:**
+```vue
+<template>
+  <FeatureDisplay
+    :features="diagnosis.features"
+    :threshold="0.3"
+    :show-summary="true"
+    active-color="linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 100%)"
+  />
+</template>
+
+<script setup lang="ts">
+import FeatureDisplay from '@/components/feature-display/feature-display.vue'
+import type { TongueFeatures } from '@/store/modules/diagnosis'
+
+const features: TongueFeatures = {
+  tongue_color: { 淡红: 0.1, 红: 0.75, 绛: 0.05, 紫: 0.1 },
+  // ... other dimensions
+}
+</script>
+```
