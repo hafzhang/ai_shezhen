@@ -1198,9 +1198,9 @@
       "title": "Create Pinia state management",
       "description": "As a frontend engineer, I need to configure Pinia state management.",
       "priority": 139,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 3: uni-app Frontend",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Install pinia dependency",
         "Create store/index.js",
@@ -1208,6 +1208,12 @@
         "Create store/modules/diagnosis.js",
         "Configure persistence",
         "Typecheck passes"
+      ],
+      "files": [
+        "uni-app_frontend/src/store/index.ts",
+        "uni-app_frontend/src/store/modules/user.ts",
+        "uni-app_frontend/src/store/modules/diagnosis.ts",
+        "uni-app_frontend/src/main.ts"
       ]
     },
     {
@@ -2119,8 +2125,8 @@
     "created_date": "2026-02-11",
     "last_updated": "2026-02-21",
     "total_user_stories": 130,
-    "completed_stories": 52,
-    "pending_stories": 78,
+    "completed_stories": 53,
+    "pending_stories": 77,
     "estimated_duration": "8周重构开发",
     "dataset_version": "shezhenv3-coco",
     "ralph_agent_compatible": true

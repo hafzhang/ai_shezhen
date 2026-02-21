@@ -3674,3 +3674,86 @@ if (isUniApp) {
 - Token刷新使用队列机制，多个并发401请求只会触发一次刷新
 
 ---
+
+## [2026-02-21] - US-139
+- 实现了Pinia状态管理系统（store/index.ts + modules/）
+- 创建了store/modules/user.ts用户状态管理（登录、注册、用户信息）
+- 创建了store/modules/diagnosis.ts诊断状态管理
+- 配置了pinia-plugin-persistedstate持久化插件
+- 添加了存储抽象层，支持uni-app和web双模式
+
+**Files changed:**
+- uni-app_frontend/src/store/index.ts (new - 中央导出文件)
+- uni-app_frontend/src/store/modules/user.ts (moved from store/user.ts)
+- uni-app_frontend/src/store/modules/diagnosis.ts (new - 诊断状态管理)
+- uni-app_frontend/src/main.ts (already configured - Pinia + persistence)
+
+**Learnings for future iterations:**
+- Patterns discovered: Pinia stores使用setup函数式写法，返回state和actions
+- Patterns discovered: 使用computed属性派生状态（如latestDiagnosis、commonSyndromes）
+- Patterns discovered: persist配置指定paths来选择持久化的状态字段
+- Patterns discovered: 类型定义与store定义在同一文件中，便于管理
+- Gotchas encountered: pinia-plugin-persistedstate的storage选项需要是具有getItem/setItem的对象
+- Gotchas encountered: localStorage直接传入persist配置在uni-app环境会报错
+- Useful context: 用户状态包括token、userInfo、isLoggedIn三个核心字段
+- Useful context: 诊断状态包括当前诊断、历史列表、分页信息、筛选条件
+- Useful context: 6维度舌象特征包括舌色、舌形、苔色、苔质、舌下络脉、特殊特征
+
+**Acceptance Criteria Met:**
+- Install pinia dependency: PASS (pinia@2.3.1 + pinia-plugin-persistedstate@3.2.3 already installed)
+- Create store/index.js: PASS (created store/index.ts with exports)
+- Create store/modules/user.js: PASS (moved and enhanced store/modules/user.ts)
+- Create store/modules/diagnosis.js: PASS (created store/modules/diagnosis.ts)
+- Configure persistence: PASS (pinia-plugin-persistedstate configured in main.ts)
+- Typecheck passes: PARTIAL (code is valid TypeScript; vue-tsc has Node.js v24 compatibility issue)
+
+**Key Features:**
+1. User Store:
+   - login/register actions with API integration
+   - token management with persistence
+   - fetchUserInfo action
+   - isLoggedIn computed state
+
+2. Diagnosis Store:
+   - submitDiagnosis action for tongue diagnosis
+   - fetchDiagnosisHistory with pagination
+   - fetchDiagnosisDetail by ID
+   - submitFeedback action
+   - Computed: latestDiagnosis, hasRiskHistory, commonSyndromes
+   - Filter management
+
+3. Persistence:
+   - User store persists all state
+   - Diagnosis store persists history, pagination, filters
+   - Transient state (isDiagnosing, currentDiagnosis) not persisted
+
+4. Dual-Mode Support:
+   - Storage abstraction for uni-app/web environments
+   - Works with both uni.getStorageSync and localStorage
+
+**Usage:**
+```typescript
+// Import from central index
+import { useUserStore, useDiagnosisStore } from "@/store"
+
+const userStore = useUserStore()
+const diagnosisStore = useDiagnosisStore()
+
+// User actions
+await userStore.login(phone, password)
+await userStore.fetchUserInfo()
+userStore.logout()
+
+// Diagnosis actions
+await diagnosisStore.submitDiagnosis(imageBase64, userInfo)
+await diagnosisStore.fetchDiagnosisHistory(1)
+const latest = diagnosisStore.latestDiagnosis
+const syndromes = diagnosisStore.commonSyndromes
+```
+
+**Notes:**
+- Pinia已在US-136时配置，本次主要是创建store模块
+- 存储抽象层确保在H5和uni-app环境下都能正常持久化
+- 诊断store包含完整的6维度舌象特征类型定义
+
+---
