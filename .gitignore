@@ -57,6 +57,14 @@ datasets/processed/
 .coverage
 htmlcov/
 
+# Playwright E2E Testing
+test-results/
+playwright-report/
+playwright/.cache/
+uni-app_frontend/e2e/screenshots/
+uni-app_frontend/e2e/videos/
+
+
 # OS
 .DS_Store
 Thumbs.db
