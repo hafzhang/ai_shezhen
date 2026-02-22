@@ -1917,9 +1917,9 @@
       "title": "Write diagnosis API tests",
       "description": "As a backend engineer, I need to write integration tests for diagnosis APIs.",
       "priority": 173,
-      "status": "pending",
+      "status": "in_progress",
       "phase": "Phase 4: Testing & Documentation",
-      "passes": false,
+      "passes": "partial",
       "acceptance_criteria": [
         "Test anonymous diagnosis",
         "Test authenticated user diagnosis",
