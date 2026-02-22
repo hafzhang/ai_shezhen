@@ -1,0 +1,69 @@
+[tool.pytest.ini_options]
+# Pytest configuration (duplicates pytest.ini for tool compatibility)
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "-ra",
+    "--showlocals",
+    "-v",
+    "-W default",
+]
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (slower, may use database/network)",
+    "slow: Slow tests (may take > 1 second)",
+    "database: Tests that require database access",
+    "auth: Tests related to authentication/authorization",
+    "model: Tests for database models",
+    "api: Tests for API endpoints",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+# Coverage configuration
+source = ["api_service"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/migrations/*",
+    "*/alembic/*",
+    "*/config.py",  # Skip config files
+]
+branch = true  # Enable branch coverage
+
+[tool.coverage.report]
+# Coverage report configuration
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    # Standard exclusions
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    # Type check blocks
+    "if typing.TYPE_CHECKING:",
+]
+
+[tool.coverage.html]
+# HTML report configuration
+directory = "htmlcov"
+
+[tool.coverage.xml]
+# XML report configuration (for CI/CD)
+output = "coverage.xml"
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
