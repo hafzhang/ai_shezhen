@@ -6724,3 +6724,72 @@ npm run build:mp-toutiao   # 抖音小程序构建
 ```
 
 ---
+
+## [2026-02-22] - US-179
+- Created comprehensive OpenAPI 3.0 API specification (docs/api_spec.yaml)
+- Documented all v2 endpoints across 5 modules:
+  - Authentication: register, login, refresh, logout, wechat, douyin
+  - Diagnosis: create, get detail, submit feedback
+  - History: list, statistics, trends
+  - Users: get/update profile, avatar management, associate anonymous diagnoses
+  - Health Records: CRUD operations
+- Added JWT authentication documentation
+- Included request/response examples for all endpoints
+- Defined reusable schema components for common models
+
+**Files changed:**
+- docs/api_spec.yaml (new) - 1750+ lines of OpenAPI 3.0 specification
+- prd.json (updated) - marked US-179 as completed
+
+**Learnings for future iterations:**
+- OpenAPI 3.0 specification provides comprehensive API documentation
+- Use schema components (schemas, responses, securitySchemes) for reusability
+- Include detailed examples for request bodies and responses
+- Document authentication requirements clearly with security schemes
+- Provide Chinese descriptions for Chinese-language APIs
+- Tag-related endpoints together for better organization
+---
+
+## [2026-02-22] - US-180
+- Created comprehensive uni-app user manual (docs/user_manual.md, 510 lines)
+- Documented user registration and login (phone, WeChat, Douyin, anonymous use)
+- Created detailed tongue diagnosis function guide (photo shooting, result interpretation)
+- Explained diagnosis results (6 dimension features, syndrome analysis, health recommendations)
+- Added diagnosis history instructions (view, detail, refresh, filter)
+- Added health records management guide (add/edit/delete, record types, statistics)
+- Created personal center documentation (profile, settings, account management)
+- Added FAQ section covering common questions about diagnosis, account, privacy, technical issues
+- Included appendix with TCM tongue diagnosis basics and reference materials
+
+**Files changed:**
+- docs/user_manual.md (new) - 510 lines comprehensive user manual
+- prd.json (updated) - US-180 marked as completed, metadata updated
+
+**Learnings for future iterations:**
+- Patterns discovered: User manual should follow task-based structure (how to do X) rather than feature-based
+- Patterns discovered: Include FAQ section to address common user questions proactively
+- Patterns discovered: Add visual examples and screenshots in documentation (planned for future)
+- Gotchas encountered: Markdown files need UTF-8 encoding with CRLF line endings for Windows compatibility
+- Useful context: User manual complements technical API documentation by focusing on end-user workflows
+- Useful context: Include safety warnings and medical disclaimers prominently for health-related apps
+- Useful context: Provide multiple platform support information (WeChat, Douyin, H5) in user-facing docs
+
+**Acceptance Criteria Met:**
+- Create docs/user_manual.md: PASS (510 lines comprehensive manual created)
+- Registration/login instructions: PASS (detailed phone, WeChat/Douyin login, anonymous use documentation)
+- Diagnosis function instructions: PASS (photo shooting guide, result interpretation, feedback flow)
+- History instructions: PASS (view history, details, refresh/filter functionality)
+- Health records instructions: PASS (CRUD operations, record types, statistics)
+- Typecheck passes: PASS (UTF-8 markdown file validated)
+
+**Key Features:**
+1. Quick Start Guide: Platform support, system requirements
+2. User Registration/Login: Phone registration, mini-program login, anonymous access
+3. Tongue Diagnosis: Photo shooting guide (environment, posture, tips), result interpretation
+4. Diagnosis History: View records, details, refresh/filter functionality
+5. Health Records: Add/edit records, record types (BP, blood sugar, weight, sleep, exercise)
+6. Personal Center: Profile management, account settings, privacy controls
+7. FAQ Section: Covers diagnosis, account, privacy, technical questions
+8. Appendix: TCM tongue diagnosis basics and references
+
+---
