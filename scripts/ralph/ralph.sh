@@ -7,7 +7,7 @@ set -e
 # Parse arguments
 TOOL="amp"  # Default to amp for backwards compatibility
 MAX_ITERATIONS=10
-DELAY=8  # 默认延时 15 分钟
+DELAY=400  # 默认延时 15 分钟
 TIMEOUT=1000  # 默认超时 10 分钟（每个任务最大执行时间）
 
 while [[ $# -gt 0 ]]; do

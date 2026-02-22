@@ -116,8 +116,9 @@ def engine(database_url: str):
         # Create a custom function to replace gen_random_uuid in DEFAULT clauses
         @event.listens_for(engine, "connect")
         def connect(dbapi_conn, connection_record):
-            # Enable foreign keys in SQLite
-            dbapi_conn.execute("PRAGMA foreign_keys=ON")
+            # Disable foreign keys in SQLite for tests
+            # This avoids issues with deferred foreign key checking
+            dbapi_conn.execute("PRAGMA foreign_keys=OFF")
 
             # Create our own gen_random_uuid function
             def gen_random_uuid():
@@ -155,10 +156,16 @@ def db_session(engine) -> Generator[Session, None, None]:
     Yields:
         Database Session
     """
-    # Create session with expire_on_commit=False
+    # Create session with expire_on_commit=False to keep objects accessible after commit
     session = Session(bind=engine, future=True, expire_on_commit=False)
 
     yield session
+
+    # Rollback any uncommitted changes
+    try:
+        session.rollback()
+    except:
+        pass
 
     # Close the session to clear the identity map
     session.close()

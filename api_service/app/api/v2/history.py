@@ -25,6 +25,7 @@ from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func, and_, or_, case
+from pydantic import BaseModel
 
 from api_service.app.api.deps import get_db, get_current_user
 from api_service.app.models.database import User, DiagnosisHistory
@@ -478,10 +479,6 @@ async def get_diagnosis_trends(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve trends: {str(e)}"
         )
-
-
-# Import BaseModel for response models
-from pydantic import BaseModel
 
 
 __all__ = [

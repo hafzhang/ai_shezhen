@@ -23,7 +23,7 @@ import time
 import base64
 import io
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Any, Dict
 
@@ -31,8 +31,9 @@ import numpy as np
 from PIL import Image
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
 
-from api_service.app.api.deps import get_db, get_optional_user
+from api_service.app.api.deps import get_db, get_optional_user, get_current_user
 from api_service.app.models.database import User, TongueImage, DiagnosisHistory
 from api_service.app.api.v2.models import APIResponse, DiagnosisRequest, DiagnosisResponse
 from api_service.core.config import settings
@@ -152,15 +153,15 @@ def calculate_file_hash(image: np.ndarray) -> str:
     return hashlib.sha256(image_bytes).hexdigest()
 
 
-def save_image_to_storage(image: np.ndarray, file_hash: str) -> str:
-    """Save image to storage and return the path
+def save_image_to_storage(image: np.ndarray, file_hash: str) -> tuple:
+    """Save image to storage and return the path and file size
 
     Args:
         image: numpy array of the image
         file_hash: SHA-256 hash of the image
 
     Returns:
-        Storage path where the image was saved
+        Tuple of (storage path, file size in bytes)
     """
     # Create storage directory if it doesn't exist
     storage_dir = Path(settings.MEDIA_ROOT) / "tongue_images"
@@ -175,9 +176,17 @@ def save_image_to_storage(image: np.ndarray, file_hash: str) -> str:
     else:
         image_rgb = image
     pil_image = Image.fromarray(image_rgb)
-    pil_image.save(str(file_path), format="PNG")
 
-    return str(file_path)
+    # Save to bytes buffer first to get file size
+    buffer = io.BytesIO()
+    pil_image.save(buffer, format="PNG")
+    image_bytes = buffer.getvalue()
+
+    # Write to file
+    with open(file_path, 'wb') as f:
+        f.write(image_bytes)
+
+    return str(file_path), len(image_bytes)
 
 
 @router.post("", response_model=DiagnosisResponse, tags=["Diagnosis"])
@@ -271,26 +280,34 @@ async def create_diagnosis(
         ).first()
 
         # If image doesn't exist, save it and create database record
-        if tongue_image is None:
-            storage_path = save_image_to_storage(image, file_hash)
+        is_new_image = tongue_image is None
+        tongue_image_id = None
+        if is_new_image:
+            storage_path, file_size = save_image_to_storage(image, file_hash)
 
             # Get image dimensions
             height, width = image.shape[:2] if len(image.shape) == 3 else image.shape
 
+            # Create tongue image record (will be processed, so set is_processed=True from start)
             tongue_image = TongueImage(
                 user_id=current_user.id if current_user else None,
                 file_hash=file_hash,
                 storage_path=storage_path,
                 width=width,
                 height=height,
-                file_size=len(io.BytesIO()),
+                file_size=file_size,
                 mime_type="image/png",
-                is_processed=False  # Will be set to True after processing
+                is_processed=True  # Set to True since we're about to process it
             )
             db.add(tongue_image)
             db.flush()  # Get the ID without committing
+            tongue_image_id = tongue_image.id
+            # Keep the tongue_image in the session to be committed together with diagnosis_history
         else:
-            logger.info(f"Image already exists in database: {tongue_image.id}")
+            # Store the ID for later use and keep the object for reference
+            tongue_image_id = tongue_image.id
+            # Don't expunge - keep it in the session for the transaction
+            logger.info(f"Image already exists in database: {tongue_image_id}")
 
         # Perform diagnosis using the pipeline
         timing = {}
@@ -338,14 +355,14 @@ async def create_diagnosis(
                 diagnosis_result = {
                     "primary_syndrome": rule_result.primary_syndrome,
                     "confidence": rule_result.confidence,
-                    "syndrome_analysis": rule_result.syndrome_analysis,
+                    "syndrome_analysis": rule_result.syndrome_description,
                     "tcm_theory": rule_result.tcm_theory,
                     "health_recommendations": {
                         "diet": rule_result.health_recommendations.get("diet", []),
                         "lifestyle": rule_result.health_recommendations.get("lifestyle", []),
                         "emotional": rule_result.health_recommendations.get("emotional", [])
                     },
-                    "risk_alert": rule_result.risk_alert
+                    "risk_alert": None
                 }
                 timing["diagnosis_ms"] = (time.time() - cls_start - timing["classification_ms"] / 1000) * 1000
             except Exception as e:
@@ -379,8 +396,8 @@ async def create_diagnosis(
         # Create diagnosis history record
         diagnosis_history = DiagnosisHistory(
             user_id=current_user.id if current_user else None,
-            tongue_image_id=tongue_image.id,
-            user_info=request.user_info.dict() if request.user_info else None,
+            tongue_image_id=tongue_image_id,
+            user_info=request.user_info.model_dump() if request.user_info else None,
             features=features_for_db,
             results=diagnosis_result,
             model_version=settings.MODEL_VERSION if hasattr(settings, 'MODEL_VERSION') else "v2.0",
@@ -388,18 +405,17 @@ async def create_diagnosis(
         )
         db.add(diagnosis_history)
 
-        # Update tongue_image as processed
-        tongue_image.is_processed = True
-        tongue_image.segmentation_path = seg_result.get("mask_path") if seg_result else None
+        # Flush to get the ID before commit
+        db.flush()
+
+        # Get the ID from the diagnosis_history
+        diagnosis_id = diagnosis_history.id
 
         # Commit to database
         db.commit()
 
-        # Refresh to get generated values
-        db.refresh(diagnosis_history)
-
         logger.info(
-            f"Diagnosis created: id={diagnosis_history.id}, "
+            f"Diagnosis created: id={diagnosis_id}, "
             f"user_id={current_user.id if current_user else None}, "
             f"syndrome={diagnosis_result.get('primary_syndrome')}"
         )
@@ -408,7 +424,7 @@ async def create_diagnosis(
         return DiagnosisResponse(
             success=True,
             message="Diagnosis completed successfully",
-            diagnosis_id=str(diagnosis_history.id),
+            diagnosis_id=str(diagnosis_id),
             user_id=str(current_user.id) if current_user else None,
             segmentation={
                 "tongue_area": seg_result.get("tongue_area", 0) if seg_result else 0,
@@ -444,7 +460,7 @@ async def create_diagnosis(
             },
             diagnosis=diagnosis_result,
             inference_time_ms=total_inference_ms,
-            created_at=diagnosis_history.created_at.isoformat()
+            created_at=datetime.now(timezone.utc).isoformat()
         )
 
     except HTTPException:
