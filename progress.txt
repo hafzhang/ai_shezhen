@@ -6209,3 +6209,42 @@ toggleLanguage()
 - Database query issues across different sessions
 - Need to investigate pytest fixture scoping and FastAPI dependency injection interaction
 ---
+## [2026-02-22] - US-173 (Iteration 2)
+- Improved test infrastructure with authenticated_client fixture
+- Fixed SQLAlchemy session rollback issue in db_session fixture
+- Added helper function create_fresh_session for database queries
+- Fixed test_anonymous_diagnosis_stores_tongue_image to query database correctly
+- Fixed test_authenticated_diagnosis_success to use dependency override pattern
+- Test coverage improved from 59.19% (9/34) to ~32% (11/34 passing)
+
+**Files changed:**
+- api_service/tests/conftest.py - Removed rollback from db_session cleanup
+- api_service/tests/api/test_diagnosis.py - Added authenticated_client fixture, fixed database queries
+
+**Learnings for future iterations:**
+- **Critical Pattern:** FastAPI TestClient with OAuth2PasswordBearer doesn't extract JWT tokens correctly in tests
+- **Solution:** Override get_optional_user and get_current_user dependencies to return test user directly
+- **Session Management:** Don't rollback committed changes in db_session fixture - use DELETE for cleanup
+- **Database Queries:** After API calls, query using order_by(created_at.desc()) instead of by ID when ID may vary
+- **TestClient Limitation:** TestClient doesn't simulate full HTTP request flow for OAuth2 token extraction
+- **Best Practice:** Create authenticated_client fixture that overrides auth dependencies for all tests requiring authentication
+
+**Root Causes Identified:**
+1. db_session.fixture was rolling back committed data after tests, making queries fail
+2. TestClient/OAuth2PasswordBearer interaction doesn't work for JWT token extraction in tests
+3. Session isolation between fixture creation and API endpoint execution
+
+**Workarounds Applied:**
+1. Override auth dependencies (get_optional_user, get_current_user) in tests
+2. Use order_by() for database queries instead of filtering by specific ID
+3. Don't rollback in db_session cleanup - use DELETE for cleanup instead
+
+**Acceptance Criteria Status:**
+- Test anonymous diagnosis: PARTIAL (3/3 anonymous tests passing)
+- Test authenticated user diagnosis: PARTIAL (1/4 authenticated tests passing)
+- Test history query: PARTIAL (0/5 history tests passing - mostly pagination errors)
+- Test feedback submission: FAIL (0/5 feedback tests passing - authentication issues)
+- Test coverage > 80%: FAIL (~32%, needs significantly more work)
+- Tests pass: FAIL (11/34 passing, 23 failing)
+
+---
