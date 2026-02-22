@@ -161,13 +161,7 @@ def db_session(engine) -> Generator[Session, None, None]:
 
     yield session
 
-    # Rollback any uncommitted changes
-    try:
-        session.rollback()
-    except:
-        pass
-
-    # Close the session to clear the identity map
+    # Close the session to clear the identity map (don't rollback - let commits persist)
     session.close()
 
     # Create a new session for cleanup

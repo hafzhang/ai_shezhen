@@ -50,6 +50,22 @@ from api_service.app.api.v2.models import DiagnosisRequest, UserInfoRequest
 # Helper Functions
 # ==============================================================================
 
+def create_fresh_session(engine) -> Session:
+    """
+    Create a fresh database session for querying committed data.
+
+    This helper function creates a new session that can see data committed
+    by API endpoints, avoiding SQLAlchemy session isolation issues.
+
+    Args:
+        engine: SQLAlchemy engine
+
+    Returns:
+        New Session instance
+    """
+    return Session(bind=engine, future=True)
+
+
 def create_test_image_base64(width: int = 512, height: int = 512) -> str:
     """
     Create a test image as base64 encoded string.
@@ -155,12 +171,13 @@ def mock_diagnose_from_classification(classification):
 # ==============================================================================
 
 @pytest.fixture(scope="function")
-def test_app(db_session: Session) -> FastAPI:
+def test_app(db_session: Session, engine) -> FastAPI:
     """
     Create a minimal FastAPI app with diagnosis routers for testing.
 
     Args:
         db_session: Database session fixture
+        engine: Database engine for creating fresh sessions
 
     Returns:
         FastAPI app instance
@@ -176,6 +193,10 @@ def test_app(db_session: Session) -> FastAPI:
             pass
 
     app.dependency_overrides[get_db] = override_get_db
+
+    # Store engine and db_session reference for tests
+    app.state.engine = engine
+    app.state.db_session = db_session
 
     # Mock models
     with patch('api_service.app.api.v2.diagnosis.settings') as mock_settings:
@@ -218,6 +239,40 @@ def client(test_app: FastAPI) -> Generator[TestClient, None, None]:
     """
     with TestClient(test_app) as test_client:
         yield test_client
+
+
+@pytest.fixture(scope="function")
+def authenticated_client(test_app: FastAPI, user: User) -> Generator[tuple[TestClient, User], None, None]:
+    """
+    Create a FastAPI TestClient with authentication override.
+
+    This fixture overrides the get_optional_user and get_current_user dependencies
+    to return the test user, bypassing JWT token verification in tests.
+
+    Args:
+        test_app: FastAPI app fixture
+        user: User fixture
+
+    Yields:
+        Tuple of (TestClient instance, User)
+    """
+    # Override get_optional_user to return the test user
+    def override_get_optional_user():
+        return user
+
+    # Override get_current_user to return the test user
+    def override_get_current_user():
+        return user
+
+    test_app.dependency_overrides[get_optional_user] = override_get_optional_user
+    test_app.dependency_overrides[get_current_user] = override_get_current_user
+
+    with TestClient(test_app) as test_client:
+        yield test_client, user
+
+    # Clean up the overrides
+    test_app.dependency_overrides.pop(get_optional_user, None)
+    test_app.dependency_overrides.pop(get_current_user, None)
 
 
 @pytest.fixture(scope="function")
@@ -337,6 +392,9 @@ class TestAnonymousDiagnosis:
         When: POST /api/v2/diagnosis is called
         Then: TongueImage and DiagnosisHistory records are created
         """
+        # Count diagnoses before
+        count_before = db_session.query(DiagnosisHistory).count()
+
         request_data = create_valid_diagnosis_request()
 
         response = client.post("/api/v2/diagnosis", json=request_data)
@@ -345,19 +403,20 @@ class TestAnonymousDiagnosis:
         data = response.json()
         diagnosis_id = data["diagnosis_id"]
 
-        # Check database records
-        from uuid import UUID
-        diagnosis_uuid = UUID(diagnosis_id)
+        # Verify a new diagnosis was created
+        count_after = db_session.query(DiagnosisHistory).count()
+        assert count_after == count_before + 1, f"Expected {count_before + 1} diagnoses, found {count_after}"
 
-        diagnosis = db_session.query(DiagnosisHistory).filter(
-            DiagnosisHistory.id == diagnosis_uuid
-        ).first()
+        # Get the diagnosis that was just created
+        diagnosis = db_session.query(DiagnosisHistory).order_by(DiagnosisHistory.created_at.desc()).first()
 
-        assert diagnosis is not None
+        assert diagnosis is not None, "No diagnosis found in database"
         assert diagnosis.user_id is None  # Anonymous
         assert diagnosis.tongue_image_id is not None
         assert diagnosis.features is not None
         assert diagnosis.results is not None
+        # Verify the ID matches
+        assert str(diagnosis.id) == diagnosis_id, f"ID mismatch: {diagnosis.id} != {diagnosis_id}"
 
 
 # ==============================================================================
@@ -368,7 +427,7 @@ class TestAuthenticatedDiagnosis:
     """Test authenticated user diagnosis flow."""
 
     @pytest.mark.integration
-    def test_authenticated_diagnosis_success(self, client: TestClient, user: User, auth_headers: dict):
+    def test_authenticated_diagnosis_success(self, authenticated_client: tuple[TestClient, User]):
         """
         Test successful authenticated diagnosis.
 
@@ -376,9 +435,11 @@ class TestAuthenticatedDiagnosis:
         When: POST /api/v2/diagnosis is called
         Then: Diagnosis is created with user_id
         """
+        client, user = authenticated_client
+
         request_data = create_valid_diagnosis_request()
 
-        response = client.post("/api/v2/diagnosis", json=request_data, headers=auth_headers)
+        response = client.post("/api/v2/diagnosis", json=request_data)
 
         # Assert response status
         assert response.status_code == 200
@@ -393,7 +454,7 @@ class TestAuthenticatedDiagnosis:
         assert "diagnosis" in data
 
     @pytest.mark.integration
-    def test_authenticated_diagnosis_stores_user_info(self, client: TestClient, user: User, auth_headers: dict, db_session: Session):
+    def test_authenticated_diagnosis_stores_user_info(self, client: TestClient, user: User, auth_headers: dict, engine):
         """
         Test authenticated diagnosis stores user info.
 
@@ -414,22 +475,26 @@ class TestAuthenticatedDiagnosis:
         data = response.json()
         diagnosis_id = data["diagnosis_id"]
 
-        # Check database
+        # Check database using fresh session
         from uuid import UUID
         diagnosis_uuid = UUID(diagnosis_id)
 
-        diagnosis = db_session.query(DiagnosisHistory).filter(
-            DiagnosisHistory.id == diagnosis_uuid
-        ).first()
+        fresh_session = create_fresh_session(engine)
+        try:
+            diagnosis = fresh_session.query(DiagnosisHistory).filter(
+                DiagnosisHistory.id == diagnosis_uuid
+            ).first()
 
-        assert diagnosis is not None
-        assert diagnosis.user_id == user.id
-        assert diagnosis.user_info["age"] == 42
-        assert diagnosis.user_info["gender"] == "female"
-        assert diagnosis.user_info["chief_complaint"] == "经常失眠"
+            assert diagnosis is not None, f"Diagnosis not found in database: {diagnosis_uuid}"
+            assert diagnosis.user_id == user.id
+            assert diagnosis.user_info["age"] == 42
+            assert diagnosis.user_info["gender"] == "female"
+            assert diagnosis.user_info["chief_complaint"] == "经常失眠"
+        finally:
+            fresh_session.close()
 
     @pytest.mark.integration
-    def test_diagnosis_reuses_existing_image(self, client: TestClient, user: User, auth_headers: dict, db_session: Session, faker):
+    def test_diagnosis_reuses_existing_image(self, client: TestClient, user: User, auth_headers: dict, engine):
         """
         Test diagnosis reuses existing tongue image.
 
@@ -451,16 +516,22 @@ class TestAuthenticatedDiagnosis:
         data1 = response1.json()
         data2 = response2.json()
 
-        # Query diagnosis records
+        # Query diagnosis records using fresh session
         from uuid import UUID
-        diagnosis1 = db_session.query(DiagnosisHistory).filter(
-            DiagnosisHistory.id == UUID(data1["diagnosis_id"])
-        ).first()
-        diagnosis2 = db_session.query(DiagnosisHistory).filter(
-            DiagnosisHistory.id == UUID(data2["diagnosis_id"])
-        ).first()
+        fresh_session = create_fresh_session(engine)
+        try:
+            diagnosis1 = fresh_session.query(DiagnosisHistory).filter(
+                DiagnosisHistory.id == UUID(data1["diagnosis_id"])
+            ).first()
+            diagnosis2 = fresh_session.query(DiagnosisHistory).filter(
+                DiagnosisHistory.id == UUID(data2["diagnosis_id"])
+            ).first()
 
-        assert diagnosis1.tongue_image_id == diagnosis2.tongue_image_id
+            assert diagnosis1 is not None, f"First diagnosis not found: {data1['diagnosis_id']}"
+            assert diagnosis2 is not None, f"Second diagnosis not found: {data2['diagnosis_id']}"
+            assert diagnosis1.tongue_image_id == diagnosis2.tongue_image_id
+        finally:
+            fresh_session.close()
 
 
 # ==============================================================================
