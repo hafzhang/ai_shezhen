@@ -320,13 +320,14 @@ def tongue_image_data(faker: Faker) -> dict:
     Returns:
         Dictionary with tongue image fields
     """
+    import random
     return {
         "file_hash": faker.sha256()[:64],
         "original_filename": faker.file_name(extension="jpg"),
         "storage_path": f"/tmp/tongue_images/{faker.uuid4()}.png",
         "width": 512,
         "height": 512,
-        "file_size": faker.pyint(10000, 500000),
+        "file_size": random.randint(10000, 500000),
         "mime_type": "image/jpeg",
     }
 
@@ -383,25 +384,27 @@ def diagnosis_data(faker: Faker) -> dict:
     Returns:
         Dictionary with diagnosis fields
     """
+    import random
     return {
         "user_info": {
-            "age": faker.pyint(18, 80),
+            "age": random.randint(18, 80),
             "gender": faker.random_element(["male", "female"]),
             "chief_complaint": faker.sentence(),
         },
         "features": {
-            "tongue_color": "red",
-            "coating_color": "white",
-            "tongue_shape": "normal",
-            "moisture": "normal",
+            "tongue_color": {"prediction": "red", "confidence": 0.8},
+            "coating_color": {"prediction": "white", "confidence": 0.8},
+            "tongue_shape": {"prediction": "normal", "confidence": 0.9},
+            "coating_quality": {"prediction": "thin", "confidence": 0.85},
+            "health_status": {"prediction": "healthy", "confidence": 0.9},
         },
         "results": {
-            "syndrome": "肝胆湿热",
+            "primary_syndrome": "肝胆湿热",
             "confidence": 0.85,
             "recommendations": ["清热利湿", "饮食清淡"],
         },
         "model_version": "v1.0",
-        "inference_time_ms": faker.pyint(100, 2000),
+        "inference_time_ms": random.randint(100, 2000),
     }
 
 
@@ -424,14 +427,74 @@ def diagnosis(
     Returns:
         DiagnosisHistory instance
     """
+    # Make sure the tongue_image is committed first
+    db_session.flush()
+
     diagnosis = DiagnosisHistory(
         user_id=user.id,
         tongue_image_id=tongue_image.id,
         **diagnosis_data,
     )
     db_session.add(diagnosis)
-    db_session.flush()  # Flush for testing
+    db_session.commit()  # Commit to persist for API queries
+    # Refresh to get the latest state from database
+    db_session.refresh(diagnosis)
     return diagnosis
+
+
+@pytest.fixture(scope="function")
+def create_diagnosis_for_user(db_session: Session, faker: Faker):
+    """
+    Helper factory function to create a diagnosis for a specific user.
+
+    Args:
+        db_session: Database session
+        faker: Faker instance
+
+    Returns:
+        Function that creates a diagnosis for a given user
+    """
+    import random
+
+    def _create(user: User) -> DiagnosisHistory:
+        # Create tongue image with explicit integer values
+        tongue_image = TongueImage(
+            user_id=user.id,
+            file_hash=faker.sha256()[:64],
+            original_filename=faker.file_name(extension="jpg"),
+            storage_path=f"/tmp/tongue_images/{faker.uuid4()}.png",
+            width=512,
+            height=512,
+            file_size=random.randint(10000, 500000),  # Use random.randint instead
+            mime_type="image/jpeg",
+        )
+        db_session.add(tongue_image)
+        db_session.flush()
+
+        # Create diagnosis
+        diagnosis = DiagnosisHistory(
+            user_id=user.id,
+            tongue_image_id=tongue_image.id,
+            user_info={"age": random.randint(18, 80), "gender": "male", "chief_complaint": faker.sentence()},
+            features={
+                "tongue_color": {"prediction": "red", "confidence": 0.8},
+                "coating_color": {"prediction": "white", "confidence": 0.8},
+                "tongue_shape": {"prediction": "normal", "confidence": 0.9},
+                "coating_quality": {"prediction": "thin", "confidence": 0.85},
+                "health_status": {"prediction": "healthy", "confidence": 0.9},
+            },
+            results={
+                "primary_syndrome": "气血调和",
+                "confidence": round(random.uniform(0.7, 0.95), 2),
+            },
+            model_version="v1.0",
+            inference_time_ms=random.randint(100, 2000),
+        )
+        db_session.add(diagnosis)
+        db_session.commit()
+        return diagnosis
+
+    return _create
 
 
 @pytest.fixture(scope="function")
@@ -477,12 +540,13 @@ def health_record_data(faker: Faker) -> dict:
         Dictionary with health record fields
     """
     from datetime import date
+    import random
 
     return {
         "record_type": "blood_pressure",
         "record_value": {
-            "systolic": faker.pyint(90, 140),
-            "diastolic": faker.pyint(60, 90),
+            "systolic": random.randint(90, 140),
+            "diastolic": random.randint(60, 90),
             "unit": "mmHg",
         },
         "record_date": date.today(),
@@ -534,7 +598,7 @@ def create_multiple_users(db_session: Session, faker: Faker, count: int = 5):
     from api_service.app.core.security import hash_password
 
     users = []
-    for _ in range(count):
+    for _ in range(int(count)):  # Ensure count is an integer
         user = User(
             phone=faker.phone_number(),
             nickname=faker.name(),
@@ -550,7 +614,6 @@ def create_multiple_users(db_session: Session, faker: Faker, count: int = 5):
 def create_multiple_diagnoses(
     db_session: Session,
     user: User,
-    tongue_image: TongueImage,
     faker: Faker,
     count: int = 3,
 ):
@@ -560,25 +623,47 @@ def create_multiple_diagnoses(
     Args:
         db_session: Database session that commits
         user: User instance
-        tongue_image: TongueImage instance
         faker: Faker instance
         count: Number of diagnoses to create
 
-    Yields:
+    Returns:
         List of DiagnosisHistory instances
     """
+    import random
+
     diagnoses = []
-    for _ in range(count):
+    for i in range(int(count)):  # Ensure count is an integer
+        # Create a tongue image for each diagnosis
+        tongue_image = TongueImage(
+            user_id=user.id,
+            file_hash=faker.sha256()[:64],
+            original_filename=faker.file_name(extension="jpg"),
+            storage_path=f"/tmp/tongue_images/{faker.uuid4()}.png",
+            width=512,
+            height=512,
+            file_size=random.randint(10000, 500000),
+            mime_type="image/jpeg",
+        )
+        db_session.add(tongue_image)
+        db_session.flush()  # Get the ID
+
         diagnosis = DiagnosisHistory(
             user_id=user.id,
             tongue_image_id=tongue_image.id,
-            user_info={"age": faker.pyint(18, 80), "gender": "male"},
-            features={"tongue_color": "red"},
-            results={"syndrome": "脾胃虚弱", "confidence": faker.pyfloat(0.5, 0.95)},
+            user_info={"age": random.randint(18, 80), "gender": "male"},
+            features={
+                "tongue_color": {"prediction": "red", "confidence": 0.8},
+                "coating_color": {"prediction": "white", "confidence": 0.8},
+            },
+            results={
+                "primary_syndrome": "脾胃虚弱",
+                "confidence": round(random.uniform(0.5, 0.95), 2),
+            },
             model_version="v1.0",
-            inference_time_ms=faker.pyint(100, 2000),
+            inference_time_ms=random.randint(100, 2000),
         )
         db_session.add(diagnosis)
         diagnoses.append(diagnosis)
 
+    db_session.commit()  # Commit to persist data for queries
     return diagnoses
