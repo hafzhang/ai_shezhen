@@ -142,16 +142,15 @@ def engine(database_url: str):
 
 
 @pytest.fixture(scope="function")
-def db_session(engine, request) -> Generator[Session, None, None]:
+def db_session(engine) -> Generator[Session, None, None]:
     """
     Create a test database session.
 
-    Each test gets a fresh session that shares the same connection.
-    Data is persisted via flush() and cleaned up by dropping tables at session end.
+    Each test gets a fresh session.
+    Uses DELETE to clean up data after each test.
 
     Args:
         engine: SQLAlchemy Engine
-        request: Pytest request object
 
     Yields:
         Database Session
@@ -159,38 +158,24 @@ def db_session(engine, request) -> Generator[Session, None, None]:
     # Create session with expire_on_commit=False
     session = Session(bind=engine, future=True, expire_on_commit=False)
 
-    # Store in request for fixtures to access
-    request._db_session = session
-
     yield session
 
-    # Cleanup
+    # Close the session to clear the identity map
     session.close()
-    if hasattr(request, "_db_session"):
-        delattr(request, "_db_session")
 
+    # Create a new session for cleanup
+    cleanup_session = Session(bind=engine, future=True)
 
-@pytest.fixture(scope="function")
-def db_session(engine) -> Generator[Session, None, None]:
-    """
-    Create a test database session for fixtures.
+    # Delete all data (in correct order due to foreign keys)
+    from api_service.app.models.database import User, RefreshToken, DiagnosisHistory, HealthRecord, TongueImage
+    cleanup_session.query(RefreshToken).delete(synchronize_session=False)
+    cleanup_session.query(HealthRecord).delete(synchronize_session=False)
+    cleanup_session.query(DiagnosisHistory).delete(synchronize_session=False)
+    cleanup_session.query(TongueImage).delete(synchronize_session=False)
+    cleanup_session.query(User).delete(synchronize_session=False)
+    cleanup_session.commit()
 
-    This is used by model fixtures that need to create test data.
-    Uses flush() instead of commit() to keep data visible in the same session.
-
-    Args:
-        engine: SQLAlchemy Engine
-
-    Yields:
-        Database Session
-    """
-    # Create session
-    session = Session(bind=engine, future=True, expire_on_commit=False)
-
-    yield session
-
-    # Just close the session
-    session.close()
+    cleanup_session.close()
 
 
 # ==============================================================================
@@ -223,12 +208,17 @@ def user_data(faker: Faker) -> dict:
     Returns:
         Dictionary with user fields
     """
+    # Use actual bcrypt hash generation for valid password hashes
+    # The password "testpassword" will be used in tests, so hash it here
+    from api_service.app.core.security import hash_password
+    password_hash = hash_password("testpassword")
+
     return {
         "phone": faker.phone_number(),
         "email": faker.email(),
         "nickname": faker.name(),
         "avatar_url": faker.url(),
-        "password_hash": "$2b$12$" + faker.password(length=60),  # Mock bcrypt hash
+        "password_hash": password_hash,
     }
 
 
@@ -242,11 +232,11 @@ def user(db_session: Session, user_data: dict) -> User:
         user_data: User data dictionary
 
     Returns:
-        User instance (added to session, caller should flush)
+        User instance (committed to database)
     """
     user = User(**user_data)
     db_session.add(user)
-    db_session.flush()  # Flush to get ID and generated fields
+    db_session.commit()  # Commit to persist in database
     return user
 
 
@@ -256,7 +246,7 @@ def wechat_user(db_session: Session, faker: Faker) -> User:
     Create a WeChat mini-program user.
 
     Args:
-        db_session: Database session that commits
+        db_session: Database session
         faker: Faker instance
 
     Returns:
@@ -268,7 +258,7 @@ def wechat_user(db_session: Session, faker: Faker) -> User:
         nickname=faker.name(),
     )
     db_session.add(user)
-    db_session.flush()  # Flush instead of commit for testing
+    db_session.commit()  # Commit to persist in database
     return user
 
 
@@ -540,12 +530,14 @@ def create_multiple_users(db_session: Session, faker: Faker, count: int = 5):
     Yields:
         List of User instances
     """
+    from api_service.app.core.security import hash_password
+
     users = []
     for _ in range(count):
         user = User(
             phone=faker.phone_number(),
             nickname=faker.name(),
-            password_hash="$2b$12$" + faker.password(length=60),
+            password_hash=hash_password("testpassword"),
         )
         db_session.add(user)
         users.append(user)

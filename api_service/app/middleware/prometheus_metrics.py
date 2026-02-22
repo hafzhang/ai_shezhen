@@ -32,7 +32,10 @@ logger = logging.getLogger(__name__)
 # Registry
 # ============================================================================
 # Use multiprocess registry for uwsgi/gunicorn workers
-if multiprocess.is_multiprocess:
+# Note: prometheus_client.multiprocess.is_multiprocess was removed in newer versions
+# We'll use environment variable to check if multiprocess mode is enabled
+import os
+if os.environ.get('prometheus_multiproc_dir'):
     registry = CollectorRegistry()
 else:
     registry = None  # Use default registry

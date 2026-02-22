@@ -157,8 +157,13 @@ def create_user(
     if password is not None:
         password_hash = hash_password(password)
 
+    # Generate ID in Python to avoid needing db.refresh()
+    import uuid
+    user_id = uuid.uuid4()
+
     # Create new user
     user = User(
+        id=user_id,
         phone=phone,
         email=email,
         password_hash=password_hash,
@@ -171,7 +176,6 @@ def create_user(
     # Add to database
     db.add(user)
     db.commit()
-    db.refresh(user)
 
     return user
 
