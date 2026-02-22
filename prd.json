@@ -2016,15 +2016,18 @@
       "title": "Update deployment docs",
       "description": "As a technical writer, I need to update deployment docs with new components.",
       "priority": 178,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 4: Testing & Documentation",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Update docs/deployment.md",
         "Add PostgreSQL deployment steps",
         "Add database migration steps",
         "Add uni-app build steps",
         "Typecheck passes"
+      ],
+      "files": [
+        "docs/deployment.md"
       ]
     },
     {
