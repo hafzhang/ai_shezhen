@@ -2035,15 +2035,18 @@
       "title": "Update API documentation",
       "description": "As a technical writer, I need to update API docs with new endpoints.",
       "priority": 179,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 4: Testing & Documentation",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "Update docs/api_spec.yaml",
         "Add all v2 endpoints",
         "Add auth documentation",
         "Add request examples",
         "Typecheck passes"
+      ],
+      "files": [
+        "docs/api_spec.yaml"
       ]
     },
     {

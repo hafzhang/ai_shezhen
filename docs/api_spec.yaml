@@ -1,0 +1,1746 @@
+openapi: 3.0.3
+info:
+  title: AI舌诊智能诊断系统 API
+  description: |
+    基于PaddlePaddle本地推理 + 文心大模型云端诊断的舌诊AI系统 API v2
+
+    ## 功能概述
+
+    ### 舌象诊断
+    - **舌体分割**: 使用BiSeNetV2模型进行舌体区域分割
+    - **特征分类**: 使用PP-HGNetV2-B4模型进行6维度舌象特征分类
+    - **智能诊断**: 基于文心一言API进行中医证型分析和健康建议
+
+    ### 用户管理
+    - 手机号注册/登录
+    - 微信小程序授权登录
+    - 抖音小程序授权登录
+    - JWT令牌认证（访问令牌30分钟，刷新令牌7天）
+    - 匿名诊断支持
+
+    ### 数据管理
+    - 诊断历史记录
+    - 健康档案管理
+    - 用户反馈收集
+
+    ## 认证方式
+
+    本API使用JWT（JSON Web Token）进行身份认证：
+
+    1. **访问令牌 (Access Token)**: 有效期30分钟，用于API访问
+    2. **刷新令牌 (Refresh Token)**: 有效期7天，用于获取新的访问令牌
+
+    ### 在请求头中携带令牌
+
+    ```
+    Authorization: Bearer <access_token>
+    ```
+
+    ### 匿名访问
+
+    部分端点支持匿名访问（如POST /api/v2/diagnosis），此时`user_id`为NULL。
+
+  version: 2.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8000
+    description: 本地开发服务器
+  - url: https://api.example.com
+    description: 生产环境服务器
+
+tags:
+  - name: Authentication
+    description: 用户认证相关接口
+  - name: Diagnosis
+    description: 舌象诊断相关接口
+  - name: History
+    description: 诊断历史相关接口
+  - name: Users
+    description: 用户管理相关接口
+  - name: Health Records
+    description: 健康档案相关接口
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT访问令牌认证
+
+  schemas:
+    # 通用响应模型
+    APIResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+        message:
+          type: string
+          description: 响应消息
+        error:
+          type: string
+          description: 错误类型
+        detail:
+          type: string
+          description: 错误详情
+
+    # 用户相关模型
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 用户ID
+        phone:
+          type: string
+          description: 手机号
+          example: "13800138000"
+        email:
+          type: string
+          format: email
+          description: 邮箱
+        nickname:
+          type: string
+          description: 昵称
+        avatar_url:
+          type: string
+          format: uri
+          description: 头像URL
+        openid:
+          type: string
+          description: OpenID（小程序用户）
+        openid_type:
+          type: string
+          enum: [wechat, douyin]
+          description: OpenID类型
+
+    # 令牌相关模型
+    TokenResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIResponse'
+        - type: object
+          properties:
+            access_token:
+              type: string
+              description: 访问令牌（30分钟有效）
+            refresh_token:
+              type: string
+              description: 刷新令牌（7天有效）
+            token_type:
+              type: string
+              default: bearer
+            expires_in:
+              type: integer
+              description: 访问令牌过期时间（秒）
+              default: 1800
+            user:
+              $ref: '#/components/schemas/UserInfo'
+
+    # 诊断相关模型
+    UserInfoRequest:
+      type: object
+      properties:
+        age:
+          type: integer
+          minimum: 0
+          maximum: 150
+          description: 年龄
+        gender:
+          type: string
+          description: 性别
+          example: "male"
+        chief_complaint:
+          type: string
+          description: 主诉症状
+          example: "最近感觉疲劳"
+
+    ClassificationFeature:
+      type: object
+      properties:
+        prediction:
+          type: string
+          description: 预测结果
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: 置信度
+        description:
+          type: string
+          description: 特征描述
+
+    SpecialFeatures:
+      type: object
+      properties:
+        red_dots:
+          type: object
+          description: 红点特征
+        cracks:
+          type: object
+          description: 裂纹特征
+        teeth_marks:
+          type: object
+          description: 齿痕特征
+
+    ClassificationResult:
+      type: object
+      properties:
+        tongue_color:
+          $ref: '#/components/schemas/ClassificationFeature'
+        coating_color:
+          $ref: '#/components/schemas/ClassificationFeature'
+        tongue_shape:
+          $ref: '#/components/schemas/ClassificationFeature'
+        coating_quality:
+          $ref: '#/components/schemas/ClassificationFeature'
+        special_features:
+          $ref: '#/components/schemas/SpecialFeatures'
+        health_status:
+          $ref: '#/components/schemas/ClassificationFeature'
+
+    DiagnosisResult:
+      type: object
+      properties:
+        primary_syndrome:
+          type: string
+          description: 主要证型
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: 证型置信度
+        syndrome_analysis:
+          type: string
+          description: 证型分析
+        tcm_theory:
+          type: string
+          description: 中医理论基础
+        health_recommendations:
+          type: object
+          properties:
+            diet:
+              type: array
+              items:
+                type: string
+              description: 饮食建议
+            lifestyle:
+              type: array
+              items:
+                type: string
+              description: 生活建议
+            emotional:
+              type: array
+              items:
+                type: string
+              description: 情志建议
+        risk_alert:
+          type: string
+          description: 风险提示
+
+    DiagnosisResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIResponse'
+        - type: object
+          required:
+            - diagnosis_id
+            - segmentation
+            - classification
+            - diagnosis
+          properties:
+            diagnosis_id:
+              type: string
+              format: uuid
+              description: 诊断记录ID
+            user_id:
+              type: string
+              format: uuid
+              description: 用户ID（匿名诊断为空）
+            segmentation:
+              type: object
+              properties:
+                tongue_area:
+                  type: integer
+                  description: 舌体区域像素数
+                tongue_ratio:
+                  type: number
+                  format: float
+                  description: 舌体区域占比
+            classification:
+              $ref: '#/components/schemas/ClassificationResult'
+            diagnosis:
+              $ref: '#/components/schemas/DiagnosisResult'
+            inference_time_ms:
+              type: number
+              format: float
+              description: 总推理时间（毫秒）
+            created_at:
+              type: string
+              format: date-time
+              description: 诊断时间
+
+    # 健康档案相关模型
+    HealthRecordType:
+      type: string
+      enum:
+        - blood_pressure
+        - heart_rate
+        - weight
+        - height
+        - temperature
+        - blood_sugar
+        - symptoms
+        - medication
+        - lab_results
+        - other
+      description: 健康档案类型
+
+    HealthRecordItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        record_type:
+          $ref: '#/components/schemas/HealthRecordType'
+        record_value:
+          type: object
+          additionalProperties: true
+          description: 档案值（灵活JSON结构）
+        record_date:
+          type: string
+          format: date-time
+        notes:
+          type: string
+          maxLength: 1000
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+  # 通用错误响应
+  responses:
+    Unauthorized:
+      description: 未授权 - 需要有效的访问令牌
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          example:
+            success: false
+            error: "unauthorized"
+            detail: "Missing or invalid authorization token"
+
+    Forbidden:
+      description: 禁止访问 - 无权限访问该资源
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          example:
+            success: false
+            error: "forbidden"
+            detail: "You do not have permission to access this resource"
+
+    NotFound:
+      description: 资源未找到
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          example:
+            success: false
+            error: "not_found"
+            detail: "Resource not found"
+
+    ValidationError:
+      description: 请求参数验证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          example:
+            success: false
+            error: "validation_error"
+            detail: "Invalid input data"
+
+    ServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIResponse'
+          example:
+            success: false
+            error: "server_error"
+            detail: "Internal server error"
+
+paths:
+  # ============================================================================
+  # Authentication Endpoints
+  # ============================================================================
+  /api/v2/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: 用户注册
+      description: |
+        使用手机号和密码创建新用户账号。
+
+        **验证规则**:
+        - 手机号：11位数字，以1开头，第二位为3-9
+        - 密码：至少8位，必须包含字母和数字
+        - 邮箱：可选，需符合邮箱格式
+
+        成功注册后返回访问令牌和刷新令牌。
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - password
+              properties:
+                phone:
+                  type: string
+                  pattern: '^1[3-9]\d{9}$'
+                  example: "13800138000"
+                password:
+                  type: string
+                  minLength: 8
+                  example: "abc12345"
+                nickname:
+                  type: string
+                  maxLength: 50
+                  example: "张三"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+            examples:
+              normal:
+                summary: 正常注册
+                value:
+                  phone: "13800138000"
+                  password: "abc12345"
+                  nickname: "张三"
+                  email: "user@example.com"
+              minimal:
+                summary: 最少信息注册
+                value:
+                  phone: "13900139000"
+                  password: "pass1234"
+      responses:
+        '201':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/UserInfo'
+              example:
+                success: true
+                message: "注册成功"
+                access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  id: "123e4567-e89b-12d3-a456-426614174000"
+                  phone: "13800138000"
+                  nickname: "张三"
+                  created_at: "2026-02-22T10:00:00Z"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v2/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: 用户登录
+      description: |
+        使用手机号和密码进行登录认证。
+
+        验证成功后返回访问令牌（30分钟有效）和刷新令牌（7天有效）。
+        旧的刷新令牌将被自动撤销。
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - password
+              properties:
+                phone:
+                  type: string
+                  example: "13800138000"
+                password:
+                  type: string
+                  example: "abc12345"
+            example:
+              phone: "13800138000"
+              password: "abc12345"
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      access_token:
+                        type: string
+                      refresh_token:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/UserInfo'
+              example:
+                success: true
+                message: "登录成功"
+                access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  id: "123e4567-e89b-12d3-a456-426614174000"
+                  phone: "13800138000"
+                  nickname: "张三"
+        '401':
+          description: 认证失败 - 手机号或密码错误
+          content:
+            application/json:
+              example:
+                success: false
+                detail: "手机号或密码错误"
+
+  /api/v2/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: 刷新访问令牌
+      description: |
+        使用有效的刷新令牌获取新的访问令牌。
+
+        刷新令牌必须满足以下条件：
+        - 未过期（7天有效期）
+        - 未被撤销
+        - 存在于数据库中
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  description: 刷新令牌
+            example:
+              refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: 刷新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      access_token:
+                        type: string
+                      expires_in:
+                        type: integer
+                        description: 访问令牌过期时间（秒）
+                        default: 1800
+              example:
+                success: true
+                message: "令牌刷新成功"
+                access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                expires_in: 1800
+        '401':
+          description: 刷新令牌无效、过期或已撤销
+          content:
+            application/json:
+              example:
+                success: false
+                detail: "刷新令牌已过期，请重新登录"
+
+  /api/v2/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: 用户登出
+      description: |
+        撤销刷新令牌，实现用户登出。
+
+        客户端在登出后应删除本地存储的访问令牌和刷新令牌。
+        该端点是幂等的，多次调用相同令牌都会返回成功。
+      operationId: logout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+            example:
+              refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              example:
+                success: true
+                message: "退出登录成功"
+
+  /api/v2/auth/wechat:
+    post:
+      tags:
+        - Authentication
+      summary: 微信小程序登录
+      description: |
+        微信小程序授权登录。
+
+        **流程说明**:
+        1. 前端调用 `wx.login()` 获取登录凭证 code
+        2. 后端使用 code 调用微信 API 换取 openid 和 session_key
+        3. 根据 openid 查找或创建用户账号
+        4. 返回 JWT 令牌
+
+        如果用户首次登录，将自动创建账号。
+      operationId: wechatLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: 微信登录凭证（wx.login()获取）
+                nickname:
+                  type: string
+                  maxLength: 50
+                  description: 用户昵称（可选）
+                avatar_url:
+                  type: string
+                  format: uri
+                  description: 用户头像URL（可选）
+            examples:
+              new_user:
+                summary: 新用户首次登录
+                value:
+                  code: "0x1234567890"
+                  nickname: "微信用户"
+                  avatar_url: "https://example.com/avatar.jpg"
+              code_only:
+                summary: 仅提供code
+                value:
+                  code: "0x1234567890"
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: 微信API调用失败
+          content:
+            application/json:
+              example:
+                success: false
+                detail: "微信登录失败: invalid code"
+
+  /api/v2/auth/douyin:
+    post:
+      tags:
+        - Authentication
+      summary: 抖音小程序登录
+      description: |
+        抖音小程序授权登录。
+
+        **流程说明**:
+        1. 前端调用 `tt.login()` 获取登录凭证 code
+        2. 后端使用 code 调用抖音 API 换取 openid
+        3. 根据 openid 查找或创建用户账号
+        4. 返回 JWT 令牌
+      operationId: douyinLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: 抖音登录凭证（tt.login()获取）
+                nickname:
+                  type: string
+                  maxLength: 50
+                avatar_url:
+                  type: string
+                  format: uri
+            example:
+              code: "1234567890"
+              nickname: "抖音用户"
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  # ============================================================================
+  # Diagnosis Endpoints
+  # ============================================================================
+  /api/v2/diagnosis:
+    post:
+      tags:
+        - Diagnosis
+      summary: 创建舌象诊断
+      description: |
+        执行端到端舌象诊断，包括分割、分类和证型分析。
+
+        **功能说明**:
+        1. 舌体分割：使用BiSeNetV2模型提取舌体区域
+        2. 特征分类：使用PP-HGNetV2-B4模型进行6维度分类
+        3. 证型分析：基于文心一言API进行中医证型诊断
+
+        **匿名诊断**:
+        - 支持未登录用户进行诊断
+        - 匿名诊断的 `user_id` 为 NULL
+        - 用户可后续登录后关联匿名诊断记录
+      operationId: createDiagnosis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: byte
+                  description: Base64编码的舌象图像（支持data URL格式）
+                  pattern: '^data:image/[^;]+;base64,.+|^[A-Za-z0-9+/=]+$'
+                user_info:
+                  $ref: '#/components/schemas/UserInfoRequest'
+                enable_llm_diagnosis:
+                  type: boolean
+                  default: true
+                  description: 是否启用LLM诊断
+                enable_rule_fallback:
+                  type: boolean
+                  default: true
+                  description: 是否启用规则库兜底
+            examples:
+              with_user_info:
+                summary: 完整诊断请求
+                value:
+                  image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                  user_info:
+                    age: 35
+                    gender: "male"
+                    chief_complaint: "最近感觉疲劳"
+                  enable_llm_diagnosis: true
+              minimal:
+                summary: 最小诊断请求
+                value:
+                  image: "iVBORw0KGgoAAAANSUhEUgAA..."
+      responses:
+        '200':
+          description: 诊断成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosisResponse'
+              example:
+                success: true
+                message: "Diagnosis completed successfully"
+                diagnosis_id: "123e4567-e89b-12d3-a456-426614174000"
+                user_id: "123e4567-e89b-12d3-a456-426614174000"
+                segmentation:
+                  tongue_area: 125000
+                  tongue_ratio: 0.35
+                classification:
+                  tongue_color:
+                    prediction: "淡红舌"
+                    confidence: 0.85
+                    description: "舌色淡红，气血调和"
+                  coating_color:
+                    prediction: "白苔"
+                    confidence: 0.80
+                    description: "舌苔薄白，正常苔色"
+                  tongue_shape:
+                    prediction: "正常"
+                    confidence: 0.90
+                  coating_quality:
+                    prediction: "薄苔"
+                    confidence: 0.88
+                  special_features:
+                    red_dots:
+                      present: false
+                      confidence: 0.0
+                    cracks:
+                      present: false
+                      confidence: 0.0
+                    teeth_marks:
+                      present: false
+                      confidence: 0.0
+                  health_status:
+                    prediction: "健康舌"
+                    confidence: 0.87
+                    description: "舌象正常，气血调和"
+                diagnosis:
+                  primary_syndrome: "气血调和"
+                  confidence: 0.85
+                  syndrome_analysis: "舌象正常，气血调和，身体状态良好"
+                  tcm_theory: "中医理论：舌为心之苗，舌色红润说明心血充足，气血运行正常"
+                  health_recommendations:
+                    diet:
+                      - "保持均衡饮食，多吃蔬菜水果"
+                      - "适量摄入优质蛋白质"
+                    lifestyle:
+                      - "保持规律作息，充足睡眠"
+                      - "适度运动，增强体质"
+                    emotional:
+                      - "保持心情愉悦，避免过度压力"
+                  risk_alert: null
+                inference_time_ms: 1523.45
+                created_at: "2026-02-22T10:30:00Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              example:
+                success: false
+                detail: "Invalid image data"
+
+  /api/v2/diagnosis/{diagnosis_id}:
+    get:
+      tags:
+        - Diagnosis
+      summary: 获取诊断详情
+      description: |
+        获取指定诊断记录的完整信息。
+
+        **权限说明**:
+        - 只能查看属于当前用户的诊断记录
+        - 匿名诊断记录（user_id为NULL）可被任何已登录用户查看
+      operationId: getDiagnosis
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: diagnosis_id
+          in: path
+          required: true
+          description: 诊断记录ID（UUID格式）
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      user_id:
+                        type: string
+                        format: uuid
+                        nullable: true
+                      tongue_image_id:
+                        type: string
+                        format: uuid
+                      created_at:
+                        type: string
+                        format: date-time
+                      user_info:
+                        $ref: '#/components/schemas/UserInfoRequest'
+                      segmentation:
+                        type: object
+                      classification:
+                        $ref: '#/components/schemas/ClassificationResult'
+                      diagnosis:
+                        $ref: '#/components/schemas/DiagnosisResult'
+                      model_version:
+                        type: string
+                      inference_time_ms:
+                        type: integer
+                      feedback:
+                        type: integer
+                        nullable: true
+                        description: 用户反馈（1/-1）
+                      feedback_comment:
+                        type: string
+                        nullable: true
+                      tongue_image:
+                        type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v2/diagnosis/{diagnosis_id}/feedback:
+    post:
+      tags:
+        - Diagnosis
+      summary: 提交诊断反馈
+      description: |
+        对诊断结果提交反馈，用于改进模型。
+
+        **反馈值**:
+        - `1`: 有帮助
+        - `-1`: 无帮助
+      operationId: submitFeedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: diagnosis_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - feedback
+              properties:
+                feedback:
+                  type: integer
+                  enum: [-1, 1]
+                  description: 反馈值（1为有帮助，-1为无帮助）
+                comment:
+                  type: string
+                  maxLength: 500
+                  description: 反馈评论
+            examples:
+              positive:
+                summary: 正面反馈
+                value:
+                  feedback: 1
+                  comment: "诊断准确"
+              negative:
+                summary: 负面反馈
+                value:
+                  feedback: -1
+                  comment: "与实际症状不符"
+      responses:
+        '200':
+          description: 反馈提交成功
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Feedback submitted successfully"
+                feedback: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ============================================================================
+  # History Endpoints
+  # ============================================================================
+  /api/v2/history/diagnoses:
+    get:
+      tags:
+        - History
+      summary: 获取诊断历史列表
+      description: |
+        获取当前用户的诊断历史记录，支持分页和日期过滤。
+
+        **分页说明**:
+        - `page`: 页码（从1开始）
+        - `page_size`: 每页记录数（最大100）
+
+        **日期过滤**:
+        - `start_date`: 起始日期（ISO 8601格式）
+        - `end_date`: 结束日期（ISO 8601格式）
+
+        结果按创建时间倒序排列（最新的在前）。
+      operationId: getDiagnosisHistory
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 页码（从1开始）
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: 每页记录数
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: 起始日期（ISO 8601格式）
+          example: "2026-01-01T00:00:00Z"
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: 结束日期（ISO 8601格式）
+          example: "2026-12-31T23:59:59Z"
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: 总记录数
+                      page:
+                        type: integer
+                        description: 当前页码
+                      page_size:
+                        type: integer
+                        description: 每页记录数
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            user_id:
+                              type: string
+                              format: uuid
+                              nullable: true
+                            created_at:
+                              type: string
+                              format: date-time
+                            user_info:
+                              type: object
+                            features:
+                              type: object
+                            primary_syndrome:
+                              type: string
+                            confidence:
+                              type: number
+                            inference_time_ms:
+                              type: integer
+                            feedback:
+                              type: integer
+                              nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/history/statistics:
+    get:
+      tags:
+        - History
+      summary: 获取健康统计数据
+      description: |
+        获取当前用户的诊断健康统计数据。
+
+        **统计内容**:
+        - 总诊断次数
+        - 最常见证型（Top 10）
+        - 各维度最常见特征（Top 5）
+        - 诊断时间分布（最近30天）
+        - 平均诊断时间
+      operationId: getStatistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      total_diagnoses:
+                        type: integer
+                      most_common_syndromes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            syndrome:
+                              type: string
+                            count:
+                              type: integer
+                      most_common_features:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              prediction:
+                                type: string
+                              count:
+                                type: integer
+                      diagnosis_time_distribution:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            count:
+                              type: integer
+                      average_diagnosis_time_ms:
+                        type: number
+                        nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/history/trends:
+    get:
+      tags:
+        - History
+      summary: 获取健康趋势数据
+      description: |
+        获取指定时间段内的健康趋势分析数据。
+
+        **趋势数据**:
+        - 证型变化趋势
+        - 各维度特征变化趋势
+
+        用于生成健康趋势图表。
+      operationId: getTrends
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period_days
+          in: query
+          schema:
+            type: integer
+            minimum: 7
+            maximum: 365
+            default: 30
+          description: 分析周期（天）
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      period_days:
+                        type: integer
+                      start_date:
+                        type: string
+                        format: date-time
+                      end_date:
+                        type: string
+                        format: date-time
+                      syndrome_trends:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            count:
+                              type: integer
+                            syndromes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  syndrome:
+                                    type: string
+                                  count:
+                                    type: integer
+                      feature_trends:
+                        type: object
+                        additionalProperties:
+                          type: array
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================================
+  # Users Endpoints
+  # ============================================================================
+  /api/v2/users/me:
+    get:
+      tags:
+        - Users
+      summary: 获取当前用户信息
+      description: 获取当前登录用户的个人资料信息。
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/UserInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags:
+        - Users
+      summary: 更新当前用户信息
+      description: |
+        更新当前用户的个人资料信息。
+
+        **可更新字段**:
+        - 昵称
+        - 邮箱
+        - 手机号
+
+        邮箱和手机号必须唯一，如果已被其他用户使用将返回409错误。
+      operationId: updateCurrentUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                  maxLength: 50
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                  maxLength: 20
+            example:
+              nickname: "新昵称"
+              email: "new@example.com"
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/UserInfo'
+        '400':
+          description: 请求数据无效
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: 邮箱或手机号已被使用
+
+    delete:
+      tags:
+        - Users
+      summary: 删除当前用户账号
+      description: |
+        软删除当前用户账号。
+
+        **软删除说明**:
+        - 设置 `deleted_at` 时间戳
+        - 数据保留但标记为已删除
+        - 用于合规和数据审计
+        - 删除后无法恢复账号
+      operationId: deleteCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Account deleted successfully"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/users/me/avatar:
+    get:
+      tags:
+        - Users
+      summary: 获取用户头像信息
+      description: 获取当前用户的头像URL和状态。
+      operationId: getAvatar
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      avatar_url:
+                        type: string
+                        format: uri
+                        nullable: true
+                      has_avatar:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags:
+        - Users
+      summary: 上传用户头像
+      description: |
+        上传或更新当前用户的头像。
+
+        **图片格式**:
+        - Base64编码
+        - 支持PNG、JPEG等格式
+        - 自动生成SHA-256哈希文件名
+      operationId: uploadAvatar
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - image_data
+              properties:
+                image_data:
+                  type: string
+                  description: Base64编码的图片数据（不含data URL前缀）
+            example:
+              image_data: "iVBORw0KGgoAAAANSUhEUgAA..."
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      avatar_url:
+                        type: string
+                        format: uri
+              example:
+                success: true
+                message: "Avatar uploaded successfully"
+                avatar_url: "/media/avatars/avatar_user123_abc123.png"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags:
+        - Users
+      summary: 删除用户头像
+      description: |
+        删除当前用户的头像。
+
+        **注意**: 仅清除数据库中的头像URL引用，不删除实际图片文件。
+      operationId: deleteAvatar
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Avatar deleted successfully"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/users/me/associate-diagnoses:
+    post:
+      tags:
+        - Users
+      summary: 关联匿名诊断记录
+      description: |
+        将匿名诊断记录关联到当前用户账号。
+
+        **使用场景**:
+        - 用户先进行匿名诊断
+        - 后续登录账号
+        - 将之前的匿名诊断记录关联到账号
+
+        **规则**:
+        - 只能关联匿名诊断（user_id为NULL）
+        - 已关联其他账号的诊断无法关联
+      operationId: associateDiagnoses
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - diagnosis_ids
+              properties:
+                diagnosis_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: 要关联的匿名诊断ID列表
+            example:
+              diagnosis_ids:
+                - "123e4567-e89b-12d3-a456-426614174000"
+                - "223e4567-e89b-12d3-a456-426614174001"
+      responses:
+        '200':
+          description: 关联完成
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      associated_count:
+                        type: integer
+                        description: 成功关联的数量
+                      failed_count:
+                        type: integer
+                        description: 失败的数量
+                      failed_ids:
+                        type: array
+                        items:
+                          type: string
+                        description: 失败的诊断ID列表
+              example:
+                success: true
+                message: "Associated 2 diagnoses successfully"
+                associated_count: 2
+                failed_count: 0
+                failed_ids: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================================
+  # Health Records Endpoints
+  # ============================================================================
+  /api/v2/health-records:
+    get:
+      tags:
+        - Health Records
+      summary: 获取健康档案列表
+      description: |
+        获取当前用户的健康档案记录。
+
+        **支持过滤**:
+        - 按档案类型过滤
+        - 限制返回数量（最大100）
+
+        结果按创建时间倒序排列。
+      operationId: getHealthRecords
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: record_type
+          in: query
+          schema:
+            $ref: '#/components/schemas/HealthRecordType'
+          description: 档案类型过滤
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: 最大返回记录数
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      total:
+                        type: integer
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HealthRecordItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Health Records
+      summary: 创建健康档案
+      description: |
+        创建新的健康档案记录。
+
+        **档案类型**:
+        - `blood_pressure`: 血压
+        - `heart_rate`: 心率
+        - `weight`: 体重
+        - `height`: 身高
+        - `temperature`: 体温
+        - `blood_sugar`: 血糖
+        - `symptoms`: 症状
+        - `medication`: 用药
+        - `lab_results`: 检查结果
+        - `other`: 其他
+
+        `record_value` 是灵活的JSON结构，可根据类型存储不同数据。
+      operationId: createHealthRecord
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - record_type
+                - record_value
+              properties:
+                record_type:
+                  $ref: '#/components/schemas/HealthRecordType'
+                record_value:
+                  type: object
+                  additionalProperties: true
+                  description: 档案值（灵活JSON结构）
+                record_date:
+                  type: string
+                  format: date-time
+                  description: 档案日期（ISO 8601格式）
+                notes:
+                  type: string
+                  maxLength: 1000
+                  description: 备注
+            examples:
+              blood_pressure:
+                summary: 血压记录
+                value:
+                  record_type: "blood_pressure"
+                  record_value:
+                    systolic: 120
+                    diastolic: 80
+                    unit: "mmHg"
+                  record_date: "2026-02-21T10:00:00Z"
+                  notes: "早上测量"
+              symptoms:
+                summary: 症状记录
+                value:
+                  record_type: "symptoms"
+                  record_value:
+                    symptoms: ["头痛", "发热"]
+                    severity: "moderate"
+                  notes: "感冒症状"
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      record:
+                        $ref: '#/components/schemas/HealthRecordItem'
+        '400':
+          description: 请求数据无效
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v2/health-records/{record_id}:
+    put:
+      tags:
+        - Health Records
+      summary: 更新健康档案
+      description: |
+        更新指定的健康档案记录。
+
+        只能更新属于当前用户的档案。
+      operationId: updateHealthRecord
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: record_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                record_value:
+                  type: object
+                  additionalProperties: true
+                record_date:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+                  maxLength: 1000
+            example:
+              record_value:
+                systolic: 118
+                diastolic: 78
+                unit: "mmHg"
+              notes: "更新测量"
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      record:
+                        $ref: '#/components/schemas/HealthRecordItem'
+        '400':
+          description: 请求数据无效
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Health Records
+      summary: 删除健康档案
+      description: |
+        永久删除指定的健康档案记录。
+
+        只能删除属于当前用户的档案。
+        删除后无法恢复。
+      operationId: deleteHealthRecord
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: record_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Health record deleted successfully"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
