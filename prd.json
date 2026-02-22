@@ -1986,9 +1986,9 @@
       "title": "Performance test - database query",
       "description": "As a backend engineer, I need to test database query performance.",
       "priority": 176,
-      "status": "pending",
+      "status": "completed",
       "phase": "Phase 4: Testing & Documentation",
-      "passes": false,
+      "passes": true,
       "acceptance_criteria": [
         "History query < 100ms",
         "Statistics query < 500ms",
