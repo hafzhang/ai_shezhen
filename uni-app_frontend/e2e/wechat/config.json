@@ -1,0 +1,36 @@
+{
+  "wechat": {
+    "appid": "",
+    "testAppid": "touristappid",
+    "projectPath": "dist/dev/mp-weixin",
+    "buildPath": "dist/build/mp-weixin",
+    "qrcodeOutput": "e2e/wechat/qrcode.png"
+  },
+  "testing": {
+    "timeout": 30000,
+    "screenshotDir": "e2e/wechat/screenshots",
+    "logDir": "e2e/wechat/logs",
+    "reportDir": "e2e/wechat/reports"
+  },
+  "api": {
+    "baseUrl": "http://localhost:8000",
+    "timeout": 10000,
+    "retryAttempts": 3
+  },
+  "testData": {
+    "testUserPhone": "13900000000",
+    "testUserPassword": "Test123!",
+    "testImages": [
+      "e2e/fixtures/images/tongue-sample-1.jpg",
+      "e2e/fixtures/images/tongue-sample-2.jpg",
+      "e2e/fixtures/images/tongue-sample-3.jpg"
+    ]
+  },
+  "features": {
+    "autoLogin": true,
+    "mockWeChatAPI": true,
+    "enableScreenshots": true,
+    "enableVideo": false,
+    "detailedLogs": true
+  }
+}
