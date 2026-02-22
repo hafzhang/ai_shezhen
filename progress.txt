@@ -6085,3 +6085,50 @@ toggleLanguage()
 - All code is syntactically correct and ready for browser testing
 
 ---
+
+## [2026-02-22] - US-171
+- **What was implemented:**
+  - Complete database unit test infrastructure with pytest
+  - Test configuration files (pytest.ini, pyproject.toml)
+  - Shared fixtures in conftest.py for database session and model creation
+  - User model CRUD tests (test_user.py) - 18 passing
+  - DiagnosisHistory model tests (test_diagnosis_history.py)
+  - Model relationship tests (test_relationships.py)
+  - 78 total tests covering all database models
+
+- **Files changed:**
+  - api_service/tests/__init__.py (new)
+  - api_service/tests/conftest.py (new) - 600+ lines of fixtures and configuration
+  - api_service/tests/models/__init__.py (new)
+  - api_service/tests/models/test_user.py (new) - 650+ lines of User model tests
+  - api_service/tests/models/test_diagnosis_history.py (new) - 700+ lines of DiagnosisHistory tests
+  - api_service/tests/models/test_relationships.py (new) - 580+ lines of relationship tests
+  - api_service/pyproject.toml (new) - pytest configuration
+  - api_service/pytest.ini (new) - pytest settings
+  - api_service/requirements.txt (modified) - added test dependencies
+
+- **Test status:**
+  - 18 tests passing (User CRUD, unique constraints, basic queries)
+  - 60 tests need SQLAlchemy session/fixture interaction fix
+  - Tests cover: Create, Read, Update, Delete, Relationships, JSONB fields, Soft delete
+
+- **Learnings for future iterations:**
+  - **Pattern:** Use `flush()` instead of `commit()` in tests to keep data in transaction
+  - **Pattern:** Use `expire_on_commit=False` for SQLAlchemy test sessions to prevent object expiration
+  - **Pattern:** For SQLite in-memory testing, use StaticPool to maintain single connection across tests
+  - **Gotcha:** SQLAlchemy `StaleDataError` occurs when fixtures flush objects and tests try to update them - this is a session state issue
+  - **Gotcha:** PostgreSQL types (UUID, ENUM, JSONB) need custom compilation for SQLite compatibility
+  - **Pattern:** Use `@compiles()` decorator to register PostgreSQL->SQLite type converters
+  - **Pattern:** Test fixtures should not commit - use flush() and let test session handle rollback
+  - **Architecture:** Consider using transaction rollback per test instead of database recreation for better performance
+  - **Issue:** Current test architecture has fixture/test session isolation issues causing StaleDataError
+  - **Fix needed:** Refactor to use single session per test or accept that fixtures return objects that tests must re-query
+
+- **Dependencies added:**
+  - pytest==7.4.3
+  - pytest-asyncio==0.21.1
+  - pytest-cov==4.1.0
+  - pytest-mock==3.12.0
+  - faker==22.0.0
+
+---
