@@ -15,7 +15,7 @@ project:
 # ============================================================
 dataset:
   # 基础路径
-  base_path: "C:/Users/Administrator/Desktop/AI_shezhen/shezhenv3-coco"
+  base_path: "/home/admin/openclaw/workspace/ai_shezhen/shezhenv3-coco"
 
   # 数据划分
   train:
