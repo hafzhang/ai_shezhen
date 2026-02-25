@@ -33,22 +33,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Create health_records table with indexes."""
-    # Create enum type for record_type
-    record_type_enum = sa.Enum(
-        "blood_pressure",
-        "heart_rate",
-        "weight",
-        "height",
-        "temperature",
-        "blood_sugar",
-        "symptoms",
-        "medication",
-        "lab_results",
-        "other",
-        name="healthrecordtype",
-    )
-    record_type_enum.create(op.get_bind(), checkfirst=False)
-
     # Create health_records table
     op.create_table(
         "health_records",
@@ -66,7 +50,20 @@ def upgrade() -> None:
         ),
         sa.Column(
             "record_type",
-            record_type_enum,
+            sa.Enum(
+                "blood_pressure",
+                "heart_rate",
+                "weight",
+                "height",
+                "temperature",
+                "blood_sugar",
+                "symptoms",
+                "medication",
+                "lab_results",
+                "other",
+                name="healthrecordtype",
+                create_type=True,
+            ),
             nullable=False,
             comment="Type of health record",
         ),

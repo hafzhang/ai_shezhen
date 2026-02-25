@@ -13,7 +13,9 @@ from api_service.app.middleware.rate_limiter import (
     RateLimiter,
     TokenBucketRateLimiter,
     RateLimitError,
+    RateLimitMiddleware,
     get_rate_limiter,
+    init_rate_limiter,
     rate_limit_dependency
 )
 
@@ -22,6 +24,7 @@ from api_service.app.middleware.circuit_breaker import (
     CircuitBreakerState,
     CircuitBreakerOpenError,
     get_circuit_breaker,
+    init_circuit_breakers,
     circuit_breaker_dependency,
     get_circuit_breaker_states
 )
@@ -65,12 +68,15 @@ __all__ = [
     "RateLimiter",
     "TokenBucketRateLimiter",
     "RateLimitError",
+    "RateLimitMiddleware",
     "get_rate_limiter",
+    "init_rate_limiter",
     "rate_limit_dependency",
     "CircuitBreaker",
     "CircuitBreakerState",
     "CircuitBreakerOpenError",
     "get_circuit_breaker",
+    "init_circuit_breakers",
     "circuit_breaker_dependency",
     "get_circuit_breaker_states",
     "RetryConfig",
