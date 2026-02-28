@@ -1,149 +1,150 @@
 <template>
-  <view class="container">
+  <div class="container">
     <!-- Header with profile info -->
-    <view class="header">
-      <view class="header-bg"></view>
-      <view class="profile-section">
-        <view class="avatar-container" @click="handleAvatarClick">
-          <image
+    <div class="header">
+      <div class="header-bg"></div>
+      <div class="profile-section">
+        <div class="avatar-container" @click="handleAvatarClick">
+          <img
             class="avatar"
             :src="userInfo?.avatar_url || defaultAvatar"
-            mode="aspectFill"
+            alt="Avatar"
           />
-          <view class="avatar-edit">
-            <text class="edit-icon">📷</text>
-          </view>
-        </view>
-        <text class="nickname">{{ userInfo?.nickname || '未登录' }}</text>
-        <text class="phone" v-if="userInfo">{{ formatPhone(userInfo.phone) }}</text>
+          <div class="avatar-edit">
+            <span class="edit-icon">📷</span>
+          </div>
+        </div>
+        <span class="nickname">{{ userInfo?.nickname || '未登录' }}</span>
+        <span class="phone" v-if="userInfo">{{ formatPhone(userInfo.phone) }}</span>
         <button class="btn-login" v-else @click="goToLogin">立即登录</button>
-      </view>
-    </view>
+      </div>
+    </div>
 
     <!-- Stats section -->
-    <view class="stats-section" v-if="userInfo">
-      <view class="stat-item" @click="goToHistory">
-        <text class="stat-value">{{ diagnosisCount }}</text>
-        <text class="stat-label">诊断次数</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-value">{{ riskCount }}</text>
-        <text class="stat-label">风险记录</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item" @click="goToHealthRecords">
-        <text class="stat-value">{{ healthRecordCount }}</text>
-        <text class="stat-label">健康档案</text>
-      </view>
-    </view>
+    <div class="stats-section" v-if="userInfo">
+      <div class="stat-item" @click="goToHistory">
+        <span class="stat-value">{{ diagnosisCount }}</span>
+        <span class="stat-label">诊断次数</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ riskCount }}</span>
+        <span class="stat-label">风险记录</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item" @click="goToHealthRecords">
+        <span class="stat-value">{{ healthRecordCount }}</span>
+        <span class="stat-label">健康档案</span>
+      </div>
+    </div>
 
     <!-- Menu section -->
-    <view class="menu-section" v-if="userInfo">
+    <div class="menu-section" v-if="userInfo">
       <!-- Health records entry -->
-      <view class="menu-item" @click="goToHealthRecords">
-        <view class="item-left">
-          <text class="item-icon">📋</text>
-          <text class="item-label">健康档案</text>
-        </view>
-        <view class="item-right">
-          <text class="item-value">{{ healthRecordCount }} 条记录</text>
-          <text class="arrow">›</text>
-        </view>
-      </view>
+      <div class="menu-item" @click="goToHealthRecords">
+        <div class="item-left">
+          <span class="item-icon">📋</span>
+          <span class="item-label">健康档案</span>
+        </div>
+        <div class="item-right">
+          <span class="item-value">{{ healthRecordCount }} 条记录</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
 
       <!-- Settings entry -->
-      <view class="menu-item" @click="goToSettings">
-        <view class="item-left">
-          <text class="item-icon">⚙️</text>
-          <text class="item-label">设置</text>
-        </view>
-        <view class="item-right">
-          <text class="arrow">›</text>
-        </view>
-      </view>
+      <div class="menu-item" @click="goToSettings">
+        <div class="item-left">
+          <span class="item-icon">⚙️</span>
+          <span class="item-label">设置</span>
+        </div>
+        <div class="item-right">
+          <span class="arrow">›</span>
+        </div>
+      </div>
 
       <!-- About entry -->
-      <view class="menu-item" @click="showAbout">
-        <view class="item-left">
-          <text class="item-icon">ℹ️</text>
-          <text class="item-label">关于我们</text>
-        </view>
-        <view class="item-right">
-          <text class="item-value">v{{ appVersion }}</text>
-          <text class="arrow">›</text>
-        </view>
-      </view>
-    </view>
+      <div class="menu-item" @click="showAbout">
+        <div class="item-left">
+          <span class="item-icon">ℹ️</span>
+          <span class="item-label">关于我们</span>
+        </div>
+        <div class="item-right">
+          <span class="item-value">v{{ appVersion }}</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+    </div>
 
     <!-- Logout button -->
-    <view class="logout-section" v-if="userInfo">
+    <div class="logout-section" v-if="userInfo">
       <button class="btn-logout" @click="handleLogout">退出登录</button>
-    </view>
+    </div>
 
     <!-- Guest section -->
-    <view class="guest-section" v-else>
-      <view class="guest-menu-item" @click="goToLogin">
-        <view class="item-left">
-          <text class="item-icon">🔑</text>
-          <text class="item-label">登录 / 注册</text>
-        </view>
-        <view class="item-right">
-          <text class="arrow">›</text>
-        </view>
-      </view>
-      <view class="guest-menu-item" @click="goToSettings">
-        <view class="item-left">
-          <text class="item-icon">⚙️</text>
-          <text class="item-label">设置</text>
-        </view>
-        <view class="item-right">
-          <text class="arrow">›</text>
-        </view>
-      </view>
-      <view class="guest-menu-item" @click="showAbout">
-        <view class="item-left">
-          <text class="item-icon">ℹ️</text>
-          <text class="item-label">关于我们</text>
-        </view>
-        <view class="item-right">
-          <text class="item-value">v{{ appVersion }}</text>
-          <text class="arrow">›</text>
-        </view>
-      </view>
-    </view>
+    <div class="guest-section" v-else>
+      <div class="guest-menu-item" @click="goToLogin">
+        <div class="item-left">
+          <span class="item-icon">🔑</span>
+          <span class="item-label">登录 / 注册</span>
+        </div>
+        <div class="item-right">
+          <span class="arrow">›</span>
+        </div>
+      </div>
+      <div class="guest-menu-item" @click="goToSettings">
+        <div class="item-left">
+          <span class="item-icon">⚙️</span>
+          <span class="item-label">设置</span>
+        </div>
+        <div class="item-right">
+          <span class="arrow">›</span>
+        </div>
+      </div>
+      <div class="guest-menu-item" @click="showAbout">
+        <div class="item-left">
+          <span class="item-icon">ℹ️</span>
+          <span class="item-label">关于我们</span>
+        </div>
+        <div class="item-right">
+          <span class="item-value">v{{ appVersion }}</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+    </div>
 
     <!-- About modal -->
-    <u-popup v-model:show="showAboutModal" mode="center" :round="20">
-      <view class="about-modal">
-        <view class="about-header">
-          <text class="about-title">关于 AI 舌诊</text>
-          <text class="about-close" @click="showAboutModal = false">×</text>
-        </view>
-        <view class="about-content">
-          <text class="about-logo">👅</text>
-          <text class="about-name">AI 舌诊智能诊断系统</text>
-          <text class="about-version">版本 {{ appVersion }}</text>
-          <view class="about-divider"></view>
-          <text class="about-desc">
+    <div class="modal-overlay" v-if="showAboutModal" @click="showAboutModal = false">
+      <div class="about-modal" @click.stop>
+        <div class="about-header">
+          <span class="about-title">关于 AI 舌诊</span>
+          <span class="about-close" @click="showAboutModal = false">×</span>
+        </div>
+        <div class="about-content">
+          <span class="about-logo">👅</span>
+          <span class="about-name">AI 舌诊智能诊断系统</span>
+          <span class="about-version">版本 {{ appVersion }}</span>
+          <div class="about-divider"></div>
+          <span class="about-desc">
             基于深度学习的中医舌诊智能诊断系统，提供舌象分析、证型辨识和健康建议。
-          </text>
-          <view class="about-info">
-            <text class="info-item">© 2026 AI 舌诊团队</text>
-            <text class="info-item">基于 PaddlePaddle + 文心大模型</text>
-          </view>
-        </view>
+          </span>
+          <div class="about-info">
+            <span class="info-item">© 2026 AI 舌诊团队</span>
+            <span class="info-item">基于 PaddlePaddle + 文心大模型</span>
+          </div>
+        </div>
         <button class="btn btn-primary" @click="showAboutModal = false">关闭</button>
-      </view>
-    </u-popup>
-  </view>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore, useDiagnosisStore } from '@/store'
-import { routeGuard } from '@/utils/routeGuard'
 
+const router = useRouter()
 const userStore = useUserStore()
 const diagnosisStore = useDiagnosisStore()
 
@@ -181,35 +182,23 @@ function handleAvatarClick() {
     return
   }
   // TODO: Implement avatar upload/crop
-  uni.showToast({
-    title: '头像编辑功能开发中',
-    icon: 'none'
-  })
+  alert('头像编辑功能开发中')
 }
 
 function goToLogin() {
-  routeGuard.navigateTo({
-    url: '/pages/login/index'
-  })
+  router.push('/login')
 }
 
 function goToHistory() {
-  routeGuard.switchTab({
-    url: '/pages/history/index'
-  })
+  router.push('/history')
 }
 
 function goToHealthRecords() {
-  // Use routeGuard - it will handle auth check and redirect if needed
-  routeGuard.navigateTo({
-    url: '/pages/health-records/index'
-  })
+  router.push('/health-records')
 }
 
 function goToSettings() {
-  uni.navigateTo({
-    url: '/pages/settings/index'
-  })
+  router.push('/settings')
 }
 
 function showAbout() {
@@ -217,19 +206,10 @@ function showAbout() {
 }
 
 function handleLogout() {
-  uni.showModal({
-    title: '退出登录',
-    content: '确定要退出登录吗？',
-    success: (res) => {
-      if (res.confirm) {
-        userStore.logout()
-        uni.showToast({
-          title: '已退出登录',
-          icon: 'success'
-        })
-      }
-    }
-  })
+  if (confirm('确定要退出登录吗？')) {
+    userStore.logout()
+    alert('已退出登录')
+  }
 }
 
 // Lifecycle
@@ -277,6 +257,7 @@ onMounted(() => {
   width: 100px;
   height: 100px;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .avatar {
@@ -285,6 +266,7 @@ onMounted(() => {
   border-radius: 50%;
   border: 4px solid #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
 }
 
 .avatar-edit {
@@ -329,6 +311,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .stats-section {
@@ -345,6 +328,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   flex: 1;
+  cursor: pointer;
 }
 
 .stat-value {
@@ -378,11 +362,17 @@ onMounted(() => {
   align-items: center;
   padding: 18px 20px;
   border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
 }
 
 .menu-item:last-child,
 .guest-menu-item:last-child {
   border-bottom: none;
+}
+
+.menu-item:hover,
+.guest-menu-item:hover {
+  background: #f8f8f8;
 }
 
 .item-left {
@@ -432,6 +422,25 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #fff0f0;
+}
+
+// Modal styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .about-modal {
@@ -439,6 +448,7 @@ onMounted(() => {
   border-radius: 20px;
   padding: 25px;
   width: 280px;
+  max-width: 90%;
 }
 
 .about-header {
@@ -458,6 +468,7 @@ onMounted(() => {
   font-size: 28px;
   color: #999999;
   line-height: 1;
+  cursor: pointer;
 }
 
 .about-content {
@@ -520,12 +531,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary {
   background: #667eea;
   color: #ffffff;
   margin-top: 20px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
 }
 
 /* Dark mode styles */
@@ -586,6 +602,11 @@ onMounted(() => {
 :global(.dark-mode) .menu-item,
 :global(.dark-mode) .guest-menu-item {
   border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .menu-item:hover,
+:global(.dark-mode) .guest-menu-item:hover {
+  background: #3a3a3a;
 }
 
 :global(.dark-mode) .item-label {

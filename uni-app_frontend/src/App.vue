@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div id="app" class="app">
     <router-view />
   </div>
 </template>
@@ -8,7 +8,6 @@
 import { onMounted } from 'vue'
 import { useUserStore } from '@/store'
 import { useDarkMode } from '@/composables'
-import { initializeRouteGuard } from '@/utils/routeGuard'
 
 // Initialize dark mode
 useDarkMode()
@@ -19,10 +18,6 @@ onMounted(async () => {
   // Initialize authentication state from storage (H5 auto-login)
   const userStore = useUserStore()
   await userStore.initializeAuth()
-
-  // Initialize route guards after auth state is ready
-  // This will check if the current page requires authentication
-  initializeRouteGuard()
 })
 </script>
 

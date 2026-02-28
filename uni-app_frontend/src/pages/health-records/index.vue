@@ -1,233 +1,205 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="header-left" @click="goBack">
-        <text class="back-icon">←</text>
-      </view>
-      <text class="header-title">健康档案</text>
-      <view class="header-right" @click="showAddModal = true">
-        <text class="add-icon">+</text>
-      </view>
-    </view>
+  <div class="container">
+    <div class="header">
+      <div class="header-left" @click="goBack">
+        <span class="back-icon">←</span>
+      </div>
+      <span class="header-title">健康档案</span>
+      <div class="header-right" @click="showAddModal = true">
+        <span class="add-icon">+</span>
+      </div>
+    </div>
 
-    <view class="content">
+    <div class="content">
       <!-- Empty state -->
-      <view class="empty-state" v-if="!isLoading && records.length === 0">
-        <text class="empty-icon">📋</text>
-        <text class="empty-title">暂无健康档案</text>
-        <text class="empty-desc">记录您的健康信息，便于跟踪健康趋势</text>
+      <div class="empty-state" v-if="!isLoading && records.length === 0">
+        <span class="empty-icon">📋</span>
+        <span class="empty-title">暂无健康档案</span>
+        <span class="empty-desc">记录您的健康信息，便于跟踪健康趋势</span>
         <button class="btn btn-primary" @click="showAddModal = true">添加记录</button>
-      </view>
+      </div>
 
       <!-- Records list -->
-      <view class="records-list" v-else>
+      <div class="records-list" v-else>
         <!-- Pull to refresh indicator -->
-        <view class="refresh-indicator" v-if="isRefreshing">
-          <text class="refresh-text">正在刷新...</text>
-        </view>
+        <div class="refresh-indicator" v-if="isRefreshing">
+          <span class="refresh-text">正在刷新...</span>
+        </div>
 
         <!-- Loading state -->
-        <view class="loading-state" v-if="isLoading">
-          <text class="loading-text">加载中...</text>
-        </view>
+        <div class="loading-state" v-if="isLoading">
+          <span class="loading-text">加载中...</span>
+        </div>
 
         <!-- Records grouped by type -->
-        <view class="record-group" v-for="group in groupedRecords" :key="group.type">
-          <view class="group-header">
-            <text class="group-title">{{ getRecordTypeLabel(group.type) }}</text>
-            <text class="group-count">{{ group.records.length }} 条</text>
-          </view>
-          <view
+        <div class="record-group" v-for="group in groupedRecords" :key="group.type">
+          <div class="group-header">
+            <span class="group-title">{{ getRecordTypeLabel(group.type) }}</span>
+            <span class="group-count">{{ group.records.length }} 条</span>
+          </div>
+          <div
             class="record-item"
             v-for="record in group.records"
             :key="record.id"
             @click="viewRecord(record)"
           >
-            <view class="record-left">
-              <text class="record-name">{{ record.record_name || record.record_type }}</text>
-              <text class="record-date">{{ formatDate(record.record_date) }}</text>
-            </view>
-            <view class="record-right">
-              <text class="record-value">{{ formatRecordValue(record) }}</text>
-              <text class="arrow">›</text>
-            </view>
-          </view>
-        </view>
-      </view>
+            <div class="record-left">
+              <span class="record-name">{{ record.record_name || record.record_type }}</span>
+              <span class="record-date">{{ formatDate(record.record_date) }}</span>
+            </div>
+            <div class="record-right">
+              <span class="record-value">{{ formatRecordValue(record) }}</span>
+              <span class="arrow">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Load more indicator -->
-      <view class="load-more" v-if="hasMore && !isLoading">
-        <text class="load-text" @click="loadMore">加载更多</text>
-      </view>
+      <div class="load-more" v-if="hasMore && !isLoading">
+        <span class="load-text" @click="loadMore">加载更多</span>
+      </div>
 
       <!-- No more indicator -->
-      <view class="no-more" v-if="!hasMore && records.length > 0">
-        <text class="no-more-text">没有更多记录了</text>
-      </view>
-    </view>
+      <div class="no-more" v-if="!hasMore && records.length > 0">
+        <span class="no-more-text">没有更多记录了</span>
+      </div>
+    </div>
 
     <!-- Add/Edit modal -->
-    <u-popup v-model:show="showAddModal" mode="bottom" :round="20">
-      <view class="modal">
-        <view class="modal-header">
-          <text class="modal-title">{{ editingRecord ? '编辑记录' : '添加记录' }}</text>
-          <text class="modal-close" @click="closeModal">×</text>
-        </view>
+    <div class="modal-overlay" v-if="showAddModal" @click="closeModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <span class="modal-title">{{ editingRecord ? '编辑记录' : '添加记录' }}</span>
+          <span class="modal-close" @click="closeModal">×</span>
+        </div>
 
-        <view class="modal-content">
+        <div class="modal-content">
           <!-- Record type -->
-          <view class="form-item">
-            <text class="form-label">记录类型</text>
-            <view class="type-options">
-              <view
+          <div class="form-item">
+            <span class="form-label">记录类型</span>
+            <div class="type-options">
+              <div
                 class="type-option"
                 :class="{ active: formData.record_type === option.value }"
                 v-for="option in recordTypeOptions"
                 :key="option.value"
                 @click="formData.record_type = option.value"
               >
-                <text class="option-text">{{ option.label }}</text>
-              </view>
-            </view>
-          </view>
+                <span class="option-text">{{ option.label }}</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Record name -->
-          <view class="form-item">
-            <text class="form-label">记录名称</text>
+          <div class="form-item">
+            <span class="form-label">记录名称</span>
             <input
               class="form-input"
               v-model="formData.record_name"
               placeholder="如：血压、血糖、体重等"
             />
-          </view>
+          </div>
 
           <!-- Record value -->
-          <view class="form-item">
-            <text class="form-label">数值</text>
+          <div class="form-item">
+            <span class="form-label">数值</span>
             <input
               class="form-input"
               v-model="formData.record_value"
               type="text"
               placeholder="请输入数值"
             />
-            <text class="form-hint">例如：120/80, 5.6, 65kg等</text>
-          </view>
+            <span class="form-hint">例如：120/80, 5.6, 65kg等</span>
+          </div>
 
           <!-- Record date -->
-          <view class="form-item">
-            <text class="form-label">记录日期</text>
-            <view class="date-picker" @click="showDatePicker = true">
-              <text class="date-text" v-if="formData.record_date">
-                {{ formatDate(formData.record_date) }}
-              </text>
-              <text class="date-placeholder" v-else>选择日期</text>
-              <text class="arrow">›</text>
-            </view>
-          </view>
+          <div class="form-item">
+            <span class="form-label">记录日期</span>
+            <input
+              type="date"
+              class="form-input"
+              v-model="formData.record_date"
+            />
+          </div>
 
           <!-- Notes -->
-          <view class="form-item">
-            <text class="form-label">备注</text>
+          <div class="form-item">
+            <span class="form-label">备注</span>
             <textarea
               class="form-textarea"
               v-model="formData.notes"
               placeholder="添加备注信息（可选）"
               maxlength="200"
             />
-          </view>
-        </view>
+          </div>
+        </div>
 
-        <view class="modal-actions">
+        <div class="modal-actions">
           <button class="btn btn-secondary" @click="closeModal">取消</button>
           <button class="btn btn-primary" @click="saveRecord">保存</button>
-        </view>
-      </view>
-    </u-popup>
-
-    <!-- Date picker -->
-    <u-popup v-model:show="showDatePicker" mode="bottom" :round="20">
-      <view class="date-picker-modal">
-        <view class="date-picker-header">
-          <text class="date-picker-cancel" @click="showDatePicker = false">取消</text>
-          <text class="date-picker-title">选择日期</text>
-          <text class="date-picker-confirm" @click="confirmDate">确定</text>
-        </view>
-        <picker-view
-          class="date-picker-view"
-          :value="datePickerValue"
-          @change="onDatePickerChange"
-        >
-          <picker-view-column>
-            <view v-for="year in years" :key="year">{{ year }}年</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view v-for="month in months" :key="month">{{ month }}月</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view v-for="day in days" :key="day">{{ day }}日</view>
-          </picker-view-column>
-        </picker-view>
-      </view>
-    </u-popup>
+        </div>
+      </div>
+    </div>
 
     <!-- View record modal -->
-    <u-popup v-model:show="showViewModal" mode="center" :round="20">
-      <view class="view-modal" v-if="currentRecord">
-        <view class="view-header">
-          <text class="view-title">记录详情</text>
-          <text class="view-close" @click="showViewModal = false">×</text>
-        </view>
-        <view class="view-content">
-          <view class="view-item">
-            <text class="view-label">类型</text>
-            <text class="view-value">{{ getRecordTypeLabel(currentRecord.record_type) }}</text>
-          </view>
-          <view class="view-item" v-if="currentRecord.record_name">
-            <text class="view-label">名称</text>
-            <text class="view-value">{{ currentRecord.record_name }}</text>
-          </view>
-          <view class="view-item">
-            <text class="view-label">数值</text>
-            <text class="view-value">{{ formatRecordValue(currentRecord) }}</text>
-          </view>
-          <view class="view-item">
-            <text class="view-label">日期</text>
-            <text class="view-value">{{ formatDate(currentRecord.record_date) }}</text>
-          </view>
-          <view class="view-item" v-if="currentRecord.notes">
-            <text class="view-label">备注</text>
-            <text class="view-value">{{ currentRecord.notes }}</text>
-          </view>
-        </view>
-        <view class="view-actions">
+    <div class="modal-overlay" v-if="showViewModal" @click="showViewModal = false">
+      <div class="view-modal" @click.stop v-if="currentRecord">
+        <div class="view-header">
+          <span class="view-title">记录详情</span>
+          <span class="view-close" @click="showViewModal = false">×</span>
+        </div>
+        <div class="view-content">
+          <div class="view-item">
+            <span class="view-label">类型</span>
+            <span class="view-value">{{ getRecordTypeLabel(currentRecord.record_type) }}</span>
+          </div>
+          <div class="view-item" v-if="currentRecord.record_name">
+            <span class="view-label">名称</span>
+            <span class="view-value">{{ currentRecord.record_name }}</span>
+          </div>
+          <div class="view-item">
+            <span class="view-label">数值</span>
+            <span class="view-value">{{ formatRecordValue(currentRecord) }}</span>
+          </div>
+          <div class="view-item">
+            <span class="view-label">日期</span>
+            <span class="view-value">{{ formatDate(currentRecord.record_date) }}</span>
+          </div>
+          <div class="view-item" v-if="currentRecord.notes">
+            <span class="view-label">备注</span>
+            <span class="view-value">{{ currentRecord.notes }}</span>
+          </div>
+        </div>
+        <div class="view-actions">
           <button class="btn btn-secondary" @click="editRecord(currentRecord)">编辑</button>
           <button class="btn btn-danger" @click="confirmDelete">删除</button>
-        </view>
-      </view>
-    </u-popup>
+        </div>
+      </div>
+    </div>
 
     <!-- Delete confirmation modal -->
-    <u-popup v-model:show="showDeleteModal" mode="center" :round="20">
-      <view class="confirm-modal">
-        <view class="confirm-header">
-          <text class="confirm-title">删除记录</text>
-        </view>
-        <view class="confirm-content">
-          <text class="confirm-message">确定要删除这条健康记录吗？</text>
-        </view>
-        <view class="confirm-actions">
+    <div class="modal-overlay" v-if="showDeleteModal" @click="showDeleteModal = false">
+      <div class="confirm-modal" @click.stop>
+        <div class="confirm-header">
+          <span class="confirm-title">删除记录</span>
+        </div>
+        <div class="confirm-content">
+          <span class="confirm-message">确定要删除这条健康记录吗？</span>
+        </div>
+        <div class="confirm-actions">
           <button class="btn btn-secondary" @click="showDeleteModal = false">取消</button>
           <button class="btn btn-danger" @click="deleteRecord">删除</button>
-        </view>
-      </view>
-    </u-popup>
-  </view>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { request } from '@/utils/request'
-import { onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app'
 
 interface HealthRecord {
   id: string
@@ -241,6 +213,8 @@ interface HealthRecord {
   updated_at: string
 }
 
+const router = useRouter()
+
 // State
 const records = ref<HealthRecord[]>([])
 const isLoading = ref(false)
@@ -252,7 +226,6 @@ const pageSize = 20
 // Modal states
 const showAddModal = ref(false)
 const showViewModal = ref(false)
-const showDatePicker = ref(false)
 const showDeleteModal = ref(false)
 
 // Form data
@@ -265,15 +238,6 @@ const formData = ref({
   record_date: new Date().toISOString().split('T')[0],
   notes: ''
 })
-
-// Date picker
-const datePickerValue = ref([0, 0, 0])
-const years = computed(() => {
-  const currentYear = new Date().getFullYear()
-  return Array.from({ length: 10 }, (_, i) => currentYear - i)
-})
-const months = Array.from({ length: 12 }, (_, i) => i + 1)
-const days = Array.from({ length: 31 }, (_, i) => i + 1)
 
 // Record type options
 const recordTypeOptions = [
@@ -302,7 +266,7 @@ const groupedRecords = computed(() => {
 
 // Functions
 function goBack() {
-  uni.navigateBack()
+  router.back()
 }
 
 function getRecordTypeLabel(type: string): string {
@@ -336,7 +300,6 @@ function resetForm() {
     record_date: new Date().toISOString().split('T')[0],
     notes: ''
   }
-  datePickerValue.value = [0, 0, 0]
 }
 
 async function loadRecords(refresh = false) {
@@ -371,10 +334,7 @@ async function loadRecords(refresh = false) {
     }
   } catch (error) {
     console.error('Failed to load health records:', error)
-    uni.showToast({
-      title: '加载失败',
-      icon: 'none'
-    })
+    alert('加载失败')
   } finally {
     isLoading.value = false
   }
@@ -390,7 +350,6 @@ async function onRefresh() {
     console.error('Refresh failed:', error)
   } finally {
     isRefreshing.value = false
-    uni.stopPullDownRefresh()
   }
 }
 
@@ -425,10 +384,7 @@ function confirmDelete() {
 
 async function saveRecord() {
   if (!formData.value.record_value) {
-    uni.showToast({
-      title: '请输入数值',
-      icon: 'none'
-    })
+    alert('请输入数值')
     return
   }
 
@@ -446,19 +402,13 @@ async function saveRecord() {
     })
 
     if (response.success) {
-      uni.showToast({
-        title: isEdit ? '更新成功' : '添加成功',
-        icon: 'success'
-      })
+      alert(isEdit ? '更新成功' : '添加成功')
       closeModal()
       loadRecords(true)
     }
   } catch (error) {
     console.error('Failed to save record:', error)
-    uni.showToast({
-      title: '保存失败',
-      icon: 'none'
-    })
+    alert('保存失败')
   }
 }
 
@@ -472,48 +422,19 @@ async function deleteRecord() {
     })
 
     if (response.success) {
-      uni.showToast({
-        title: '删除成功',
-        icon: 'success'
-      })
+      alert('删除成功')
       showDeleteModal.value = false
       loadRecords(true)
     }
   } catch (error) {
     console.error('Failed to delete record:', error)
-    uni.showToast({
-      title: '删除失败',
-      icon: 'none'
-    })
+    alert('删除失败')
   }
-}
-
-function onDatePickerChange(e: any) {
-  datePickerValue.value = e.detail.value
-}
-
-function confirmDate() {
-  const [yearIndex, monthIndex, dayIndex] = datePickerValue.value
-  const year = years.value[yearIndex]
-  const month = String(months[monthIndex]).padStart(2, '0')
-  const day = String(days[dayIndex]).padStart(2, '0')
-  formData.value.record_date = `${year}-${month}-${day}`
-  showDatePicker.value = false
 }
 
 // Lifecycle
 onMounted(() => {
   loadRecords(true)
-})
-
-// Pull to refresh (uni-app API)
-onPullDownRefresh(() => {
-  onRefresh()
-})
-
-// Load more on scroll (uni-app API)
-onReachBottom(() => {
-  loadMore()
 })
 </script>
 
@@ -528,7 +449,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 50px 15px 15px;
+  padding: 40px 15px 15px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -539,6 +460,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .back-icon,
@@ -576,14 +498,12 @@ onReachBottom(() => {
   font-weight: 500;
   color: #333333;
   margin-bottom: 10px;
-  display: block;
 }
 
 .empty-desc {
   font-size: 14px;
   color: #999999;
   margin-bottom: 30px;
-  display: block;
 }
 
 .records-list {
@@ -646,10 +566,15 @@ onReachBottom(() => {
   align-items: center;
   padding: 18px 20px;
   border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
 }
 
 .record-item:last-child {
   border-bottom: none;
+}
+
+.record-item:hover {
+  background: #f8f8f8;
 }
 
 .record-left {
@@ -695,6 +620,7 @@ onReachBottom(() => {
 .load-text {
   font-size: 14px;
   color: #667eea;
+  cursor: pointer;
 }
 
 .no-more-text {
@@ -702,25 +628,46 @@ onReachBottom(() => {
   color: #999999;
 }
 
+// Modal styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .modal,
-.date-picker-modal,
 .view-modal,
 .confirm-modal {
   background: #ffffff;
   border-radius: 20px 20px 0 0;
   padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .view-modal,
 .confirm-modal {
   border-radius: 20px;
   width: 280px;
+  max-width: 90%;
 }
 
 .modal-header,
 .view-header,
-.confirm-header,
-.date-picker-header {
+.confirm-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -729,8 +676,7 @@ onReachBottom(() => {
 
 .modal-title,
 .view-title,
-.confirm-title,
-.date-picker-title {
+.confirm-title {
   font-size: 18px;
   font-weight: 500;
   color: #333333;
@@ -741,12 +687,7 @@ onReachBottom(() => {
   font-size: 28px;
   color: #999999;
   line-height: 1;
-}
-
-.date-picker-cancel,
-.date-picker-confirm {
-  font-size: 15px;
-  color: #667eea;
+  cursor: pointer;
 }
 
 .modal-content {
@@ -774,6 +715,7 @@ onReachBottom(() => {
   padding: 12px 15px;
   font-size: 15px;
   color: #333333;
+  border: 1px solid #e0e0e0;
 }
 
 .form-textarea {
@@ -797,6 +739,7 @@ onReachBottom(() => {
   border-radius: 20px;
   border: 1px solid #e0e0e0;
   background: #ffffff;
+  cursor: pointer;
 }
 
 .type-option.active {
@@ -811,29 +754,6 @@ onReachBottom(() => {
 
 .type-option.active .option-text {
   color: #ffffff;
-}
-
-.date-picker {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 12px 15px;
-}
-
-.date-text {
-  font-size: 15px;
-  color: #333333;
-}
-
-.date-placeholder {
-  font-size: 15px;
-  color: #999999;
-}
-
-.date-picker-view {
-  height: 300px;
 }
 
 .modal-actions,
@@ -854,6 +774,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary {
@@ -861,14 +782,26 @@ onReachBottom(() => {
   color: #ffffff;
 }
 
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
 .btn-secondary {
   background: #f0f0f0;
   color: #666666;
 }
 
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
 .btn-danger {
   background: #fff0f0;
   color: #ff4d4f;
+}
+
+.btn-danger:hover {
+  background: #ffe0e0;
 }
 
 .view-content {
@@ -905,5 +838,98 @@ onReachBottom(() => {
   color: #333333;
   text-align: center;
   line-height: 1.6;
+}
+
+/* Dark mode styles */
+:global(.dark-mode) .container {
+  background: #1a1a1a;
+}
+
+:global(.dark-mode) .header {
+  background: #2a2a2a;
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .back-icon,
+:global(.dark-mode) .add-icon,
+:global(.dark-mode) .header-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .record-group {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .group-header {
+  background: #3a3a3a;
+  border-bottom-color: #4a4a4a;
+}
+
+:global(.dark-mode) .group-title,
+:global(.dark-mode) .record-name {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .record-item {
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .record-item:hover {
+  background: #3a3a3a;
+}
+
+:global(.dark-mode) .modal,
+:global(.dark-mode) .view-modal,
+:global(.dark-mode) .confirm-modal {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .modal-title,
+:global(.dark-mode) .view-title,
+:global(.dark-mode) .confirm-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .modal-close,
+:global(.dark-mode) .view-close {
+  color: #888888;
+}
+
+:global(.dark-mode) .form-label {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .form-input,
+:global(.dark-mode) .form-textarea {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .type-option {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+}
+
+:global(.dark-mode) .option-text {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .view-value {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .confirm-message {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .btn-secondary {
+  background: #3a3a3a;
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .btn-danger {
+  background: #3a2a2a;
+  color: #ff6b6b;
 }
 </style>

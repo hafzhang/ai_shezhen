@@ -13,7 +13,7 @@ async function globalSetup(config: FullConfig) {
   console.log('🔧 Setting up E2E test environment...')
 
   // Check if API server is running
-  const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000'
+  const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000'
   const HEALTH_URL = `${API_BASE_URL}/api/v2/health`
 
   try {

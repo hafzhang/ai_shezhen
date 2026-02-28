@@ -119,12 +119,25 @@ class TongueClassificationPredictor:
             # Load state dict
             state_dict = paddle.load(model_path)
 
-            # Handle FP16 weights (convert to FP32)
-            if any(isinstance(v, np.ndarray) and v.dtype == np.float16 for v in state_dict.values()):
-                print("Converting FP16 weights to FP32...")
-                for key, value in state_dict.items():
-                    if isinstance(value, np.ndarray) and value.dtype == np.float16:
-                        state_dict[key] = value.astype(np.float32)
+            # Handle FP16 weights (convert to FP32) - both numpy arrays and Paddle tensors
+            print("Checking for FP16 weights to convert to FP32...")
+            converted = False
+            for key, value in list(state_dict.items()):
+                # Check for numpy array FP16
+                if isinstance(value, np.ndarray) and value.dtype == np.float16:
+                    state_dict[key] = value.astype(np.float32)
+                    converted = True
+                # Check for Paddle tensor FP16
+                elif hasattr(value, 'dtype') and str(value.dtype) == 'paddle.float16':
+                    state_dict[key] = value.cast(paddle.float32)
+                    converted = True
+                # Check for numpy float16 in tensor
+                elif isinstance(value, np.ndarray) and 'float16' in str(value.dtype):
+                    state_dict[key] = value.astype(np.float32)
+                    converted = True
+
+            if converted:
+                print("Converted FP16 weights to FP32")
 
             # Handle INT8 weights (NPZ format)
             if model_path.endswith('.npz'):

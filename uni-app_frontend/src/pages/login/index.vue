@@ -49,9 +49,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store'
 import { handleLoginSuccess } from '@/utils/routeGuard'
 
+const router = useRouter()
 const userStore = useUserStore()
 const phone = ref('')
 const password = ref('')
@@ -59,19 +61,11 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 function goBack() {
-  uni.navigateBack({
-    delta: 1,
-    fail: () => {
-      // If can't go back, reLaunch to home
-      uni.reLaunch({ url: '/pages/index/index' })
-    }
-  })
+  router.back()
 }
 
 function goToRegister() {
-  uni.navigateTo({
-    url: '/pages/register/index'
-  })
+  router.push('/register')
 }
 
 async function handleLogin() {
@@ -96,15 +90,11 @@ async function handleLogin() {
 
     if (success) {
       // Show success message and redirect using route guard
-      uni.showToast({
-        title: '登录成功',
-        icon: 'success',
-        duration: 1500
-      })
+      alert('登录成功')
 
       setTimeout(() => {
         handleLoginSuccess()
-      }, 1500)
+      }, 500)
     } else {
       errorMessage.value = '登录失败，请检查手机号和密码'
     }

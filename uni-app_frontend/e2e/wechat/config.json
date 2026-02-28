@@ -13,7 +13,7 @@
     "reportDir": "e2e/wechat/reports"
   },
   "api": {
-    "baseUrl": "http://localhost:8000",
+    "baseUrl": "http://localhost:9000",
     "timeout": 10000,
     "retryAttempts": 3
   },

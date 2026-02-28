@@ -22,11 +22,12 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session
 
 # Database URL from environment variable
 # Supports both DATABASE_URL and ALEMBIC_DATABASE_URL for compatibility
+# For development, use SQLite if PostgreSQL is not available
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     os.getenv(
         "ALEMBIC_DATABASE_URL",
-        "postgresql://shezhen:shezhen_password@localhost:5432/shezhen_db"
+        "sqlite:///./shezhen.db"  # SQLite for development (easier setup)
     )
 )
 

@@ -1,346 +1,356 @@
 <template>
-  <view class="container">
+  <div class="container">
     <!-- Custom Header -->
-    <view class="header">
-      <view class="header-left" @click="goBack">
-        <text class="icon-back">←</text>
-      </view>
-      <text class="header-title">诊断结果</text>
-      <view class="header-right" @click="showShareMenu">
-        <text class="icon-share">⋮</text>
-      </view>
-    </view>
+    <div class="header">
+      <div class="header-left" @click="goBack">
+        <span class="icon-back">←</span>
+      </div>
+      <span class="header-title">诊断结果</span>
+      <div class="header-right" @click="showShareModal = true">
+        <span class="icon-share">⋮</span>
+      </div>
+    </div>
 
-    <scroll-view class="content" scroll-y v-if="diagnosis">
+    <div class="content" v-if="diagnosis">
       <!-- Tongue Image with Mask Overlay -->
-      <view class="image-section">
-        <view class="image-container">
-          <image
+      <div class="image-section">
+        <div class="image-container">
+          <img
             class="tongue-image"
             :src="diagnosis.image_url"
-            mode="aspectFill"
+            alt="舌部照片"
           />
           <!-- Mask Overlay -->
-          <image
+          <div
             v-if="diagnosis.mask_url"
             class="mask-overlay"
-            :src="diagnosis.mask_url"
-            mode="aspectFill"
+            :style="{ backgroundImage: `url(${diagnosis.mask_url})` }"
           />
-        </view>
-      </view>
+        </div>
+      </div>
 
       <!-- 6-Dimension Feature Display -->
-      <view class="section features-section">
-        <text class="section-title">舌象特征分析</text>
-        <view class="features-grid">
+      <div class="section features-section">
+        <span class="section-title">舌象特征分析</span>
+        <div class="features-grid">
           <!-- Tongue Color -->
-          <view class="feature-item">
-            <text class="feature-label">舌色</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">舌色</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.tongue_color"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Tongue Shape -->
-          <view class="feature-item">
-            <text class="feature-label">舌形</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">舌形</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.tongue_shape"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Coating Color -->
-          <view class="feature-item">
-            <text class="feature-label">苔色</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">苔色</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.coating_color"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Coating Quality -->
-          <view class="feature-item">
-            <text class="feature-label">苔质</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">苔质</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.coating_quality"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Sublingual Vein -->
-          <view class="feature-item">
-            <text class="feature-label">舌下络脉</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">舌下络脉</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.sublingual_vein"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Special Features -->
-          <view class="feature-item">
-            <text class="feature-label">特殊特征</text>
-            <view class="feature-values">
-              <view
+          <div class="feature-item">
+            <span class="feature-label">特殊特征</span>
+            <div class="feature-values">
+              <div
                 v-for="(value, key) in diagnosis.features.special_features"
                 :key="key"
                 class="feature-value"
                 :class="{ active: value > 0.3 }"
               >
-                <text class="value-name">{{ key }}</text>
-                <view class="value-bar">
-                  <view class="bar-fill" :style="{ width: `${value * 100}%` }"></view>
-                </view>
-                <text class="value-percent">{{ Math.round(value * 100) }}%</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
+                <span class="value-name">{{ key }}</span>
+                <div class="value-bar">
+                  <div class="bar-fill" :style="{ width: `${value * 100}%` }"></div>
+                </div>
+                <span class="value-percent">{{ Math.round(value * 100) }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Syndrome Analysis -->
-      <view class="section syndrome-section">
-        <text class="section-title">证型分析</text>
-        <view class="syndrome-cards">
-          <view
+      <div class="section syndrome-section">
+        <span class="section-title">证型分析</span>
+        <div class="syndrome-cards">
+          <div
             v-for="syndrome in diagnosis.syndromes"
             :key="syndrome.name"
             class="syndrome-card"
             :class="{ primary: syndrome.confidence > 0.6 }"
           >
-            <view class="syndrome-header">
-              <text class="syndrome-name">{{ syndrome.name }}</text>
-              <view class="syndrome-confidence">
-                <text class="confidence-value">{{ Math.round(syndrome.confidence * 100) }}%</text>
-              </view>
-            </view>
-            <text class="syndrome-desc">{{ syndrome.description }}</text>
-            <view class="syndrome-theory" v-if="syndrome.tcm_theory">
-              <text class="theory-label">中医理论：</text>
-              <text class="theory-text">{{ syndrome.tcm_theory }}</text>
-            </view>
-          </view>
-        </view>
-      </view>
+            <div class="syndrome-header">
+              <span class="syndrome-name">{{ syndrome.name }}</span>
+              <div class="syndrome-confidence">
+                <span class="confidence-value">{{ Math.round(syndrome.confidence * 100) }}%</span>
+              </div>
+            </div>
+            <span class="syndrome-desc">{{ syndrome.description }}</span>
+            <div class="syndrome-theory" v-if="syndrome.tcm_theory">
+              <span class="theory-label">中医理论：</span>
+              <span class="theory-text">{{ syndrome.tcm_theory }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Health Recommendations (Collapsible) -->
-      <view class="section recommendations-section">
-        <view class="section-header" @click="toggleRecommendations">
-          <text class="section-title">健康建议</text>
-          <text class="toggle-icon" :class="{ expanded: recommendationsExpanded }">▼</text>
-        </view>
-        <view class="recommendations-content" v-if="recommendationsExpanded">
+      <div class="section recommendations-section">
+        <div class="section-header" @click="toggleRecommendations">
+          <span class="section-title">健康建议</span>
+          <span class="toggle-icon" :class="{ expanded: recommendationsExpanded }">▼</span>
+        </div>
+        <div class="recommendations-content" v-if="recommendationsExpanded">
           <!-- Dietary -->
-          <view class="recommendation-group" v-if="diagnosis.recommendations.dietary?.length">
-            <view class="group-header">
-              <text class="group-icon">🥗</text>
-              <text class="group-title">饮食建议</text>
-            </view>
-            <view class="recommendation-list">
-              <text
+          <div class="recommendation-group" v-if="diagnosis.recommendations.dietary?.length">
+            <div class="group-header">
+              <span class="group-icon">🥗</span>
+              <span class="group-title">饮食建议</span>
+            </div>
+            <div class="recommendation-list">
+              <span
                 v-for="(item, index) in diagnosis.recommendations.dietary"
                 :key="index"
                 class="recommendation-item"
               >
                 {{ item }}
-              </text>
-            </view>
-          </view>
+              </span>
+            </div>
+          </div>
 
           <!-- Lifestyle -->
-          <view class="recommendation-group" v-if="diagnosis.recommendations.lifestyle?.length">
-            <view class="group-header">
-              <text class="group-icon">🏃</text>
-              <text class="group-title">生活建议</text>
-            </view>
-            <view class="recommendation-list">
-              <text
+          <div class="recommendation-group" v-if="diagnosis.recommendations.lifestyle?.length">
+            <div class="group-header">
+              <span class="group-icon">🏃</span>
+              <span class="group-title">生活建议</span>
+            </div>
+            <div class="recommendation-list">
+              <span
                 v-for="(item, index) in diagnosis.recommendations.lifestyle"
                 :key="index"
                 class="recommendation-item"
               >
                 {{ item }}
-              </text>
-            </view>
-          </view>
+              </span>
+            </div>
+          </div>
 
           <!-- Emotional -->
-          <view class="recommendation-group" v-if="diagnosis.recommendations.emotional?.length">
-            <view class="group-header">
-              <text class="group-icon">😌</text>
-              <text class="group-title">情志建议</text>
-            </view>
-            <view class="recommendation-list">
-              <text
+          <div class="recommendation-group" v-if="diagnosis.recommendations.emotional?.length">
+            <div class="group-header">
+              <span class="group-icon">😌</span>
+              <span class="group-title">情志建议</span>
+            </div>
+            <div class="recommendation-list">
+              <span
                 v-for="(item, index) in diagnosis.recommendations.emotional"
                 :key="index"
                 class="recommendation-item"
               >
                 {{ item }}
-              </text>
-            </view>
-          </view>
-        </view>
-      </view>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Risk Alert -->
-      <view
+      <div
         class="section risk-section"
         v-if="diagnosis.risks && diagnosis.risks.level !== 'low'"
         :class="`risk-${diagnosis.risks.level}`"
       >
-        <view class="risk-header">
-          <text class="risk-icon">⚠️</text>
-          <text class="risk-title">健康提醒</text>
-        </view>
-        <view class="risk-content">
-          <text
+        <div class="risk-header">
+          <span class="risk-icon">⚠️</span>
+          <span class="risk-title">健康提醒</span>
+        </div>
+        <div class="risk-content">
+          <span
             v-for="(factor, index) in diagnosis.risks.factors"
             :key="index"
             class="risk-factor"
           >
             {{ factor }}
-          </text>
-          <text
+          </span>
+          <span
             v-for="(suggestion, index) in diagnosis.risks.suggestions"
             :key="`sug-${index}`"
             class="risk-suggestion"
           >
             {{ suggestion }}
-          </text>
-        </view>
-      </view>
+          </span>
+        </div>
+      </div>
 
       <!-- Meta Info -->
-      <view class="section meta-section">
-        <text class="meta-text">诊断时间：{{ formatDate(diagnosis.created_at) }}</text>
-        <text class="meta-text">AI诊断耗时：{{ diagnosis.inference_time }}秒</text>
-      </view>
-    </scroll-view>
+      <div class="section meta-section">
+        <span class="meta-text">诊断时间：{{ formatDate(diagnosis.created_at) }}</span>
+        <span class="meta-text">AI诊断耗时：{{ (diagnosis.inference_time / 1000).toFixed(2) }}秒</span>
+      </div>
+    </div>
 
     <!-- Loading State -->
-    <view class="loading-container" v-else>
-      <view class="loading-spinner"></view>
-      <text class="loading-text">正在加载诊断结果...</text>
-    </view>
+    <div class="loading-container" v-else>
+      <div class="loading-spinner"></div>
+      <span class="loading-text">正在加载诊断结果...</span>
+    </div>
 
     <!-- Action Buttons -->
-    <view class="action-bar" v-if="diagnosis">
+    <div class="action-bar" v-if="diagnosis">
       <button class="btn-action btn-feedback" @click="showFeedbackModal">
-        <text class="btn-icon">👍</text>
-        <text class="btn-text">反馈</text>
+        <span class="btn-icon">👍</span>
+        <span class="btn-text">反馈</span>
       </button>
-      <button class="btn-action btn-share" @click="showShareMenu">
-        <text class="btn-icon">📤</text>
-        <text class="btn-text">分享</text>
+      <button class="btn-action btn-share" @click="showShareModal = true">
+        <span class="btn-icon">📤</span>
+        <span class="btn-text">分享</span>
       </button>
       <button class="btn-action btn-save" @click="saveImage">
-        <text class="btn-icon">💾</text>
-        <text class="btn-text">保存</text>
+        <span class="btn-icon">💾</span>
+        <span class="btn-text">保存</span>
       </button>
-    </view>
+    </div>
 
     <!-- Feedback Modal -->
-    <view class="modal-overlay" v-if="showFeedback" @click="closeFeedbackModal">
-      <view class="feedback-modal" @click.stop>
-        <text class="modal-title">诊断结果是否有帮助？</text>
-        <view class="feedback-buttons">
+    <div class="modal-overlay" v-if="showFeedback" @click="showFeedback = false">
+      <div class="feedback-modal" @click.stop>
+        <span class="modal-title">诊断结果是否有帮助？</span>
+        <div class="feedback-buttons">
           <button class="btn-feedback-option" @click="submitFeedback(1)">
-            <text class="feedback-icon">👍</text>
-            <text class="feedback-text">准确</text>
+            <span class="feedback-icon">👍</span>
+            <span class="feedback-text">准确</span>
           </button>
           <button class="btn-feedback-option" @click="submitFeedback(-1)">
-            <text class="feedback-icon">👎</text>
-            <text class="feedback-text">不准确</text>
+            <span class="feedback-icon">👎</span>
+            <span class="feedback-text">不准确</span>
           </button>
-        </view>
-        <button class="btn-close" @click="closeFeedbackModal">取消</button>
-      </view>
-    </view>
-  </view>
+        </div>
+        <button class="btn-close" @click="showFeedback = false">取消</button>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" v-if="showShareModal" @click="showShareModal = false">
+      <div class="share-modal" @click.stop>
+        <div class="modal-header">
+          <span class="modal-title">分享诊断结果</span>
+          <span class="modal-close" @click="showShareModal = false">×</span>
+        </div>
+        <div class="share-options">
+          <div class="share-option" @click="saveImage">
+            <span class="share-icon">📷</span>
+            <span class="share-label">保存图片</span>
+          </div>
+          <div class="share-option" @click="copyLink">
+            <span class="share-icon">🔗</span>
+            <span class="share-label">复制链接</span>
+          </div>
+        </div>
+        <button class="btn btn-close" @click="showShareModal = false">取消</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useDiagnosisStore } from '@/store'
 import type { DiagnosisResult } from '@/store/modules/diagnosis'
-import {
-  generateShareImage,
-  saveImageToAlbum,
-  shareToWeChat,
-  shareWithSystem,
-  copyToClipboard,
-  generateShareLink,
-  shareDiagnosis,
-  getPlatform
-} from '@/utils/share'
 
+const router = useRouter()
+const route = useRoute()
 const diagnosisStore = useDiagnosisStore()
-const platform = getPlatform()
 
 // State
-const diagnosisId = ref<string>('')
 const diagnosis = ref<DiagnosisResult | null>(null)
 const recommendationsExpanded = ref(false)
 const showFeedback = ref(false)
+const showShareModal = ref(false)
 
 // Methods
 function goBack() {
-  uni.navigateBack({
-    delta: 1
-  })
+  router.back()
 }
 
 function formatDate(dateString: string): string {
@@ -352,217 +362,73 @@ function toggleRecommendations() {
   recommendationsExpanded.value = !recommendationsExpanded.value
 }
 
-function showFeedbackModal() {
-  showFeedback.value = true
-}
-
-function closeFeedbackModal() {
-  showFeedback.value = false
-}
-
 async function submitFeedback(feedback: 1 | -1) {
   if (!diagnosis.value) return
 
   try {
     await diagnosisStore.submitFeedback(diagnosis.value.id, feedback)
-    uni.showToast({
-      title: '感谢您的反馈',
-      icon: 'success'
-    })
-    closeFeedbackModal()
+    alert('感谢您的反馈')
+    showFeedback.value = false
   } catch (error: any) {
-    uni.showToast({
-      title: error.message || '反馈失败',
-      icon: 'none'
-    })
+    alert(error.message || '反馈失败')
   }
 }
 
-function showShareMenu() {
-  uni.showActionSheet({
-    itemList: ['保存图片', '分享给朋友', '复制链接'],
-    success: (res) => {
-      switch (res.tapIndex) {
-        case 0:
-          saveImage()
-          break
-        case 1:
-          shareToFriend()
-          break
-        case 2:
-          copyLink()
-          break
-      }
-    }
-  })
+function saveImage() {
+  alert('保存图片功能开发中')
 }
 
-function saveResult() {
-  uni.showToast({
-    title: '保存功能开发中',
-    icon: 'none'
-  })
-}
+function copyLink() {
+  const link = `${window.location.origin}/result?id=${diagnosis.value?.id || ''}`
 
-async function saveImage() {
-  if (!diagnosis.value) return
-
-  try {
-    uni.showLoading({
-      title: '正在生成图片...'
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(() => {
+      alert('链接已复制')
+    }).catch(() => {
+      alert('复制失败')
     })
-
-    // Generate share image
-    const result = await generateShareImage({
-      title: 'AI舌诊诊断结果',
-      imageUrl: diagnosis.value.image_url,
-      primarySyndrome: diagnosis.value.syndromes[0]?.name || '',
-      confidence: diagnosis.value.syndromes[0]?.confidence || 0,
-      recommendations: diagnosis.value.recommendations.dietary?.slice(0, 3) || []
-    })
-
-    uni.hideLoading()
-
-    if (result.success && result.filePath) {
-      // For H5, download the image
-      if (platform.isH5) {
-        // Create download link for H5
-        const link = document.createElement('a')
-        link.href = result.filePath
-        link.download = `tongue-diagnosis-${Date.now()}.png`
-        link.click()
-
-        uni.showToast({
-          title: '图片已下载',
-          icon: 'success'
-        })
-      } else {
-        // For mini-programs, save to album
-        const saveResult = await saveImageToAlbum(result.filePath)
-        if (saveResult.success) {
-          uni.showToast({
-            title: saveResult.message || '已保存到相册',
-            icon: 'success'
-          })
-        } else {
-          uni.showToast({
-            title: saveResult.message || '保存失败',
-            icon: 'none'
-          })
-        }
-      }
-    } else {
-      uni.showToast({
-        title: result.message || '生成失败',
-        icon: 'none'
-      })
+  } else {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = link
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      alert('链接已复制')
+    } catch {
+      alert('复制失败')
     }
-  } catch (error: any) {
-    uni.hideLoading()
-    uni.showToast({
-      title: error.message || '保存失败',
-      icon: 'none'
-    })
+    document.body.removeChild(textArea)
   }
-}
-
-async function shareToFriend() {
-  if (!diagnosis.value) return
-
-  try {
-    uni.showLoading({
-      title: '正在处理...'
-    })
-
-    // Use main share function
-    const result = await shareDiagnosis({
-      diagnosisId: diagnosis.value.id,
-      title: 'AI舌诊诊断结果',
-      imageUrl: diagnosis.value.image_url,
-      primarySyndrome: diagnosis.value.syndromes[0]?.name || '',
-      confidence: diagnosis.value.syndromes[0]?.confidence || 0,
-      recommendations: diagnosis.value.recommendations.dietary?.slice(0, 3) || [],
-      baseUrl: (typeof window !== 'undefined' ? window.location.origin : '') || 'https://your-app.com'
-    })
-
-    uni.hideLoading()
-
-    if (result.success) {
-      uni.showToast({
-        title: result.message || '分享成功',
-        icon: 'success'
-      })
-    } else {
-      uni.showToast({
-        title: result.message || '分享失败',
-        icon: 'none'
-      })
-    }
-  } catch (error: any) {
-    uni.hideLoading()
-    uni.showToast({
-      title: error.message || '分享失败',
-      icon: 'none'
-    })
-  }
-}
-
-async function copyLink() {
-  if (!diagnosis.value) return
-
-  try {
-    const link = generateShareLink(
-      diagnosis.value.id,
-      (typeof window !== 'undefined' ? window.location.origin : '') || 'https://your-app.com'
-    )
-    const result = await copyToClipboard(link)
-
-    if (result.success) {
-      uni.showToast({
-        title: result.message || '链接已复制',
-        icon: 'success'
-      })
-    } else {
-      uni.showToast({
-        title: result.message || '复制失败',
-        icon: 'none'
-      })
-    }
-  } catch (error: any) {
-    uni.showToast({
-      title: error.message || '复制失败',
-      icon: 'none'
-    })
-  }
+  showShareModal.value = false
 }
 
 // Lifecycle
 onMounted(async () => {
   // Get diagnosis ID from query params
-  const pages = getCurrentPages()
-  const currentPage = pages[pages.length - 1]
-  const options = currentPage.options as any
+  const id = route.query.id as string
 
-  if (options.id) {
-    diagnosisId.value = options.id
-    try {
-      const result = await diagnosisStore.fetchDiagnosisDetail(diagnosisId.value)
-      diagnosis.value = result
-    } catch (error: any) {
-      uni.showToast({
-        title: error.message || '加载失败',
-        icon: 'none'
-      })
+  if (id) {
+    // Try to get from current diagnosis (for mock results)
+    if (diagnosisStore.currentDiagnosis?.id === id) {
+      diagnosis.value = diagnosisStore.currentDiagnosis
+    } else {
+      // Otherwise try to fetch from API
+      try {
+        const result = await diagnosisStore.fetchDiagnosisDetail(id)
+        diagnosis.value = result
+      } catch (error: any) {
+        alert(error.message || '加载失败')
+        router.back()
+      }
     }
   } else if (diagnosisStore.currentDiagnosis) {
     diagnosis.value = diagnosisStore.currentDiagnosis
   } else {
-    uni.showToast({
-      title: '未找到诊断结果',
-      icon: 'none'
-    })
+    alert('未找到诊断结果')
     setTimeout(() => {
-      uni.navigateBack()
+      router.back()
     }, 1500)
   }
 })
@@ -581,7 +447,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   height: 44px;
-  padding: 0 15px;
+  padding: 40px 15px 15px;
   background: #ffffff;
   border-bottom: 1px solid #e5e5e5;
 }
@@ -609,6 +475,7 @@ onMounted(async () => {
 .content {
   flex: 1;
   padding: 15px;
+  overflow-y: auto;
 }
 
 .image-section {
@@ -627,6 +494,7 @@ onMounted(async () => {
 .tongue-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .mask-overlay {
@@ -635,7 +503,11 @@ onMounted(async () => {
   left: 0;
   width: 100%;
   height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .section {
@@ -658,6 +530,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  cursor: pointer;
 }
 
 .toggle-icon {
@@ -955,6 +828,7 @@ onMounted(async () => {
   gap: 4px;
   font-size: 11px;
   color: #ffffff;
+  cursor: pointer;
 }
 
 .btn-feedback {
@@ -978,7 +852,7 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-// Feedback Modal
+// Modal styles
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -992,7 +866,8 @@ onMounted(async () => {
   z-index: 1000;
 }
 
-.feedback-modal {
+.feedback-modal,
+.share-modal {
   width: 80%;
   max-width: 320px;
   background: #ffffff;
@@ -1003,11 +878,27 @@ onMounted(async () => {
   gap: 16px;
 }
 
+.share-modal {
+  max-width: 280px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .modal-title {
   font-size: 16px;
   font-weight: 500;
   color: #333333;
-  text-align: center;
+}
+
+.modal-close {
+  font-size: 24px;
+  color: #999999;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .feedback-buttons {
@@ -1026,6 +917,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .btn-feedback-option:active {
@@ -1049,5 +941,36 @@ onMounted(async () => {
   background: #f5f5f5;
   color: #666666;
   font-size: 15px;
+  cursor: pointer;
+}
+
+.share-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.share-option:hover {
+  background: #f8f9fa;
+}
+
+.share-icon {
+  font-size: 24px;
+}
+
+.share-label {
+  font-size: 15px;
+  color: #333333;
 }
 </style>

@@ -48,6 +48,7 @@ router = APIRouter()
 _pipeline = None
 _segmentor = None
 _classifier = None
+_llm_engine = None
 
 
 def get_pipeline():
@@ -87,6 +88,24 @@ def get_classifier():
         except ImportError:
             pass
     return _classifier
+
+
+def get_llm_engine():
+    """Get LLM diagnosis engine instance"""
+    global _llm_engine
+    if _llm_engine is None:
+        try:
+            from api_service.core.llm_diagnosis import create_llm_diagnosis_engine
+            _llm_engine = create_llm_diagnosis_engine()
+            logger.info("LLM diagnosis engine initialized")
+        except Exception as e:
+            logger.warning(f"Failed to initialize LLM engine: {e}")
+    return _llm_engine
+
+
+def get_llm_engine_sync():
+    """Synchronous wrapper for get_llm_engine"""
+    return get_llm_engine()
 
 
 def decode_base64_image(image_data: str) -> np.ndarray:
@@ -345,50 +364,131 @@ async def create_diagnosis(
             "health_status": classification.get("health_status", {}).__dict__ if hasattr(classification.get("health_status", {}), "__dict__") else classification.get("health_status", {}),
         }
 
+        # Convert classification result to dict format for LLM engine
+        classification_result = {
+            "tongue_color": [features_for_db.get("tongue_color", {}).get("prediction", "")] if features_for_db.get("tongue_color") else [],
+            "coating_color": [features_for_db.get("coating_color", {}).get("prediction", "")] if features_for_db.get("coating_color") else [],
+            "tongue_shape": [features_for_db.get("tongue_shape", {}).get("prediction", "")] if features_for_db.get("tongue_shape") else [],
+            "coating_quality": [features_for_db.get("coating_quality", {}).get("prediction", "")] if features_for_db.get("coating_quality") else [],
+            "special_features": [],
+            "health_status": features_for_db.get("health_status", {}).get("prediction", "")
+        }
+
+        # Add special features if present
+        special = features_for_db.get("special_features", {})
+        if special.get("red_dots", {}).get("present"):
+            classification_result["special_features"].append("红点")
+        if special.get("cracks", {}).get("present"):
+            classification_result["special_features"].append("裂纹")
+        if special.get("teeth_marks", {}).get("present"):
+            classification_result["special_features"].append("齿痕")
+
         # Run LLM diagnosis if enabled
         diagnosis_result = {}
+        llm_timing = {}
         if request.enable_llm_diagnosis:
-            from api_service.core.rule_based_diagnosis import diagnose_from_classification
+            from api_service.core.llm_diagnosis import create_llm_diagnosis_engine
+            import asyncio
 
             try:
-                rule_result = diagnose_from_classification(classification)
-                diagnosis_result = {
-                    "primary_syndrome": rule_result.primary_syndrome,
-                    "confidence": rule_result.confidence,
-                    "syndrome_analysis": rule_result.syndrome_description,
-                    "tcm_theory": rule_result.tcm_theory,
-                    "health_recommendations": {
-                        "diet": rule_result.health_recommendations.get("diet", []),
-                        "lifestyle": rule_result.health_recommendations.get("lifestyle", []),
-                        "emotional": rule_result.health_recommendations.get("emotional", [])
-                    },
-                    "risk_alert": None
-                }
-                timing["diagnosis_ms"] = (time.time() - cls_start - timing["classification_ms"] / 1000) * 1000
+                # Get or create LLM engine
+                llm_engine = get_llm_engine()
+                if llm_engine:
+                    # Run LLM diagnosis asynchronously
+                    llm_start = time.time()
+                    llm_diagnosis = await llm_engine.diagnose(
+                        image_base64=request.image,
+                        classification_result=classification_result,
+                        user_info=request.user_info.model_dump() if request.user_info else None
+                    )
+                    llm_timing["llm_diagnosis_ms"] = (time.time() - llm_start) * 1000
+
+                    # Format LLM result for response
+                    if llm_diagnosis.get("success"):
+                        syndrome_analysis = llm_diagnosis.get("syndrome_analysis", {})
+                        health_recommendations = llm_diagnosis.get("health_recommendations", {})
+
+                        diagnosis_result = {
+                            "primary_syndrome": syndrome_analysis.get("primary_syndrome", ""),
+                            "confidence": llm_diagnosis.get("confidence", 0.0),
+                            "syndrome_analysis": syndrome_analysis.get("syndrome_description", ""),
+                            "tcm_theory": syndrome_analysis.get("possible_syndromes", [{}])[0].get("tcm_theory", ""),
+                            "health_recommendations": {
+                                "diet": health_recommendations.get("dietary", []),
+                                "lifestyle": health_recommendations.get("lifestyle", []),
+                                "emotional": health_recommendations.get("emotional", [])
+                            },
+                            "risk_alert": llm_diagnosis.get("anomaly_detection", {}).get("reason") if llm_diagnosis.get("anomaly_detection", {}).get("detected") else None,
+                            "source": llm_diagnosis.get("source", "unknown"),
+                            "llm_time_ms": llm_diagnosis.get("llm_time_ms", 0),
+                            "retrieved_cases_count": llm_diagnosis.get("retrieved_cases_count", 0)
+                        }
+                        logger.info(f"LLM diagnosis successful: syndrome={diagnosis_result['primary_syndrome']}, confidence={diagnosis_result['confidence']}")
+                    else:
+                        # LLM failed, use fallback
+                        logger.warning(f"LLM diagnosis failed: {llm_diagnosis.get('error', 'Unknown error')}")
+                        raise Exception("LLM diagnosis failed")
+                else:
+                    # LLM engine not available, use rule-based fallback
+                    logger.warning("LLM engine not initialized, using rule-based fallback")
+                    raise Exception("LLM engine not available")
             except Exception as e:
-                logger.warning(f"LLM diagnosis failed, using basic results: {e}")
-                diagnosis_result = {
-                    "primary_syndrome": features_for_db.get("health_status", {}).get("prediction", "未知"),
-                    "confidence": features_for_db.get("health_status", {}).get("confidence", 0.0),
-                    "syndrome_analysis": "基于舌象特征的初步分析",
-                    "health_recommendations": {
-                        "diet": ["建议咨询专业医师"],
-                        "lifestyle": ["保持健康作息"],
-                        "emotional": ["保持良好心态"]
+                logger.warning(f"LLM diagnosis failed, using rule-based fallback: {e}")
+
+                # Use rule-based diagnosis as fallback
+                from api_service.core.rule_based_diagnosis import diagnose_from_classification
+                try:
+                    rule_start = time.time()
+                    rule_result = diagnose_from_classification(classification)
+                    llm_timing["rule_diagnosis_ms"] = (time.time() - rule_start) * 1000
+
+                    diagnosis_result = {
+                        "primary_syndrome": rule_result.primary_syndrome,
+                        "confidence": rule_result.confidence,
+                        "syndrome_analysis": rule_result.syndrome_description,
+                        "tcm_theory": rule_result.tcm_theory,
+                        "health_recommendations": {
+                            "diet": rule_result.health_recommendations.get("diet", []),
+                            "lifestyle": rule_result.health_recommendations.get("lifestyle", []),
+                            "emotional": rule_result.health_recommendations.get("emotional", [])
+                        },
+                        "risk_alert": None,
+                        "source": "rule_based_fallback"
                     }
-                }
+                except Exception as rule_error:
+                    logger.error(f"Rule-based fallback also failed: {rule_error}")
+                    # Final fallback - basic diagnosis
+                    diagnosis_result = {
+                        "primary_syndrome": features_for_db.get("health_status", {}).get("prediction", "未知"),
+                        "confidence": 0.3,
+                        "syndrome_analysis": "基于舌象特征的初步分析",
+                        "tcm_theory": "请咨询专业中医医师",
+                        "health_recommendations": {
+                            "diet": ["建议咨询专业医师"],
+                            "lifestyle": ["保持健康作息"],
+                            "emotional": ["保持良好心态"]
+                        },
+                        "risk_alert": "诊断系统异常，请咨询专业医师",
+                        "source": "basic_fallback"
+                    }
         else:
-            # Basic diagnosis without LLM
+            # LLM diagnosis disabled, use basic analysis
             diagnosis_result = {
                 "primary_syndrome": features_for_db.get("health_status", {}).get("prediction", "未知"),
                 "confidence": features_for_db.get("health_status", {}).get("confidence", 0.0),
                 "syndrome_analysis": "基于舌象特征的初步分析",
+                "tcm_theory": "",
                 "health_recommendations": {
                     "diet": ["建议咨询专业医师"],
                     "lifestyle": ["保持健康作息"],
                     "emotional": ["保持良好心态"]
-                }
+                },
+                "risk_alert": None,
+                "source": "basic_analysis"
             }
+
+        # Merge timing information
+        timing.update(llm_timing)
 
         # Calculate total inference time
         total_inference_ms = (time.time() - total_start) * 1000
@@ -726,18 +826,26 @@ async def submit_diagnosis_feedback(
         )
 
 
-def set_model_references(pipeline=None, segmentor=None, classifier=None):
+def set_model_references(pipeline=None, segmentor=None, classifier=None, llm_engine=None):
     """Set global model references (called by main.py on startup)
 
     Args:
         pipeline: End-to-end pipeline instance
         segmentor: Segmentation predictor instance
         classifier: Classification predictor instance
+        llm_engine: LLM diagnosis engine instance
     """
-    global _pipeline, _segmentor, _classifier
+    global _pipeline, _segmentor, _classifier, _llm_engine
     _pipeline = pipeline
     _segmentor = segmentor
     _classifier = classifier
+    if llm_engine is None:
+        # Initialize LLM engine if not provided
+        from api_service.core.llm_diagnosis import create_llm_diagnosis_engine
+        _llm_engine = create_llm_diagnosis_engine()
+        logger.info("LLM diagnosis engine auto-initialized")
+    else:
+        _llm_engine = llm_engine
 
 
 __all__ = [

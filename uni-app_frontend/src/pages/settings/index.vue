@@ -1,228 +1,230 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="header-left" @click="goBack">
-        <text class="back-icon">←</text>
-      </view>
-      <text class="header-title">设置</text>
-      <view class="header-right"></view>
-    </view>
+  <div class="container">
+    <div class="header">
+      <div class="header-left" @click="goBack">
+        <span class="back-icon">←</span>
+      </div>
+      <span class="header-title">设置</span>
+      <div class="header-right"></div>
+    </div>
 
-    <view class="content">
+    <div class="content">
       <!-- Account section -->
-      <view class="section" v-if="isLoggedIn">
-        <view class="section-header">
-          <text class="section-title">账号设置</text>
-        </view>
-        <view class="menu-item" @click="editProfile">
-          <view class="item-left">
-            <text class="item-icon">👤</text>
-            <text class="item-label">个人资料</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-        <view class="menu-item" @click="changePassword">
-          <view class="item-left">
-            <text class="item-icon">🔒</text>
-            <text class="item-label">修改密码</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-      </view>
+      <div class="section" v-if="isLoggedIn">
+        <div class="section-header">
+          <span class="section-title">账号设置</span>
+        </div>
+        <div class="menu-item" @click="editProfile">
+          <div class="item-left">
+            <span class="item-icon">👤</span>
+            <span class="item-label">个人资料</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+        <div class="menu-item" @click="changePassword">
+          <div class="item-left">
+            <span class="item-icon">🔒</span>
+            <span class="item-label">修改密码</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- General section -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-title">通用设置</text>
-        </view>
-        <view class="menu-item">
-          <view class="item-left">
-            <text class="item-icon">🌙</text>
-            <text class="item-label">深色模式</text>
-          </view>
-          <view class="item-right">
-            <switch
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">通用设置</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-icon">🌙</span>
+            <span class="item-label">深色模式</span>
+          </div>
+          <div class="item-right">
+            <input
+              type="checkbox"
+              class="switch"
               :checked="darkModeEnabled"
               @change="toggleDarkMode"
-              color="#667eea"
-              style="transform: scale(0.8)"
             />
-          </view>
-        </view>
-        <view class="menu-item" @click="showLanguageModal = true">
-          <view class="item-left">
-            <text class="item-icon">🌐</text>
-            <text class="item-label">{{ t('settings.language') }}</text>
-          </view>
-          <view class="item-right">
-            <text class="item-value">{{ localeDisplayName }}</text>
-            <text class="arrow">›</text>
-          </view>
-        </view>
-      </view>
+          </div>
+        </div>
+        <div class="menu-item" @click="showLanguageModal = true">
+          <div class="item-left">
+            <span class="item-icon">🌐</span>
+            <span class="item-label">{{ t('settings.language') }}</span>
+          </div>
+          <div class="item-right">
+            <span class="item-value">{{ localeDisplayName }}</span>
+            <span class="arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Storage section -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-title">存储与缓存</text>
-        </view>
-        <view class="menu-item">
-          <view class="item-left">
-            <text class="item-icon">💾</text>
-            <text class="item-label">缓存大小</text>
-          </view>
-          <view class="item-right">
-            <text class="item-value">{{ cacheSize }}</text>
-          </view>
-        </view>
-        <view class="menu-item" @click="clearCache">
-          <view class="item-left">
-            <text class="item-icon">🗑️</text>
-            <text class="item-label">清除缓存</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-      </view>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">存储与缓存</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-icon">💾</span>
+            <span class="item-label">缓存大小</span>
+          </div>
+          <div class="item-right">
+            <span class="item-value">{{ cacheSize }}</span>
+          </div>
+        </div>
+        <div class="menu-item" @click="clearCache">
+          <div class="item-left">
+            <span class="item-icon">🗑️</span>
+            <span class="item-label">清除缓存</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Legal section -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-title">法律条款</text>
-        </view>
-        <view class="menu-item" @click="openPrivacyPolicy">
-          <view class="item-left">
-            <text class="item-icon">🛡️</text>
-            <text class="item-label">隐私政策</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-        <view class="menu-item" @click="openUserAgreement">
-          <view class="item-left">
-            <text class="item-icon">📜</text>
-            <text class="item-label">用户协议</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-      </view>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">法律条款</span>
+        </div>
+        <div class="menu-item" @click="openPrivacyPolicy">
+          <div class="item-left">
+            <span class="item-icon">🛡️</span>
+            <span class="item-label">隐私政策</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+        <div class="menu-item" @click="openUserAgreement">
+          <div class="item-left">
+            <span class="item-icon">📜</span>
+            <span class="item-label">用户协议</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- About section -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-title">关于</text>
-        </view>
-        <view class="menu-item" @click="openAbout">
-          <view class="item-left">
-            <text class="item-icon">ℹ️</text>
-            <text class="item-label">关于我们</text>
-          </view>
-          <view class="item-right">
-            <text class="item-value">v{{ appVersion }}</text>
-            <text class="arrow">›</text>
-          </view>
-        </view>
-        <view class="menu-item" @click="openFeedback">
-          <view class="item-left">
-            <text class="item-icon">💬</text>
-            <text class="item-label">意见反馈</text>
-          </view>
-          <view class="item-right">
-            <text class="arrow">›</text>
-          </view>
-        </view>
-      </view>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">关于</span>
+        </div>
+        <div class="menu-item" @click="openAbout">
+          <div class="item-left">
+            <span class="item-icon">ℹ️</span>
+            <span class="item-label">关于我们</span>
+          </div>
+          <div class="item-right">
+            <span class="item-value">v{{ appVersion }}</span>
+            <span class="arrow">›</span>
+          </div>
+        </div>
+        <div class="menu-item" @click="openFeedback">
+          <div class="item-left">
+            <span class="item-icon">💬</span>
+            <span class="item-label">意见反馈</span>
+          </div>
+          <div class="item-right">
+            <span class="arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Logout button -->
-      <view class="logout-section" v-if="isLoggedIn">
+      <div class="logout-section" v-if="isLoggedIn">
         <button class="btn-logout" @click="handleLogout">退出登录</button>
-      </view>
+      </div>
 
       <!-- Version info -->
-      <view class="version-info">
-        <text class="version-text">AI 舌诊智能诊断系统 v{{ appVersion }}</text>
-      </view>
-    </view>
+      <div class="version-info">
+        <span class="version-text">AI 舌诊智能诊断系统 v{{ appVersion }}</span>
+      </div>
+    </div>
 
     <!-- About modal -->
-    <u-popup v-model:show="showAboutModal" mode="center" :round="20">
-      <view class="about-modal">
-        <view class="about-header">
-          <text class="about-title">关于 AI 舌诊</text>
-          <text class="about-close" @click="showAboutModal = false">×</text>
-        </view>
-        <view class="about-content">
-          <text class="about-logo">👅</text>
-          <text class="about-name">AI 舌诊智能诊断系统</text>
-          <text class="about-version">版本 {{ appVersion }}</text>
-          <view class="about-divider"></view>
-          <text class="about-desc">
+    <div class="modal-overlay" v-if="showAboutModal" @click="showAboutModal = false">
+      <div class="about-modal" @click.stop>
+        <div class="about-header">
+          <span class="about-title">关于 AI 舌诊</span>
+          <span class="about-close" @click="showAboutModal = false">×</span>
+        </div>
+        <div class="about-content">
+          <span class="about-logo">👅</span>
+          <span class="about-name">AI 舌诊智能诊断系统</span>
+          <span class="about-version">版本 {{ appVersion }}</span>
+          <div class="about-divider"></div>
+          <span class="about-desc">
             基于深度学习的中医舌诊智能诊断系统，提供舌象分析、证型辨识和健康建议。
-          </text>
-          <view class="about-info">
-            <text class="info-item">© 2026 AI 舌诊团队</text>
-            <text class="info-item">基于 PaddlePaddle + 文心大模型</text>
-          </view>
-        </view>
+          </span>
+          <div class="about-info">
+            <span class="info-item">© 2026 AI 舌诊团队</span>
+            <span class="info-item">基于 PaddlePaddle + 文心大模型</span>
+          </div>
+        </div>
         <button class="btn btn-primary" @click="showAboutModal = false">关闭</button>
-      </view>
-    </u-popup>
+      </div>
+    </div>
 
     <!-- Clear cache modal -->
-    <u-popup v-model:show="showClearCacheModal" mode="center" :round="20">
-      <view class="confirm-modal">
-        <view class="confirm-header">
-          <text class="confirm-title">{{ t('settings.clearCache') }}</text>
-        </view>
-        <view class="confirm-content">
-          <text class="confirm-message">确定要清除所有缓存吗？</text>
-        </view>
-        <view class="confirm-actions">
+    <div class="modal-overlay" v-if="showClearCacheModal" @click="showClearCacheModal = false">
+      <div class="confirm-modal" @click.stop>
+        <div class="confirm-header">
+          <span class="confirm-title">{{ t('settings.clearCache') }}</span>
+        </div>
+        <div class="confirm-content">
+          <span class="confirm-message">确定要清除所有缓存吗？</span>
+        </div>
+        <div class="confirm-actions">
           <button class="btn btn-secondary" @click="showClearCacheModal = false">{{ t('common.cancel') }}</button>
           <button class="btn btn-primary" @click="confirmClearCache">{{ t('common.confirm') }}</button>
-        </view>
-      </view>
-    </u-popup>
+        </div>
+      </div>
+    </div>
 
     <!-- Language selection modal -->
-    <u-popup v-model:show="showLanguageModal" mode="bottom" :round="20">
-      <view class="language-modal">
-        <view class="language-header">
-          <text class="language-header-close" @click="showLanguageModal = false">{{ t('common.cancel') }}</text>
-          <text class="language-header-title">{{ t('settings.language') }}</text>
-          <view class="language-header-spacer"></view>
-        </view>
-        <view class="language-list">
-          <view
+    <div class="modal-overlay" v-if="showLanguageModal" @click="showLanguageModal = false">
+      <div class="language-modal" @click.stop>
+        <div class="language-header">
+          <span class="language-header-close" @click="showLanguageModal = false">{{ t('common.cancel') }}</span>
+          <span class="language-header-title">{{ t('settings.language') }}</span>
+          <div class="language-header-spacer"></div>
+        </div>
+        <div class="language-list">
+          <div
             v-for="locale in availableLocalesList"
             :key="locale.code"
             class="language-item"
             :class="{ active: currentLocale === locale.code }"
             @click="handleLanguageChange(locale.code)"
           >
-            <text class="language-item-name">{{ locale.name }}</text>
-            <text v-if="currentLocale === locale.code" class="language-item-check">✓</text>
-          </view>
-        </view>
-      </view>
-    </u-popup>
-  </view>
+            <span class="language-item-name">{{ locale.name }}</span>
+            <span v-if="currentLocale === locale.code" class="language-item-check">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store'
 import { useDarkMode, useLanguage } from '@/composables'
 
+const router = useRouter()
 const { t } = useI18n()
 const userStore = useUserStore()
 const { isDark, setDarkMode } = useDarkMode()
@@ -239,30 +241,22 @@ const showLanguageModal = ref(false)
 
 // Functions
 function goBack() {
-  uni.navigateBack()
+  router.back()
 }
 
 function editProfile() {
-  uni.showToast({
-    title: '个人资料编辑功能开发中',
-    icon: 'none'
-  })
+  alert('个人资料编辑功能开发中')
 }
 
 function changePassword() {
-  uni.showToast({
-    title: '修改密码功能开发中',
-    icon: 'none'
-  })
+  alert('修改密码功能开发中')
 }
 
-function toggleDarkMode(e: any) {
-  const newMode = e.detail.value ? 'dark' : 'auto'
+function toggleDarkMode(e: Event) {
+  const target = e.target as HTMLInputElement
+  const newMode = target.checked ? 'dark' : 'auto'
   setDarkMode(newMode)
-  uni.showToast({
-    title: e.detail.value ? '已开启深色模式' : '已关闭深色模式',
-    icon: 'none'
-  })
+  alert(target.checked ? '已开启深色模式' : '已关闭深色模式')
 }
 
 function clearCache() {
@@ -272,29 +266,16 @@ function clearCache() {
 function confirmClearCache() {
   showClearCacheModal.value = false
   // Simulate clearing cache
-  uni.showLoading({
-    title: '清除中...'
-  })
-  setTimeout(() => {
-    uni.hideLoading()
-    cacheSize.value = '0 MB'
-    uni.showToast({
-      title: '缓存已清除',
-      icon: 'success'
-    })
-  }, 1000)
+  cacheSize.value = '0 MB'
+  alert('缓存已清除')
 }
 
 function openPrivacyPolicy() {
-  uni.navigateTo({
-    url: '/pages/privacy/index'
-  })
+  router.push('/privacy')
 }
 
 function openUserAgreement() {
-  uni.navigateTo({
-    url: '/pages/terms/index'
-  })
+  router.push('/terms')
 }
 
 function openAbout() {
@@ -302,44 +283,26 @@ function openAbout() {
 }
 
 function openFeedback() {
-  uni.showToast({
-    title: '意见反馈功能开发中',
-    icon: 'none'
-  })
+  alert('意见反馈功能开发中')
 }
 
 function handleLogout() {
-  uni.showModal({
-    title: t('settings.logout'),
-    content: t('profile.logoutConfirm'),
-    success: (res) => {
-      if (res.confirm) {
-        userStore.logout()
-        uni.showToast({
-          title: t('auth.logoutSuccess'),
-          icon: 'success'
-        })
-        setTimeout(() => {
-          uni.navigateBack()
-        }, 1500)
-      }
-    }
-  })
+  if (confirm(t('settings.logout') + '\n' + t('profile.logoutConfirm'))) {
+    userStore.logout()
+    alert(t('auth.logoutSuccess'))
+    router.back()
+  }
 }
 
 function handleLanguageChange(localeCode: string) {
   setLanguage(localeCode as any)
   showLanguageModal.value = false
-  uni.showToast({
-    title: t('settings.language') + ': ' + localeDisplayName.value,
-    icon: 'success'
-  })
+  alert(t('settings.language') + ': ' + localeDisplayName.value)
 }
 
 // Calculate cache size on mount
 onMounted(() => {
   // Simulate cache size calculation
-  // In real app, calculate actual storage size
   const mockSize = (Math.random() * 50).toFixed(1)
   cacheSize.value = `${mockSize} MB`
 })
@@ -356,7 +319,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 50px 15px 15px;
+  padding: 40px 15px 15px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -367,6 +330,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .back-icon {
@@ -405,6 +369,11 @@ onMounted(() => {
   align-items: center;
   padding: 18px 20px;
   border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #f8f8f8;
 }
 
 .menu-item:last-child {
@@ -442,6 +411,39 @@ onMounted(() => {
   color: #cccccc;
 }
 
+// Custom switch
+.switch {
+  appearance: none;
+  width: 50px;
+  height: 28px;
+  background: #e0e0e0;
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.switch:checked {
+  background: #667eea;
+}
+
+.switch::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch:checked::before {
+  transform: translateX(22px);
+}
+
 .logout-section {
   padding: 20px 15px;
 }
@@ -458,6 +460,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #fff0f0;
 }
 
 .version-info {
@@ -470,12 +477,27 @@ onMounted(() => {
   color: #cccccc;
 }
 
+// Modal styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .about-modal,
 .confirm-modal {
   background: #ffffff;
   border-radius: 20px;
   padding: 25px;
   width: 280px;
+  max-width: 90%;
 }
 
 .about-header,
@@ -497,6 +519,7 @@ onMounted(() => {
   font-size: 28px;
   color: #999999;
   line-height: 1;
+  cursor: pointer;
 }
 
 .about-content {
@@ -576,6 +599,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary {
@@ -583,9 +607,99 @@ onMounted(() => {
   color: #ffffff;
 }
 
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
 .btn-secondary {
   background: #f0f0f0;
   color: #666666;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+// Language modal
+.language-modal {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 500px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.language-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.language-header-close,
+.language-header-title {
+  font-size: 15px;
+  color: #333333;
+  font-weight: 500;
+}
+
+.language-header-close {
+  color: #667eea;
+  cursor: pointer;
+}
+
+.language-header-spacer {
+  width: 60px;
+}
+
+.language-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.language-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.language-item:last-child {
+  border-bottom: none;
+}
+
+.language-item:hover {
+  background: #f8f8f8;
+}
+
+.language-item.active {
+  background: #f0f4ff;
+}
+
+.language-item-name {
+  font-size: 15px;
+  color: #333333;
+}
+
+.language-item.active .language-item-name {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.language-item-check {
+  font-size: 18px;
+  color: #667eea;
 }
 
 /* Dark mode styles */
@@ -615,6 +729,10 @@ onMounted(() => {
   border-bottom-color: #3a3a3a;
 }
 
+:global(.dark-mode) .menu-item:hover {
+  background: #3a3a3a;
+}
+
 :global(.dark-mode) .item-label {
   color: #e0e0e0;
 }
@@ -631,6 +749,10 @@ onMounted(() => {
   background: #2a2a2a;
   border-color: #3a3a3a;
   color: #ff6b6b;
+}
+
+:global(.dark-mode) .btn-logout:hover {
+  background: #3a3a3a;
 }
 
 :global(.dark-mode) .about-modal,
@@ -680,74 +802,6 @@ onMounted(() => {
   color: #666666;
 }
 
-/* Language modal styles */
-.language-modal {
-  background: #ffffff;
-  border-radius: 20px 20px 0 0;
-  overflow: hidden;
-}
-
-.language-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.language-header-close,
-.language-header-title {
-  font-size: 15px;
-  color: #333333;
-  font-weight: 500;
-}
-
-.language-header-close {
-  color: #667eea;
-}
-
-.language-header-spacer {
-  width: 60px;
-}
-
-.language-list {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.language-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 20px;
-  border-bottom: 1px solid #f5f5f5;
-  transition: background-color 0.2s;
-}
-
-.language-item:last-child {
-  border-bottom: none;
-}
-
-.language-item.active {
-  background: #f0f4ff;
-}
-
-.language-item-name {
-  font-size: 15px;
-  color: #333333;
-}
-
-.language-item.active .language-item-name {
-  color: #667eea;
-  font-weight: 500;
-}
-
-.language-item-check {
-  font-size: 18px;
-  color: #667eea;
-}
-
-/* Dark mode styles for language modal */
 :global(.dark-mode) .language-modal {
   background: #2a2a2a;
 }

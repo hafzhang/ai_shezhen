@@ -13,7 +13,7 @@ interface ApiResponse<T = any> {
   data: T
 }
 
-const BASE_URL = import.meta.env.DEV ? '/api/v2' : 'https://api.shezhen.com/api/v2'
+const BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.shezhen.com/api/v1'
 
 // Check if running in uni-app environment
 const isUniApp = typeof uni !== 'undefined'

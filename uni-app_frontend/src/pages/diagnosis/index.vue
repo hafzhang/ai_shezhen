@@ -1,119 +1,175 @@
 <template>
-  <view class="container">
+  <div class="container">
     <!-- Custom Header -->
-    <view class="header">
-      <view class="header-left" @click="goBack">
-        <text class="icon-back">←</text>
-      </view>
-      <text class="header-title">舌诊诊断</text>
-      <view class="header-right"></view>
-    </view>
+    <div class="header">
+      <div class="header-left" @click="goBack">
+        <span class="icon-back">←</span>
+      </div>
+      <span class="header-title">舌诊诊断</span>
+      <div class="header-right"></div>
+    </div>
 
-    <view class="content">
+    <div class="content">
       <!-- Image Upload Section -->
-      <view class="upload-section">
-        <text class="section-title">上传舌部照片</text>
-        <text class="section-desc">请拍摄清晰的舌部照片，确保光线充足</text>
+      <div class="upload-section">
+        <span class="section-title">上传舌部照片</span>
+        <span class="section-desc">请拍摄清晰的舌部照片，确保光线充足</span>
 
-        <!-- Image Preview Component -->
-        <image-preview
-          :image-src="selectedImage"
-          :show-actions="true"
-          :show-info="false"
-          :show-preview-hint="true"
-          :compression-info="compressionInfo"
-          empty-text="请拍摄或选择舌部照片"
-          @delete="removeImage"
-          @reselect="selectFromAlbum"
-          @empty-click="takePhoto"
+        <!-- Image Upload Area -->
+        <div class="upload-area" v-if="!selectedImage" @click="showUploadOptions = true">
+          <div class="upload-icon">📷</div>
+          <span class="upload-text">点击拍摄或选择照片</span>
+          <span class="upload-hint">支持 JPG、PNG 格式，建议不超过 5MB</span>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="image-preview" v-else>
+          <img class="preview-image" :src="selectedImage" alt="舌部照片" />
+          <div class="preview-overlay">
+            <button class="btn-remove" @click="removeImage">删除</button>
+            <button class="btn-reselect" @click="showUploadOptions = true">重新选择</button>
+          </div>
+          <div class="compression-info" v-if="compressionInfo">
+            <span class="info-text">已压缩: {{ compressionInfo.originalSize }} → {{ compressionInfo.compressedSize }} ({{ compressionInfo.ratio }})</span>
+          </div>
+        </div>
+
+        <!-- Hidden file inputs -->
+        <input
+          ref="fileInputCamera"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style="display: none"
+          @change="handleFileSelect"
+        />
+        <input
+          ref="fileInputAlbum"
+          type="file"
+          accept="image/*"
+          style="display: none"
+          @change="handleFileSelect"
         />
 
+        <!-- Upload Options Modal -->
+        <div class="modal-overlay" v-if="showUploadOptions" @click="showUploadOptions = false">
+          <div class="upload-options-modal" @click.stop>
+            <div class="modal-header">
+              <span class="modal-title">选择照片</span>
+              <span class="modal-close" @click="showUploadOptions = false">×</span>
+            </div>
+            <div class="upload-actions">
+              <button class="upload-option" @click="selectFromCamera">
+                <span class="option-icon">📷</span>
+                <span class="option-text">拍照</span>
+              </button>
+              <button class="upload-option" @click="selectFromAlbum">
+                <span class="option-icon">🖼️</span>
+                <span class="option-text">从相册选择</span>
+              </button>
+            </div>
+            <button class="btn-cancel" @click="showUploadOptions = false">取消</button>
+          </div>
+        </div>
+
         <!-- Photo Tips -->
-        <view class="photo-tips">
-          <text class="tips-title">拍照提示：</text>
-          <view class="tips-list">
-            <text class="tip-item">• 请在自然光或明亮灯光下拍摄</text>
-            <text class="tip-item">• 舌头自然伸出，不要过度用力</text>
-            <text class="tip-item">• 保持舌面平整，尽量舒展</text>
-            <text class="tip-item">• 避免有色食物（如咖啡、咖喱）后立即拍摄</text>
-          </view>
-        </view>
-      </view>
+        <div class="photo-tips">
+          <span class="tips-title">拍照提示：</span>
+          <div class="tips-list">
+            <span class="tip-item">• 请在自然光或明亮灯光下拍摄</span>
+            <span class="tip-item">• 舌头自然伸出，不要过度用力</span>
+            <span class="tip-item">• 保持舌面平整，尽量舒展</span>
+            <span class="tip-item">• 避免有色食物（如咖啡、咖喱）后立即拍摄</span>
+          </div>
+        </div>
+      </div>
 
       <!-- User Info Form -->
-      <view class="form-section">
-        <text class="section-title">基本信息（可选）</text>
-        <text class="section-desc">提供信息有助于更准确的诊断分析</text>
+      <div class="form-section">
+        <span class="section-title">基本信息（可选）</span>
+        <span class="section-desc">提供信息有助于更准确的诊断分析</span>
 
-        <view class="form-group">
-          <text class="form-label">年龄</text>
+        <div class="form-group">
+          <span class="form-label">年龄</span>
           <input
             class="form-input"
             type="number"
             v-model="formData.age"
             placeholder="请输入年龄"
-            :maxlength="3"
+            maxlength="3"
           />
-        </view>
+        </div>
 
-        <view class="form-group">
-          <text class="form-label">性别</text>
-          <view class="gender-options">
-            <view
+        <div class="form-group">
+          <span class="form-label">性别</span>
+          <div class="gender-options">
+            <div
               class="gender-option"
               :class="{ active: formData.gender === 'male' }"
               @click="selectGender('male')"
             >
-              <text class="gender-icon">♂</text>
-              <text class="gender-text">男</text>
-            </view>
-            <view
+              <span class="gender-icon">♂</span>
+              <span class="gender-text">男</span>
+            </div>
+            <div
               class="gender-option"
               :class="{ active: formData.gender === 'female' }"
               @click="selectGender('female')"
             >
-              <text class="gender-icon">♀</text>
-              <text class="gender-text">女</text>
-            </view>
-          </view>
-        </view>
+              <span class="gender-icon">♀</span>
+              <span class="gender-text">女</span>
+            </div>
+          </div>
+        </div>
 
-        <view class="form-group">
-          <text class="form-label">主要症状</text>
+        <div class="form-group">
+          <span class="form-label">主要症状</span>
           <textarea
             class="form-textarea"
             v-model="formData.chief_complaint"
             placeholder="请描述您的主要症状或不适（可选）"
-            :maxlength="200"
+            maxlength="200"
           />
-          <text class="char-count">{{ formData.chief_complaint.length }}/200</text>
-        </view>
-      </view>
+          <span class="char-count">{{ formData.chief_complaint.length }}/200</span>
+        </div>
+      </div>
 
       <!-- Submit Button -->
-      <view class="submit-section">
+      <div class="submit-section">
         <button
           class="btn-submit"
           :class="{ disabled: !canSubmit || isDiagnosing }"
           :disabled="!canSubmit || isDiagnosing"
           @click="submitDiagnosis"
         >
-          <text v-if="!isDiagnosing">开始诊断</text>
-          <text v-else>诊断中...</text>
+          <span v-if="!isDiagnosing">开始诊断</span>
+          <span v-else>诊断中...</span>
         </button>
-        <text class="submit-hint">诊断过程可能需要几秒钟，请耐心等待</text>
-      </view>
-    </view>
-  </view>
+        <span class="submit-hint">诊断过程可能需要几秒钟，请耐心等待</span>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" v-if="isLoading">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <span class="loading-text">{{ loadingText }}</span>
+      </div>
+    </div>
+
+    <!-- Toast message -->
+    <div class="toast" :class="{ show: showToast }" v-if="toastMessage">
+      <span class="toast-text">{{ toastMessage }}</span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useDiagnosisStore } from '@/store'
-import type { DiagnosisResult } from '@/store/modules/diagnosis'
-import ImagePreview from '@/components/image-preview/image-preview.vue'
-import { compressImage, formatFileSize } from '@/utils/imageCompress'
 
+const router = useRouter()
 const diagnosisStore = useDiagnosisStore()
 
 // Form data
@@ -129,8 +185,9 @@ const formData = ref<FormData>({
   chief_complaint: ''
 })
 
-// Selected image (base64 or temp file path)
+// Selected image (base64)
 const selectedImage = ref<string>('')
+const originalFileName = ref<string>('')
 
 // Compression info
 const compressionInfo = ref<{
@@ -138,6 +195,17 @@ const compressionInfo = ref<{
   compressedSize: string
   ratio: string
 } | null>(null)
+
+// File input refs
+const fileInputCamera = ref<HTMLInputElement | null>(null)
+const fileInputAlbum = ref<HTMLInputElement | null>(null)
+
+// UI state
+const showUploadOptions = ref(false)
+const isLoading = ref(false)
+const loadingText = ref('处理中...')
+const showToast = ref(false)
+const toastMessage = ref('')
 
 // Computed
 const canSubmit = computed(() => {
@@ -150,9 +218,7 @@ const isDiagnosing = computed(() => {
 
 // Actions
 function goBack() {
-  uni.navigateBack({
-    delta: 1
-  })
+  router.back()
 }
 
 function selectGender(gender: 'male' | 'female') {
@@ -163,117 +229,183 @@ function selectGender(gender: 'male' | 'female') {
   }
 }
 
+// Toast message
+function showToastMsg(message: string, duration = 2000) {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, duration)
+}
+
+// Show loading
+function showLoading(text = '处理中...') {
+  loadingText.value = text
+  isLoading.value = true
+}
+
+// Hide loading
+function hideLoading() {
+  isLoading.value = false
+}
+
 // Camera functionality
-function takePhoto() {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'], // Use compressed image
-    sourceType: ['camera'],
-    success: (res) => {
-      handleSelectedImage(res.tempFilePaths[0])
-    },
-    fail: (error) => {
-      console.error('Failed to take photo:', error)
-      uni.showToast({
-        title: '拍照失败，请重试',
-        icon: 'none'
-      })
-    }
-  })
+function selectFromCamera() {
+  showUploadOptions.value = false
+  fileInputCamera.value?.click()
 }
 
 function selectFromAlbum() {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album'],
-    success: (res) => {
-      handleSelectedImage(res.tempFilePaths[0])
-    },
-    fail: (error) => {
-      console.error('Failed to select from album:', error)
-      uni.showToast({
-        title: '选择图片失败，请重试',
-        icon: 'none'
-      })
-    }
-  })
+  showUploadOptions.value = false
+  fileInputAlbum.value?.click()
 }
 
-async function handleSelectedImage(filePath: string) {
+async function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+
+  if (!file) return
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    showToastMsg('请选择图片文件')
+    return
+  }
+
+  // Validate file size (max 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    showToastMsg('图片大小不能超过 10MB')
+    return
+  }
+
+  originalFileName.value = file.name
+
   // Show loading
-  uni.showLoading({
-    title: '处理中...',
-    mask: true
-  })
+  showLoading('处理图片...')
 
   try {
-    // Compress image using canvas
-    const result = await compressImage(filePath, {
-      quality: 0.8,
-      maxWidth: 1920,
-      maxHeight: 1920,
-      maxFileSize: 2 * 1024 * 1024, // 2MB
-      format: 'jpeg'
-    })
+    // Compress and convert to base64
+    const result = await compressImage(file)
 
-    // Update selected image
     selectedImage.value = result.dataUrl
 
-    // Store compression info
     compressionInfo.value = {
-      originalSize: formatFileSize(result.originalSize),
+      originalSize: formatFileSize(file.size),
       compressedSize: formatFileSize(result.compressedSize),
       ratio: `${Math.round(result.ratio * 100)}%`
     }
 
-    // Show compression success message
-    uni.showToast({
-      title: `已压缩 (${compressionInfo.value.ratio})`,
-      icon: 'success',
-      duration: 2000
-    })
-
-    console.log('Image compressed:', {
-      original: formatFileSize(result.originalSize),
+    console.log('Image processed:', {
+      original: formatFileSize(file.size),
       compressed: formatFileSize(result.compressedSize),
       ratio: compressionInfo.value.ratio,
       dimensions: `${result.width}x${result.height}`
     })
-  } catch (error) {
-    console.error('Image compression failed:', error)
 
-    // Fallback to direct base64 conversion
-    uni.getFileSystemManager().readFile({
-      filePath: filePath,
-      encoding: 'base64',
-      success: (res) => {
-        const base64 = `data:image/jpeg;base64,${res.data}`
-        selectedImage.value = base64
-        compressionInfo.value = null
-        uni.hideLoading()
-        uni.showToast({
-          title: '图片处理完成',
-          icon: 'success'
-        })
-      },
-      fail: (err) => {
-        console.error('Failed to read file:', err)
-        uni.hideLoading()
-        uni.showToast({
-          title: '图片处理失败',
-          icon: 'none'
+    showToastMsg(`已压缩 (${compressionInfo.value.ratio})`)
+  } catch (error) {
+    console.error('Image processing failed:', error)
+    showToastMsg('图片处理失败，请重试')
+  } finally {
+    hideLoading()
+    // Clear input
+    target.value = ''
+  }
+}
+
+// Image compression using Canvas
+function compressImage(file: File): Promise<{
+  dataUrl: string
+  compressedSize: number
+  originalSize: number
+  ratio: number
+  width: number
+  height: number
+}> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      const img = new Image()
+
+      img.onload = () => {
+        // Calculate dimensions (max 1920x1920)
+        const maxWidth = 1920
+        const maxHeight = 1920
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height
+            height = maxHeight
+          }
+        }
+
+        // Create canvas
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'))
+          return
+        }
+
+        // Draw image
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, width, height)
+        ctx.drawImage(img, 0, 0, width, height)
+
+        // Compress to JPEG with quality 0.8
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+
+        // Calculate compressed size
+        const compressedSize = Math.round((dataUrl.length - 'data:image/jpeg;base64,'.length) * 3 / 4)
+        const originalSize = file.size
+
+        resolve({
+          dataUrl,
+          compressedSize,
+          originalSize,
+          ratio: compressedSize / originalSize,
+          width: Math.round(width),
+          height: Math.round(height)
         })
       }
-    })
-  } finally {
-    uni.hideLoading()
-  }
+
+      img.onerror = () => {
+        reject(new Error('Failed to load image'))
+      }
+
+      img.src = e.target?.result as string
+    }
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'))
+    }
+
+    reader.readAsDataURL(file)
+  })
+}
+
+// Format file size
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
 function removeImage() {
   selectedImage.value = ''
   compressionInfo.value = null
+  originalFileName.value = ''
 }
 
 async function submitDiagnosis() {
@@ -285,13 +417,12 @@ async function submitDiagnosis() {
   if (formData.value.age) {
     const ageNum = parseInt(formData.value.age)
     if (isNaN(ageNum) || ageNum < 0 || ageNum > 150) {
-      uni.showToast({
-        title: '请输入有效的年龄',
-        icon: 'none'
-      })
+      showToastMsg('请输入有效的年龄')
       return
     }
   }
+
+  showLoading('诊断中...')
 
   try {
     // Prepare user info
@@ -314,17 +445,17 @@ async function submitDiagnosis() {
     // Submit diagnosis
     const result = await diagnosisStore.submitDiagnosis(selectedImage.value, userInfo)
 
+    showToastMsg('诊断完成！')
+
     // Navigate to result page
-    uni.redirectTo({
-      url: `/pages/result/index?id=${result.id}`
-    })
+    setTimeout(() => {
+      router.push(`/result?id=${result.id}`)
+    }, 500)
   } catch (error: any) {
     console.error('Diagnosis failed:', error)
-    uni.showToast({
-      title: error.message || '诊断失败，请重试',
-      icon: 'none',
-      duration: 3000
-    })
+    showToastMsg(error?.message || '诊断失败，请重试')
+  } finally {
+    hideLoading()
   }
 }
 </script>
@@ -342,7 +473,7 @@ async function submitDiagnosis() {
   align-items: center;
   justify-content: space-between;
   height: 44px;
-  padding: 0 15px;
+  padding: 40px 15px 15px;
   background: #ffffff;
   border-bottom: 1px solid #e5e5e5;
 }
@@ -357,6 +488,7 @@ async function submitDiagnosis() {
 .icon-back {
   font-size: 20px;
   color: #333333;
+  cursor: pointer;
 }
 
 .header-title {
@@ -392,10 +524,186 @@ async function submitDiagnosis() {
   margin-bottom: 15px;
 }
 
+.upload-area {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.upload-area:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e9ff 100%);
+}
+
+.upload-icon {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #999999;
+}
+
+.image-preview {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+}
+
+.preview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-remove,
+.btn-reselect {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-remove {
+  background: rgba(255, 77, 79, 0.9);
+  color: #ffffff;
+}
+
+.btn-reselect {
+  background: rgba(102, 126, 234, 0.9);
+  color: #ffffff;
+}
+
+.compression-info {
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.info-text {
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.upload-options-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  width: 280px;
+  max-width: 90%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.modal-close {
+  font-size: 28px;
+  color: #999999;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.upload-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.upload-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-option:hover {
+  background: #e9ecef;
+  border-color: #667eea;
+}
+
+.option-icon {
+  font-size: 24px;
+}
+
+.btn-cancel {
+  width: 100%;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  border: none;
+  font-size: 16px;
+  color: #666666;
+  cursor: pointer;
+}
+
 .photo-tips {
   background: #f8f9fa;
   border-radius: 8px;
   padding: 12px;
+  margin-top: 15px;
 }
 
 .tips-title {
@@ -450,9 +758,11 @@ async function submitDiagnosis() {
   padding: 0 15px;
   font-size: 15px;
   color: #333333;
+  box-sizing: border-box;
 }
 
 .form-input:focus {
+  outline: none;
   border-color: #667eea;
   background: #ffffff;
 }
@@ -473,6 +783,7 @@ async function submitDiagnosis() {
   justify-content: center;
   gap: 8px;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .gender-option.active {
@@ -508,9 +819,12 @@ async function submitDiagnosis() {
   font-size: 15px;
   color: #333333;
   line-height: 1.5;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
 .form-textarea:focus {
+  outline: none;
   border-color: #667eea;
   background: #ffffff;
 }
@@ -540,15 +854,18 @@ async function submitDiagnosis() {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btn-submit:active {
+.btn-submit:active:not(:disabled) {
   opacity: 0.8;
 }
 
-.btn-submit.disabled {
+.btn-submit:disabled {
   background: #d0d0d0;
   box-shadow: none;
+  cursor: not-allowed;
 }
 
 .submit-hint {
@@ -557,5 +874,164 @@ async function submitDiagnosis() {
   text-align: center;
   display: block;
   margin-top: 12px;
+}
+
+// Loading overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.loading-content {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f0f0f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #666666;
+}
+
+// Toast
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 3000;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+/* Dark mode styles */
+:global(.dark-mode) .container {
+  background: #1a1a1a;
+}
+
+:global(.dark-mode) .header {
+  background: #2a2a2a;
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .icon-back,
+:global(.dark-mode) .header-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .upload-section,
+:global(.dark-mode) .form-section {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .section-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .upload-area {
+  background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+  border-color: #4a4a4a;
+}
+
+:global(.dark-mode) .upload-area:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #1a2540 0%, #2a3a50 100%);
+}
+
+:global(.dark-mode) .upload-text {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .upload-options-modal {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .modal-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .upload-option {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .upload-option:hover {
+  background: #4a4a4a;
+}
+
+:global(.dark-mode) .btn-cancel {
+  background: #3a3a3a;
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .form-label {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .form-input,
+:global(.dark-mode) .form-textarea {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .form-input:focus,
+:global(.dark-mode) .form-textarea:focus {
+  border-color: #667eea;
+  background: #4a4a4a;
+}
+
+:global(.dark-mode) .gender-option {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+}
+
+:global(.dark-mode) .gender-text {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .loading-content {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .loading-text {
+  color: #aaaaaa;
 }
 </style>

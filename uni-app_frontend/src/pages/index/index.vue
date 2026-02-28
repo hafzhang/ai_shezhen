@@ -1,90 +1,95 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <text class="title">AI舌诊智能诊断</text>
-      <text class="subtitle">基于人工智能的中医舌诊分析</text>
-    </view>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">AI舌诊智能诊断</h1>
+      <p class="subtitle">基于人工智能的中医舌诊分析</p>
+    </div>
 
-    <view class="content">
+    <div class="content">
       <!-- User info section -->
-      <view class="user-card" v-if="userStore.isLoggedIn && userStore.userInfo">
-        <view class="user-info">
-          <image
+      <div class="user-card" v-if="userStore.isLoggedIn && userStore.userInfo">
+        <div class="user-info">
+          <img
             class="avatar"
             :src="userStore.userInfo.avatar_url || '/static/default-avatar.png'"
-            mode="aspectFill"
+            alt="Avatar"
           />
-          <view class="user-details">
-            <text class="nickname">{{ userStore.userInfo.nickname || '用户' }}</text>
-            <text class="phone">{{ maskPhone(userStore.userInfo.phone) }}</text>
-          </view>
-        </view>
-        <view class="user-actions">
-          <text class="action-link" @click="goToProfile">个人中心</text>
-        </view>
-      </view>
+          <div class="user-details">
+            <div class="nickname">{{ userStore.userInfo.nickname || '用户' }}</div>
+            <div class="phone">{{ maskPhone(userStore.userInfo.phone) }}</div>
+          </div>
+        </div>
+        <div class="user-actions">
+          <a class="action-link" @click="goToProfile">个人中心</a>
+        </div>
+      </div>
 
       <!-- Welcome card -->
-      <view class="welcome-card">
-        <text class="logo">🏥</text>
-        <text class="welcome-text">欢迎使用AI舌诊系统</text>
-        <text class="description">通过拍照上传舌部照片，AI将为您分析舌象特征并给出健康建议</text>
-      </view>
+      <div class="welcome-card">
+        <div class="logo">🏥</div>
+        <h2 class="welcome-text">欢迎使用AI舌诊系统</h2>
+        <p class="description">通过拍照上传舌部照片，AI将为您分析舌象特征并给出健康建议</p>
+      </div>
 
       <!-- Start diagnosis button -->
-      <view class="action-buttons">
+      <div class="action-buttons">
         <button class="btn btn-primary" @click="startDiagnosis">
           开始诊断
         </button>
-      </view>
+      </div>
 
       <!-- Feature grid -->
-      <view class="feature-grid">
-        <view class="feature-item" @click="viewHistory">
-          <view class="feature-icon">📋</view>
-          <text class="feature-title">历史记录</text>
-          <text class="feature-desc">查看诊断历史</text>
-        </view>
+      <div class="feature-grid">
+        <div class="feature-item" @click="viewHistory">
+          <div class="feature-icon">📋</div>
+          <div class="feature-title">历史记录</div>
+          <div class="feature-desc">查看诊断历史</div>
+        </div>
 
-        <view class="feature-item" @click="viewHealthRecords">
-          <view class="feature-icon">📊</view>
-          <text class="feature-title">健康档案</text>
-          <text class="feature-desc">管理健康数据</text>
-        </view>
+        <div class="feature-item" @click="viewHealthRecords">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">健康档案</div>
+          <div class="feature-desc">管理健康数据</div>
+        </div>
 
-        <view class="feature-item" @click="viewStatistics">
-          <view class="feature-icon">📈</view>
-          <text class="feature-title">健康趋势</text>
-          <text class="feature-desc">查看健康变化</text>
-        </view>
+        <div class="feature-item" @click="viewStatistics">
+          <div class="feature-icon">📈</div>
+          <div class="feature-title">健康趋势</div>
+          <div class="feature-desc">查看健康变化</div>
+        </div>
 
-        <view class="feature-item" @click="goToSettings">
-          <view class="feature-icon">⚙️</view>
-          <text class="feature-title">设置</text>
-          <text class="feature-desc">应用设置</text>
-        </view>
-      </view>
+        <div class="feature-item" @click="goToSettings">
+          <div class="feature-icon">⚙️</div>
+          <div class="feature-title">设置</div>
+          <div class="feature-desc">应用设置</div>
+        </div>
+      </div>
 
       <!-- Login prompt for non-logged-in users -->
-      <view class="info-section" v-if="!userStore.isLoggedIn">
-        <text class="info-text">登录后可保存诊断记录并查看历史</text>
-        <view class="info-actions">
+      <div class="info-section" v-if="!userStore.isLoggedIn">
+        <p class="info-text">登录后可保存诊断记录并查看历史</p>
+        <div class="info-actions">
           <button class="btn btn-text" @click="goToLogin">登录</button>
-          <text class="divider">|</text>
+          <span class="divider">|</span>
           <button class="btn btn-text" @click="goToRegister">注册</button>
-        </view>
-      </view>
-    </view>
-  </view>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store'
 
+const router = useRouter()
 const userStore = useUserStore()
 
 onMounted(() => {
+  console.log('Index page mounted')
+  console.log('Is logged in:', userStore.isLoggedIn)
+
   // Fetch user info if logged in
   if (userStore.isLoggedIn && !userStore.userInfo) {
     userStore.fetchUserInfo()
@@ -97,81 +102,51 @@ function maskPhone(phone: string): string {
 }
 
 function startDiagnosis() {
-  // Navigate to diagnosis page (to be implemented in US-143)
-  uni.navigateTo({
-    url: '/pages/diagnosis/index'
-  })
+  router.push('/diagnosis')
 }
 
 function viewHistory() {
   if (!userStore.isLoggedIn) {
-    uni.showToast({
-      title: '请先登录',
-      icon: 'none'
-    })
+    alert('请先登录')
     goToLogin()
     return
   }
-  // Navigate to history page (to be implemented in US-150)
-  uni.navigateTo({
-    url: '/pages/history/index'
-  })
+  router.push('/history')
 }
 
 function viewHealthRecords() {
   if (!userStore.isLoggedIn) {
-    uni.showToast({
-      title: '请先登录',
-      icon: 'none'
-    })
+    alert('请先登录')
     goToLogin()
     return
   }
-  // Navigate to health records page (to be implemented in US-153)
-  uni.navigateTo({
-    url: '/pages/health-records/index'
-  })
+  router.push('/health-records')
 }
 
 function viewStatistics() {
   if (!userStore.isLoggedIn) {
-    uni.showToast({
-      title: '请先登录',
-      icon: 'none'
-    })
+    alert('请先登录')
     goToLogin()
     return
   }
-  // Navigate to statistics/trends page
-  uni.navigateTo({
-    url: '/pages/statistics/index'
-  })
+  // Statistics page - to be implemented
+  alert('健康趋势功能即将上线')
 }
 
 function goToSettings() {
-  // Navigate to settings page (to be implemented in US-154)
-  uni.navigateTo({
-    url: '/pages/settings/index'
-  })
+  router.push('/settings')
 }
 
 function goToProfile() {
-  // Navigate to profile page (to be implemented in US-152)
-  uni.navigateTo({
-    url: '/pages/profile/index'
-  })
+  router.push('/profile')
 }
 
 function goToLogin() {
-  uni.navigateTo({
-    url: '/pages/login/index'
-  })
+  router.push('/login')
 }
 
 function goToRegister() {
-  uni.navigateTo({
-    url: '/pages/register/index'
-  })
+  router.push('/register')
 }
 </script>
 
@@ -192,14 +167,13 @@ function goToRegister() {
   font-size: 28px;
   font-weight: bold;
   color: #ffffff;
-  display: block;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0;
 }
 
 .subtitle {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
-  display: block;
+  margin: 0;
 }
 
 .content {
@@ -228,6 +202,7 @@ function goToRegister() {
   height: 50px;
   border-radius: 25px;
   background: #f0f0f0;
+  object-fit: cover;
 }
 
 .user-details {
@@ -255,6 +230,8 @@ function goToRegister() {
 .action-link {
   font-size: 14px;
   color: #667eea;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .welcome-card {
@@ -277,16 +254,15 @@ function goToRegister() {
   font-size: 20px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px;
-  display: block;
+  margin: 0 0 10px 0;
 }
 
 .description {
   font-size: 14px;
   color: #666666;
   line-height: 1.6;
-  display: block;
   padding: 0 10px;
+  margin: 0;
 }
 
 .action-buttons {
@@ -303,12 +279,17 @@ function goToRegister() {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
 }
 
 .btn-text {
@@ -318,6 +299,12 @@ function goToRegister() {
   height: auto;
   padding: 0;
   display: inline;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-text:hover {
+  opacity: 0.7;
 }
 
 .feature-grid {
@@ -336,9 +323,10 @@ function goToRegister() {
   align-items: center;
   text-align: center;
   transition: transform 0.2s;
+  cursor: pointer;
 }
 
-.feature-item:active {
+.feature-item:hover {
   transform: scale(0.98);
 }
 
@@ -352,13 +340,11 @@ function goToRegister() {
   font-weight: 500;
   color: #333333;
   margin-bottom: 5px;
-  display: block;
 }
 
 .feature-desc {
   font-size: 12px;
   color: #999999;
-  display: block;
 }
 
 .info-section {
@@ -372,8 +358,7 @@ function goToRegister() {
 .info-text {
   font-size: 14px;
   color: #ffffff;
-  display: block;
-  margin-bottom: 15px;
+  margin: 0 0 15px 0;
 }
 
 .info-actions {

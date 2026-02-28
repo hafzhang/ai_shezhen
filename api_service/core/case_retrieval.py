@@ -507,28 +507,42 @@ def retrieve_similar_cases_from_classification(
     """
     engine = get_case_retrieval()
 
-    # 提取特征
-    tongue_color = classification_result.get("tongue_color", {}).get("prediction")
-    coating_color = classification_result.get("coating_color", {}).get("prediction")
-    tongue_shape = classification_result.get("tongue_shape", {}).get("prediction")
-    coating_quality = classification_result.get("coating_quality", {}).get("prediction")
-    health_status = classification_result.get("health_status", {}).get("prediction")
+    # 提取特征 - 支持多种格式
+    def extract_feature_value(key, classification_result):
+        """提取特征值，支持dict和list格式"""
+        value = classification_result.get(key, {})
+        if isinstance(value, list) and len(value) > 0:
+            return value[0]  # 取列表第一个元素
+        elif isinstance(value, dict):
+            return value.get("prediction", "")
+        return str(value) if value else ""
 
-    # 提取特殊特征
+    tongue_color = extract_feature_value("tongue_color", classification_result)
+    coating_color = extract_feature_value("coating_color", classification_result)
+    tongue_shape = extract_feature_value("tongue_shape", classification_result)
+    coating_quality = extract_feature_value("coating_quality", classification_result)
+    health_status = extract_feature_value("health_status", classification_result)
+
+    # 提取特殊特征 - 支持多种格式
     special_features = []
     special_data = classification_result.get("special_features", {})
 
-    red_dots = special_data.get("red_dots", {})
-    if red_dots.get("present", False):
-        special_features.append("红点")
+    # Handle list format (e.g., ["红点", "裂纹"])
+    if isinstance(special_data, list):
+        special_features = special_data
+    # Handle dict format
+    elif isinstance(special_data, dict):
+        red_dots = special_data.get("red_dots", {})
+        if red_dots.get("present", False):
+            special_features.append("红点")
 
-    cracks = special_data.get("cracks", {})
-    if cracks.get("present", False):
-        special_features.append("裂纹")
+        cracks = special_data.get("cracks", {})
+        if cracks.get("present", False):
+            special_features.append("裂纹")
 
-    teeth_marks = special_data.get("teeth_marks", {})
-    if teeth_marks.get("present", False):
-        special_features.append("齿痕")
+        teeth_marks = special_data.get("teeth_marks", {})
+        if teeth_marks.get("present", False):
+            special_features.append("齿痕")
 
     # 执行检索
     return engine.retrieve_similar_cases(

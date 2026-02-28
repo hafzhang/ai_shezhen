@@ -1,167 +1,168 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="header-left" @click="goBack">
-        <text class="back-icon">←</text>
-      </view>
-      <text class="header-title">诊断历史</text>
-      <view class="header-right"></view>
-    </view>
+  <div class="container">
+    <div class="header">
+      <div class="header-left" @click="goBack">
+        <span class="back-icon">←</span>
+      </div>
+      <span class="header-title">诊断历史</span>
+      <div class="header-right"></div>
+    </div>
 
-    <view class="content">
+    <div class="content">
       <!-- Filters -->
-      <view class="filters" v-if="hasActiveFilters">
-        <view class="filter-chips">
-          <view class="chip" v-if="filters.syndrome" @click="clearSyndromeFilter">
-            <text class="chip-text">{{ filters.syndrome }}</text>
-            <text class="chip-close">×</text>
-          </view>
-          <view class="chip" v-if="filters.has_risk !== undefined" @click="clearRiskFilter">
-            <text class="chip-text">{{ filters.has_risk ? '有风险' : '无风险' }}</text>
-            <text class="chip-close">×</text>
-          </view>
-          <view class="chip" v-if="filters.start_date || filters.end_date" @click="clearDateFilter">
-            <text class="chip-text">日期筛选</text>
-            <text class="chip-close">×</text>
-          </view>
-          <view class="chip chip-clear" @click="clearAllFilters">
-            <text class="chip-text">清空</text>
-          </view>
-        </view>
-      </view>
+      <div class="filters" v-if="hasActiveFilters">
+        <div class="filter-chips">
+          <div class="chip" v-if="filters.syndrome" @click="clearSyndromeFilter">
+            <span class="chip-text">{{ filters.syndrome }}</span>
+            <span class="chip-close">×</span>
+          </div>
+          <div class="chip" v-if="filters.has_risk !== undefined" @click="clearRiskFilter">
+            <span class="chip-text">{{ filters.has_risk ? '有风险' : '无风险' }}</span>
+            <span class="chip-close">×</span>
+          </div>
+          <div class="chip" v-if="filters.start_date || filters.end_date" @click="clearDateFilter">
+            <span class="chip-text">日期筛选</span>
+            <span class="chip-close">×</span>
+          </div>
+          <div class="chip chip-clear" @click="clearAllFilters">
+            <span class="chip-text">清空</span>
+          </div>
+        </div>
+      </div>
 
       <!-- Empty state -->
-      <view class="empty-state" v-if="!isLoading && history.length === 0">
-        <text class="empty-icon">📋</text>
-        <text class="empty-title">暂无诊断记录</text>
-        <text class="empty-desc">完成首次诊断后，这里将显示您的诊断历史</text>
+      <div class="empty-state" v-if="!isLoading && history.length === 0">
+        <span class="empty-icon">📋</span>
+        <span class="empty-title">暂无诊断记录</span>
+        <span class="empty-desc">完成首次诊断后，这里将显示您的诊断历史</span>
         <button class="btn btn-primary" @click="goToDiagnosis">开始诊断</button>
-      </view>
+      </div>
 
       <!-- History list -->
-      <view class="history-list" v-else>
+      <div class="history-list" v-else>
         <!-- Pull to refresh indicator -->
-        <view class="refresh-indicator" v-if="isRefreshing">
-          <text class="refresh-text">正在刷新...</text>
-        </view>
+        <div class="refresh-indicator" v-if="isRefreshing">
+          <span class="refresh-text">正在刷新...</span>
+        </div>
 
         <!-- List items -->
-        <view
+        <div
           class="history-item"
           v-for="item in history"
           :key="item.id"
           @click="viewDetail(item.id)"
         >
-          <view class="item-header">
-            <view class="syndrome-info">
-              <text class="syndrome-name">{{ item.primary_syndrome }}</text>
-              <view
+          <div class="item-header">
+            <div class="syndrome-info">
+              <span class="syndrome-name">{{ item.primary_syndrome }}</span>
+              <div
                 class="risk-badge"
                 :class="{ 'has-risk': item.has_risk, 'no-risk': !item.has_risk }"
               >
-                <text class="risk-text">{{ item.has_risk ? '风险' : '正常' }}</text>
-              </view>
-            </view>
-            <text class="confidence">{{ Math.round(item.confidence * 100) }}%</text>
-          </view>
+                <span class="risk-text">{{ item.has_risk ? '风险' : '正常' }}</span>
+              </div>
+            </div>
+            <span class="confidence">{{ Math.round(item.confidence * 100) }}%</span>
+          </div>
 
-          <view class="item-footer">
-            <text class="diagnosis-time">{{ formatTime(item.created_at) }}</text>
-            <text class="view-detail">查看详情 →</text>
-          </view>
-        </view>
+          <div class="item-footer">
+            <span class="diagnosis-time">{{ formatTime(item.created_at) }}</span>
+            <span class="view-detail">查看详情 →</span>
+          </div>
+        </div>
 
         <!-- Loading more indicator -->
-        <view class="load-more" v-if="isLoadingMore">
-          <text class="load-text">加载中...</text>
-        </view>
+        <div class="load-more" v-if="isLoadingMore">
+          <span class="load-text">加载中...</span>
+        </div>
 
         <!-- No more data indicator -->
-        <view class="no-more" v-if="!hasMore && history.length > 0">
-          <text class="no-more-text">没有更多记录了</text>
-        </view>
-      </view>
+        <div class="no-more" v-if="!hasMore && history.length > 0">
+          <span class="no-more-text">没有更多记录了</span>
+        </div>
+      </div>
 
       <!-- Loading state -->
-      <view class="loading-state" v-if="isLoading && history.length === 0">
-        <text class="loading-text">加载中...</text>
-      </view>
-    </view>
+      <div class="loading-state" v-if="isLoading && history.length === 0">
+        <span class="loading-text">加载中...</span>
+      </div>
+    </div>
 
     <!-- Filter button (bottom right) -->
-    <view class="filter-button" @click="showFilterSheet = true" v-if="history.length > 0">
-      <text class="filter-icon">🔍</text>
-    </view>
+    <div class="filter-button" @click="showFilterSheet = true" v-if="history.length > 0">
+      <span class="filter-icon">🔍</span>
+    </div>
 
     <!-- Filter sheet -->
-    <u-popup v-model:show="showFilterSheet" mode="bottom" :round="20">
-      <view class="filter-sheet">
-        <view class="sheet-header">
-          <text class="sheet-title">筛选条件</text>
-          <text class="sheet-close" @click="showFilterSheet = false">完成</text>
-        </view>
+    <div class="modal-overlay" v-if="showFilterSheet" @click="showFilterSheet = false">
+      <div class="filter-sheet" @click.stop>
+        <div class="sheet-header">
+          <span class="sheet-title">筛选条件</span>
+          <span class="sheet-close" @click="showFilterSheet = false">完成</span>
+        </div>
 
-        <view class="sheet-content">
+        <div class="sheet-content">
           <!-- Date range filter -->
-          <view class="filter-section">
-            <text class="section-title">日期范围</text>
-            <view class="date-options">
-              <view
+          <div class="filter-section">
+            <span class="section-title">日期范围</span>
+            <div class="date-options">
+              <div
                 class="date-option"
                 :class="{ active: dateRange === option.value }"
                 v-for="option in dateRangeOptions"
                 :key="option.value"
                 @click="selectDateRange(option.value)"
               >
-                <text class="option-text">{{ option.label }}</text>
-              </view>
-            </view>
-          </view>
+                <span class="option-text">{{ option.label }}</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Risk filter -->
-          <view class="filter-section">
-            <text class="section-title">风险状态</text>
-            <view class="risk-options">
-              <view
+          <div class="filter-section">
+            <span class="section-title">风险状态</span>
+            <div class="risk-options">
+              <div
                 class="risk-option"
                 :class="{ active: filters.has_risk === undefined }"
                 @click="filters.has_risk = undefined"
               >
-                <text class="option-text">全部</text>
-              </view>
-              <view
+                <span class="option-text">全部</span>
+              </div>
+              <div
                 class="risk-option"
                 :class="{ active: filters.has_risk === true }"
                 @click="filters.has_risk = true"
               >
-                <text class="option-text">有风险</text>
-              </view>
-              <view
+                <span class="option-text">有风险</span>
+              </div>
+              <div
                 class="risk-option"
                 :class="{ active: filters.has_risk === false }"
                 @click="filters.has_risk = false"
               >
-                <text class="option-text">无风险</text>
-              </view>
-            </view>
-          </view>
+                <span class="option-text">无风险</span>
+              </div>
+            </div>
+          </div>
 
           <!-- Apply button -->
-          <view class="sheet-actions">
+          <div class="sheet-actions">
             <button class="btn btn-secondary" @click="resetFilters">重置</button>
             <button class="btn btn-primary" @click="applyFilters">应用</button>
-          </view>
-        </view>
-      </view>
-    </u-popup>
-  </view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useDiagnosisStore, type DiagnosisHistory, type DiagnosisFilters } from '@/store'
-import { onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app'
+import { useRouter } from 'vue-router'
+import { useDiagnosisStore, type DiagnosisFilters } from '@/store'
 
+const router = useRouter()
 const diagnosisStore = useDiagnosisStore()
 
 // State
@@ -220,19 +221,15 @@ function formatTime(timestamp: string): string {
 }
 
 function goBack() {
-  uni.navigateBack()
+  router.back()
 }
 
 function goToDiagnosis() {
-  uni.navigateTo({
-    url: '/pages/diagnosis/index'
-  })
+  router.push('/diagnosis')
 }
 
 function viewDetail(id: string) {
-  uni.navigateTo({
-    url: `/pages/detail/index?id=${id}`
-  })
+  router.push(`/detail/${id}`)
 }
 
 async function loadHistory(refresh: boolean = false) {
@@ -244,10 +241,7 @@ async function loadHistory(refresh: boolean = false) {
     await diagnosisStore.fetchDiagnosisHistory(page, filters.value)
   } catch (error) {
     console.error('Failed to load history:', error)
-    uni.showToast({
-      title: '加载失败',
-      icon: 'none'
-    })
+    alert('加载失败')
   } finally {
     isLoading.value = false
   }
@@ -263,7 +257,6 @@ async function onRefresh() {
     console.error('Refresh failed:', error)
   } finally {
     isRefreshing.value = false
-    uni.stopPullDownRefresh()
   }
 }
 
@@ -354,16 +347,6 @@ function clearAllFilters() {
 onMounted(() => {
   loadHistory(true)
 })
-
-// Pull to refresh (uni-app API)
-onPullDownRefresh(() => {
-  onRefresh()
-})
-
-// Load more on scroll (uni-app API)
-onReachBottom(() => {
-  loadMore()
-})
 </script>
 
 <style lang="scss" scoped>
@@ -377,7 +360,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 50px 15px 15px;
+  padding: 40px 15px 15px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -388,6 +371,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .back-icon {
@@ -422,6 +406,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
 }
 
 .chip-clear {
@@ -458,14 +443,12 @@ onReachBottom(() => {
   font-weight: 500;
   color: #333333;
   margin-bottom: 10px;
-  display: block;
 }
 
 .empty-desc {
   font-size: 14px;
   color: #999999;
   margin-bottom: 30px;
-  display: block;
 }
 
 .history-list {
@@ -488,10 +471,11 @@ onReachBottom(() => {
   background: #ffffff;
   border-radius: 12px;
   padding: 15px;
+  cursor: pointer;
   transition: background 0.2s;
 }
 
-.history-item:active {
+.history-item:hover {
   background: #f8f8f8;
 }
 
@@ -598,6 +582,7 @@ onReachBottom(() => {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  cursor: pointer;
 }
 
 .filter-icon {
@@ -607,14 +592,37 @@ onReachBottom(() => {
 .filter-sheet {
   background: #ffffff;
   border-radius: 20px 20px 0 0;
-  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .sheet-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .sheet-title {
@@ -626,12 +634,14 @@ onReachBottom(() => {
 .sheet-close {
   font-size: 15px;
   color: #667eea;
+  cursor: pointer;
 }
 
 .sheet-content {
   display: flex;
   flex-direction: column;
   gap: 25px;
+  padding: 20px;
 }
 
 .filter-section {
@@ -659,6 +669,7 @@ onReachBottom(() => {
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   background: #ffffff;
+  cursor: pointer;
 }
 
 .date-option.active,
@@ -691,6 +702,7 @@ onReachBottom(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary {
@@ -698,8 +710,84 @@ onReachBottom(() => {
   color: #ffffff;
 }
 
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
 .btn-secondary {
   background: #f0f0f0;
   color: #666666;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+/* Dark mode styles */
+:global(.dark-mode) .container {
+  background: #1a1a1a;
+}
+
+:global(.dark-mode) .header {
+  background: #2a2a2a;
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .back-icon,
+:global(.dark-mode) .header-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .history-item {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .history-item:hover {
+  background: #3a3a3a;
+}
+
+:global(.dark-mode) .syndrome-name {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .filter-sheet {
+  background: #2a2a2a;
+}
+
+:global(.dark-mode) .sheet-header {
+  border-bottom-color: #3a3a3a;
+}
+
+:global(.dark-mode) .sheet-title {
+  color: #e0e0e0;
+}
+
+:global(.dark-mode) .section-title {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .date-option,
+:global(.dark-mode) .risk-option {
+  background: #3a3a3a;
+  border-color: #4a4a4a;
+}
+
+:global(.dark-mode) .date-option.active,
+:global(.dark-mode) .risk-option.active {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+:global(.dark-mode) .option-text {
+  color: #aaaaaa;
+}
+
+:global(.dark-mode) .active .option-text {
+  color: #ffffff;
+}
+
+:global(.dark-mode) .btn-secondary {
+  background: #3a3a3a;
+  color: #aaaaaa;
 }
 </style>

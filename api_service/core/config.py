@@ -14,6 +14,11 @@ import os
 from pathlib import Path
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
+
+# Load .env file manually to ensure it's loaded
+env_file = Path(__file__).parent.parent / ".env"
+load_dotenv(env_file)
 
 
 class Settings(BaseSettings):
@@ -41,15 +46,21 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     API_VERSION: str = "1.0.0"
     API_HOST: str = "0.0.0.0"
-    API_PORT: int = 8000
+    API_PORT: int = 9000
     ENABLE_API_DOCS: bool = True
 
     # CORS Configuration
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
-        "http://localhost:8000",
+        "http://localhost:9000",
         "http://127.0.0.1:3000",
-        "http://127.0.0.1:8000"
+        "http://127.0.0.1:9000",
+        "http://192.168.51.194:3000",
+        "http://192.168.51.194:9000",
+        # Allow any port on localhost and 192.168.51.194 for development
+        "http://localhost:*",
+        "http://127.0.0.1:*",
+        "http://192.168.51.194:*"
     ]
 
     # Model Configuration
@@ -76,12 +87,21 @@ class Settings(BaseSettings):
     FEW_SHOT_EXAMPLES_PATH: Path = PROMPTS_DIR / "few_shot_examples.json"
     USER_PROMPT_TEMPLATE_PATH: Path = PROMPTS_DIR / "user_prompt_template.py"
 
-    # Wenxin API Configuration
+    # LLM Provider Configuration
+    LLM_PROVIDER: str = "zhipu"  # "wenxin" or "zhipu"
+
+    # ZhipuAI (智谱AI) Configuration
+    ZHIPU_API_KEY: Optional[str] = None
+    ZHIPU_MODEL: str = "glm-4.5-air"
+    ZHIPU_API_BASE: str = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+
+    # Wenxin API Configuration (百度文心一言)
     BAIDU_API_KEY: Optional[str] = None
     BAIDU_SECRET_KEY: Optional[str] = None
     WENXIN_MODEL: str = "ERNIE-Speed"
     WENXIN_API_BASE: str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop"
     API_CALL_TIMEOUT: int = 10
+    LLM_MAX_RETRIES: int = 2
 
     # Rule-based fallback
     ENABLE_RULE_BASED_FALLBACK: bool = True
@@ -184,7 +204,8 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
-        extra="ignore"
+        extra="ignore",
+        env_ignore_empty=True
     )
 
     def get_model_paths(self) -> dict:

@@ -13,7 +13,7 @@ import { defineConfig, devices } from '@playwright/test'
  * Read environment variables from process.env
  */
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5173'
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000'
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000'
 
 export default defineConfig({
   // Test directory
