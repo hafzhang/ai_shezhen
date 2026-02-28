@@ -336,6 +336,14 @@ try:
 except ImportError as e:
     logger.warning(f"API v2 users endpoints not available: {e}")
 
+# Include API v2 RAG router (RAG knowledge base and PDF reports)
+try:
+    from api_service.app.api.v2 import rag
+    app.include_router(rag.router, prefix="/api/v2/rag", tags=["RAG Knowledge Base"])
+    logger.info("API v2 RAG endpoints registered")
+except ImportError as e:
+    logger.warning(f"API v2 RAG endpoints not available: {e}")
+
 
 # Root endpoint
 @app.get("/", tags=["Root"])
