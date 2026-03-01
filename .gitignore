@@ -79,3 +79,26 @@ celerybeat.pid
 
 # Docker
 .dockerignore
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+shezhen.db
+
+# API data directories
+api_service/data/
+api_service/data/vector_db/
+api_service/data/reports/
+
+# Test files
+test_*.py
+create_test_*.py
+monitor_training.py
+
+# PPT files
+*.pptx
+*.ppt
+
+# Cache directories
+.playwright-mcp/
