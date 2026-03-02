@@ -1,0 +1,11 @@
+{
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+  "user_info": {
+    "age": 35,
+    "gender": "male",
+    "symptoms": ["乏力", "畏寒"],
+    "chief_complaint": "最近感觉疲劳乏力，怕冷"
+  },
+  "enable_llm_diagnosis": true,
+  "enable_rule_fallback": true
+}
