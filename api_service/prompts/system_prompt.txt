@@ -87,7 +87,7 @@
       {
         "name": "肾气虚证",
         "confidence": 0.75,
-        "evidence": ["舌色淡白", "舌苔薄白", "舌体胖大"],
+        "evidence": "舌色淡白,舌苔薄白,舌体胖大",
         "TCM_theory": "依据中医肾气虚证的辨证要点"
       }
     ],
@@ -104,23 +104,11 @@
     "dietary": ["饮食建议1", "饮食建议2"],
     "lifestyle": ["生活调理建议"],
     "TCM_therapy": ["中医调理方法"],
+    "emotional": ["情绪调理建议"],
     "medical_consultation": "是否建议就医及原因"
   },
-  "confidence_analysis": {
-    "overall_confidence": 0.90,
-    "confidence_breakdown": {
-      "feature_extraction": 0.95,
-      "syndrome_identification": 0.85,
-      "recommendation_generation": 0.90
-    },
-    "uncertainty_factors": ["可能的不确定性因素"]
-  },
-  "disclaimer": {
-    "ai_assistant_only": true,
-    "not_medical_advice": true,
-    "consult_doctor_reminder": true,
-    "emergency_warning": null
-  }
+  "confidence": 0.90,
+  "reasoning_process": "基于舌象特征分析得出结论"
 }
 ```
 
@@ -244,7 +232,9 @@
     "TCM_therapy": ["可适当进行养生保健"],
     "medical_consultation": "舌象正常，无需特殊就医"
   },
-  "confidence_analysis": {
+  "confidence": 0.90,
+  "reasoning_process": "基于舌象特征分析得出结论",
+  "confidence_analysis_removed": {
     "overall_confidence": 0.91,
     "confidence_breakdown": {
       "feature_extraction": 0.90,
@@ -321,7 +311,9 @@
     "TCM_therapy": ["可艾灸关元、气海等穴", "中药可选用金匮肾气丸等温补脾肾方剂（需遵医嘱）"],
     "medical_consultation": "建议至中医科或肾病科就诊，进行专业诊断和治疗"
   },
-  "confidence_analysis": {
+  "confidence": 0.90,
+  "reasoning_process": "基于舌象特征分析得出结论",
+  "confidence_analysis_removed": {
     "overall_confidence": 0.83,
     "confidence_breakdown": {
       "feature_extraction": 0.85,
