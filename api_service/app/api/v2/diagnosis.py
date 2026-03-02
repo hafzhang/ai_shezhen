@@ -248,121 +248,121 @@ async def create_diagnosis(
     try:
         # Get pipeline
         pipeline = get_pipeline()
-        if pipeline is None:
-            if settings.MOCK_MODE:
-                # Mock response for testing
-                mock_diagnosis_id = "00000000-0000-0000-0000-000000000000"
-                return DiagnosisResponse(
-                    success=True,
-                    message="Mock mode: diagnosis result",
-                    diagnosis_id=mock_diagnosis_id,
-                    user_id=str(current_user.id) if current_user else None,
-                    segmentation={"tongue_area": 100000, "tongue_ratio": 0.3},
-                    classification={
-                        "tongue_color": {"prediction": "淡红舌", "confidence": 0.85},
-                        "coating_color": {"prediction": "白苔", "confidence": 0.80},
-                        "tongue_shape": {"prediction": "正常", "confidence": 0.90},
-                        "coating_quality": {"prediction": "薄苔", "confidence": 0.88},
-                        "special_features": {
-                            "red_dots": {"present": False, "confidence": 0.0},
-                            "cracks": {"present": False, "confidence": 0.0},
-                            "teeth_marks": {"present": False, "confidence": 0.0}
-                        },
-                        "health_status": {"prediction": "健康舌", "confidence": 0.87}
-                    },
-                    diagnosis={
-                        "primary_syndrome": "气血调和",
-                        "confidence": 0.85,
-                        "syndrome_analysis": "舌象正常，气血调和",
-                        "health_recommendations": {
-                            "diet": ["保持均衡饮食"],
-                            "lifestyle": ["保持规律作息"],
-                            "emotional": ["保持心情愉悦"]
-                        }
-                    },
-                    inference_time_ms=100.0
-                )
+
+        # Check if running in mock mode (pipeline not loaded)
+        mock_mode = pipeline is None and settings.MOCK_MODE
+
+        if pipeline is None and not mock_mode:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="ML models not loaded"
             )
 
-        # Decode image
-        image = decode_base64_image(request.image)
-
-        # Calculate file hash for deduplication
-        file_hash = calculate_file_hash(image)
-
-        # Check if image already exists in database
-        tongue_image = db.query(TongueImage).filter(
-            TongueImage.file_hash == file_hash
-        ).first()
-
-        # If image doesn't exist, save it and create database record
-        is_new_image = tongue_image is None
-        tongue_image_id = None
-        if is_new_image:
-            storage_path, file_size = save_image_to_storage(image, file_hash)
-
-            # Get image dimensions
-            height, width = image.shape[:2] if len(image.shape) == 3 else image.shape
-
-            # Create tongue image record (will be processed, so set is_processed=True from start)
-            tongue_image = TongueImage(
-                user_id=current_user.id if current_user else None,
-                file_hash=file_hash,
-                storage_path=storage_path,
-                width=width,
-                height=height,
-                file_size=file_size,
-                mime_type="image/png",
-                is_processed=True  # Set to True since we're about to process it
-            )
-            db.add(tongue_image)
-            db.flush()  # Get the ID without committing
-            tongue_image_id = tongue_image.id
-            # Keep the tongue_image in the session to be committed together with diagnosis_history
-        else:
-            # Store the ID for later use and keep the object for reference
-            tongue_image_id = tongue_image.id
-            # Don't expunge - keep it in the session for the transaction
-            logger.info(f"Image already exists in database: {tongue_image_id}")
-
-        # Perform diagnosis using the pipeline
-        timing = {}
-        seg_start = time.time()
-
-        # Run segmentation
-        segmentor = get_segmentor()
-        if segmentor:
-            seg_result = segmentor.predict(image, return_mask=True, return_overlay=True)
-            timing["segmentation_ms"] = (time.time() - seg_start) * 1000
-        else:
+        # In mock mode, use mock classification results but still run LLM diagnosis
+        if mock_mode:
+            logger.info("Running in MOCK_MODE - using mock classification but will call LLM")
+            # Mock classification result for LLM
+            classification_result = {
+                "tongue_color": ["淡红舌"],
+                "coating_color": ["白苔"],
+                "tongue_shape": ["正常"],
+                "coating_quality": ["薄苔"],
+                "special_features": [],
+                "health_status": "健康舌"
+            }
+            features_for_db = {
+                "tongue_color": {"prediction": "淡红舌", "confidence": 0.85, "description": ""},
+                "coating_color": {"prediction": "白苔", "confidence": 0.80, "description": ""},
+                "tongue_shape": {"prediction": "正常", "confidence": 0.90, "description": ""},
+                "coating_quality": {"prediction": "薄苔", "confidence": 0.88, "description": ""},
+                "special_features": {
+                    "red_dots": {"present": False, "confidence": 0.0, "description": ""},
+                    "cracks": {"present": False, "confidence": 0.0, "description": ""},
+                    "teeth_marks": {"present": False, "confidence": 0.0, "description": ""}
+                },
+                "health_status": {"prediction": "健康舌", "confidence": 0.87, "description": ""}
+            }
             seg_result = {}
-            timing["segmentation_ms"] = 0
+            timing = {"segmentation_ms": 0, "classification_ms": 0}
+            tongue_image_id = None
 
-        # Run classification
-        cls_start = time.time()
-        classifier = get_classifier()
-        if classifier:
-            cls_result = classifier.predict(image)
-            timing["classification_ms"] = (time.time() - cls_start) * 1000
-        else:
-            cls_result = {}
-            timing["classification_ms"] = 0
+        if not mock_mode:
+            # Decode image
+            image = decode_base64_image(request.image)
 
-        # Extract classification results
-        classification = cls_result.get('results', {}) if cls_result else {}
+            # Calculate file hash for deduplication
+            file_hash = calculate_file_hash(image)
 
-        # Format for database storage (JSONB)
-        features_for_db = {
-            "tongue_color": classification.get("tongue_color", {}).__dict__ if hasattr(classification.get("tongue_color", {}), "__dict__") else classification.get("tongue_color", {}),
-            "coating_color": classification.get("coating_color", {}).__dict__ if hasattr(classification.get("coating_color", {}), "__dict__") else classification.get("coating_color", {}),
-            "tongue_shape": classification.get("tongue_shape", {}).__dict__ if hasattr(classification.get("tongue_shape", {}), "__dict__") else classification.get("tongue_shape", {}),
-            "coating_quality": classification.get("coating_quality", {}).__dict__ if hasattr(classification.get("coating_quality", {}), "__dict__") else classification.get("coating_quality", {}),
-            "special_features": classification.get("special_features", {}).__dict__ if hasattr(classification.get("special_features", {}), "__dict__") else classification.get("special_features", {}),
-            "health_status": classification.get("health_status", {}).__dict__ if hasattr(classification.get("health_status", {}), "__dict__") else classification.get("health_status", {}),
-        }
+            # Check if image already exists in database
+            tongue_image = db.query(TongueImage).filter(
+                TongueImage.file_hash == file_hash
+            ).first()
+
+            # If image doesn't exist, save it and create database record
+            is_new_image = tongue_image is None
+            tongue_image_id = None
+            if is_new_image:
+                storage_path, file_size = save_image_to_storage(image, file_hash)
+
+                # Get image dimensions
+                height, width = image.shape[:2] if len(image.shape) == 3 else image.shape
+
+                # Create tongue image record (will be processed, so set is_processed=True from start)
+                tongue_image = TongueImage(
+                    user_id=current_user.id if current_user else None,
+                    file_hash=file_hash,
+                    storage_path=storage_path,
+                    width=width,
+                    height=height,
+                    file_size=file_size,
+                    mime_type="image/png",
+                    is_processed=True  # Set to True since we're about to process it
+                )
+                db.add(tongue_image)
+                db.flush()  # Get the ID without committing
+                tongue_image_id = tongue_image.id
+                # Keep the tongue_image in the session to be committed together with diagnosis_history
+            else:
+                # Store the ID for later use and keep the object for reference
+                tongue_image_id = tongue_image.id
+                # Don't expunge - keep it in the session for the transaction
+                logger.info(f"Image already exists in database: {tongue_image_id}")
+
+            # Perform diagnosis using the pipeline
+            timing = {}
+            seg_start = time.time()
+
+            # Run segmentation
+            segmentor = get_segmentor()
+            if segmentor:
+                seg_result = segmentor.predict(image, return_mask=True, return_overlay=True)
+                timing["segmentation_ms"] = (time.time() - seg_start) * 1000
+            else:
+                seg_result = {}
+                timing["segmentation_ms"] = 0
+
+            # Run classification
+            cls_start = time.time()
+            classifier = get_classifier()
+            if classifier:
+                cls_result = classifier.predict(image)
+                timing["classification_ms"] = (time.time() - cls_start) * 1000
+            else:
+                cls_result = {}
+                timing["classification_ms"] = 0
+
+            # Extract classification results
+            classification = cls_result.get('results', {}) if cls_result else {}
+
+            # Format for database storage (JSONB)
+            features_for_db = {
+                "tongue_color": classification.get("tongue_color", {}).__dict__ if hasattr(classification.get("tongue_color", {}), "__dict__") else classification.get("tongue_color", {}),
+                "coating_color": classification.get("coating_color", {}).__dict__ if hasattr(classification.get("coating_color", {}), "__dict__") else classification.get("coating_color", {}),
+                "tongue_shape": classification.get("tongue_shape", {}).__dict__ if hasattr(classification.get("tongue_shape", {}), "__dict__") else classification.get("tongue_shape", {}),
+                "coating_quality": classification.get("coating_quality", {}).__dict__ if hasattr(classification.get("coating_quality", {}), "__dict__") else classification.get("coating_quality", {}),
+                "special_features": classification.get("special_features", {}).__dict__ if hasattr(classification.get("special_features", {}), "__dict__") else classification.get("special_features", {}),
+                "health_status": classification.get("health_status", {}).__dict__ if hasattr(classification.get("health_status", {}), "__dict__") else classification.get("health_status", {}),
+            }
 
         # Convert classification result to dict format for LLM engine
         classification_result = {
@@ -373,6 +373,8 @@ async def create_diagnosis(
             "special_features": [],
             "health_status": features_for_db.get("health_status", {}).get("prediction", "")
         }
+
+        logger.info(f"Classification result for LLM: {classification_result}")
 
         # Add special features if present
         special = features_for_db.get("special_features", {})
@@ -393,15 +395,25 @@ async def create_diagnosis(
             try:
                 # Get or create LLM engine
                 llm_engine = get_llm_engine()
+                logger.info(f"LLM engine status: {'available' if llm_engine else 'not available'}")
+
                 if llm_engine:
                     # Run LLM diagnosis asynchronously
                     llm_start = time.time()
+                    logger.info(f"Starting LLM diagnosis with classification: {classification_result}")
+
                     llm_diagnosis = await llm_engine.diagnose(
                         image_base64=request.image,
                         classification_result=classification_result,
                         user_info=request.user_info.model_dump() if request.user_info else None
                     )
                     llm_timing["llm_diagnosis_ms"] = (time.time() - llm_start) * 1000
+
+                    # Log full LLM diagnosis result for debugging
+                    logger.info(f"LLM diagnosis result: success={llm_diagnosis.get('success')}, source={llm_diagnosis.get('source')}")
+                    logger.info(f"LLM diagnosis confidence: {llm_diagnosis.get('confidence')}")
+                    if llm_diagnosis.get('syndrome_analysis'):
+                        logger.info(f"LLM syndrome: {llm_diagnosis['syndrome_analysis'].get('primary_syndrome')}")
 
                     # Format LLM result for response
                     if llm_diagnosis.get("success"):
@@ -420,10 +432,10 @@ async def create_diagnosis(
                             },
                             "risk_alert": llm_diagnosis.get("anomaly_detection", {}).get("reason") if llm_diagnosis.get("anomaly_detection", {}).get("detected") else None,
                             "source": llm_diagnosis.get("source", "unknown"),
-                            "llm_time_ms": llm_diagnosis.get("llm_time_ms", 0),
+                            "llm_time_ms": int(llm_diagnosis.get("llm_time_ms", 0)) if llm_diagnosis.get("llm_time_ms") else int(llm_timing.get("llm_diagnosis_ms", 0)),
                             "retrieved_cases_count": llm_diagnosis.get("retrieved_cases_count", 0)
                         }
-                        logger.info(f"LLM diagnosis successful: syndrome={diagnosis_result['primary_syndrome']}, confidence={diagnosis_result['confidence']}")
+                        logger.info(f"LLM diagnosis successful: syndrome={diagnosis_result['primary_syndrome']}, confidence={diagnosis_result['confidence']}, source={diagnosis_result['source']}")
                     else:
                         # LLM failed, use fallback
                         logger.warning(f"LLM diagnosis failed: {llm_diagnosis.get('error', 'Unknown error')}")
@@ -453,7 +465,8 @@ async def create_diagnosis(
                             "emotional": rule_result.health_recommendations.get("emotional", [])
                         },
                         "risk_alert": None,
-                        "source": "rule_based_fallback"
+                        "source": "rule_based_fallback",
+                        "llm_time_ms": 0
                     }
                 except Exception as rule_error:
                     logger.error(f"Rule-based fallback also failed: {rule_error}")
@@ -469,7 +482,8 @@ async def create_diagnosis(
                             "emotional": ["保持良好心态"]
                         },
                         "risk_alert": "诊断系统异常，请咨询专业医师",
-                        "source": "basic_fallback"
+                        "source": "basic_fallback",
+                        "llm_time_ms": 0
                     }
         else:
             # LLM diagnosis disabled, use basic analysis
@@ -484,7 +498,8 @@ async def create_diagnosis(
                     "emotional": ["保持良好心态"]
                 },
                 "risk_alert": None,
-                "source": "basic_analysis"
+                "source": "basic_analysis",
+                "llm_time_ms": 0
             }
 
         # Merge timing information
@@ -493,37 +508,40 @@ async def create_diagnosis(
         # Calculate total inference time
         total_inference_ms = (time.time() - total_start) * 1000
 
-        # Create diagnosis history record
-        diagnosis_history = DiagnosisHistory(
-            user_id=current_user.id if current_user else None,
-            tongue_image_id=tongue_image_id,
-            user_info=request.user_info.model_dump() if request.user_info else None,
-            features=features_for_db,
-            results=diagnosis_result,
-            model_version=settings.MODEL_VERSION if hasattr(settings, 'MODEL_VERSION') else "v2.0",
-            inference_time_ms=int(total_inference_ms)
-        )
-        db.add(diagnosis_history)
+        # Create diagnosis history record (skip in mock mode)
+        diagnosis_id = "00000000-0000-0000-0000-000000000000"
+        if not mock_mode:
+            diagnosis_history = DiagnosisHistory(
+                user_id=current_user.id if current_user else None,
+                tongue_image_id=tongue_image_id,
+                user_info=request.user_info.model_dump() if request.user_info else None,
+                features=features_for_db,
+                results=diagnosis_result,
+                model_version=settings.MODEL_VERSION if hasattr(settings, 'MODEL_VERSION') else "v2.0",
+                inference_time_ms=int(total_inference_ms)
+            )
+            db.add(diagnosis_history)
 
-        # Flush to get the ID before commit
-        db.flush()
+            # Flush to get the ID before commit
+            db.flush()
 
-        # Get the ID from the diagnosis_history
-        diagnosis_id = diagnosis_history.id
+            # Get the ID from the diagnosis_history
+            diagnosis_id = diagnosis_history.id
 
-        # Commit to database
-        db.commit()
+            # Commit to database
+            db.commit()
 
         logger.info(
             f"Diagnosis created: id={diagnosis_id}, "
             f"user_id={current_user.id if current_user else None}, "
-            f"syndrome={diagnosis_result.get('primary_syndrome')}"
+            f"syndrome={diagnosis_result.get('primary_syndrome')}, "
+            f"mock_mode={mock_mode}"
         )
 
         # Return response
         return DiagnosisResponse(
             success=True,
-            message="Diagnosis completed successfully",
+            message="Diagnosis completed successfully" if not mock_mode else "Mock mode: diagnosis result (LLM enabled)",
             diagnosis_id=str(diagnosis_id),
             user_id=str(current_user.id) if current_user else None,
             segmentation={

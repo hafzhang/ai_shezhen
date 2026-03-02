@@ -24,7 +24,7 @@ from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 
 import httpx
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, field_validator
 
 from api_service.core.config import settings
 from api_service.prompts.user_prompt_template import UserPromptBuilder
@@ -46,6 +46,19 @@ class SyndromeInfo(BaseModel):
     confidence: float
     evidence: str = ""
     tcm_theory: str = ""
+
+    class Config:
+        """Pydantic config"""
+        # Allow arbitrary types to handle list -> str conversion
+        arbitrary_types_allowed = True
+
+    @field_validator('evidence', mode='before')
+    @classmethod
+    def convert_evidence_to_string(cls, v):
+        """Convert evidence from list to string if needed"""
+        if isinstance(v, list):
+            return ', '.join(str(item) for item in v)
+        return v if isinstance(v, str) else str(v)
 
 
 class SyndromeAnalysis(BaseModel):
@@ -93,8 +106,8 @@ class LLMConfig:
     api_base: str
     temperature: float = 0.7
     top_p: float = 0.9
-    max_tokens: int = 2000  # Balanced token limit
-    timeout: int = 120  # Increased timeout for ZhipuAI
+    max_tokens: int = 4000  # Increased for complete JSON output
+    timeout: int = 180  # Increased timeout for ZhipuAI
     max_retries: int = 2
     enable_rule_based: bool = True
     enable_case_retrieval: bool = True
@@ -397,6 +410,8 @@ class LLMDiagnosisEngine:
                         content = message.get("reasoning_content", "")
 
                     logger.info(f"ZhipuAI API response received: {len(content)} chars")
+                    # Log full response for debugging
+                    logger.debug(f"ZhipuAI full response: {content}")
                     return content
                 else:
                     logger.error(f"Unexpected ZhipuAI response format: {result}")
@@ -559,7 +574,6 @@ class LLMDiagnosisEngine:
         Returns:
             JSON 字符串
         """
-        # Remove markdown code block markers if present
         import re
 
         # First, try to find JSON in markdown code blocks
@@ -584,6 +598,37 @@ class LLMDiagnosisEngine:
         cleaned_response = response.strip()
         if cleaned_response.startswith('{') and cleaned_response.endswith('}'):
             return cleaned_response
+
+        # Try to fix truncated JSON: find the last complete object
+        if cleaned_response.startswith('{'):
+            # Count braces to find where JSON might be truncated
+            brace_count = 0
+            last_valid_pos = 0
+            in_string = False
+            escape_next = False
+
+            for i, char in enumerate(cleaned_response):
+                if escape_next:
+                    escape_next = False
+                    continue
+                if char == '\\':
+                    escape_next = True
+                    continue
+                if char == '"' and not escape_next:
+                    in_string = not in_string
+                    continue
+                if not in_string:
+                    if char == '{':
+                        brace_count += 1
+                    elif char == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            last_valid_pos = i + 1
+
+            if last_valid_pos > 0:
+                json_str = cleaned_response[:last_valid_pos]
+                logger.info(f"Attempted to fix truncated JSON, extracted {len(json_str)} chars")
+                return json_str
 
         return None
 

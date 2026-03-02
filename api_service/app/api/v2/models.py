@@ -618,6 +618,8 @@ class DiagnosisResult(BaseModel):
         tcm_theory: TCM theoretical basis (optional)
         health_recommendations: Health recommendations
         risk_alert: Risk warning (optional)
+        source: Diagnosis source (llm_api/rule_based_fallback/basic_fallback)
+        llm_time_ms: LLM inference time in milliseconds
     """
 
     primary_syndrome: str = Field(..., description="主要证型")
@@ -626,6 +628,8 @@ class DiagnosisResult(BaseModel):
     tcm_theory: Optional[str] = Field(None, description="中医理论基础")
     health_recommendations: dict = Field(..., description="健康建议")
     risk_alert: Optional[str] = Field(None, description="风险提示")
+    source: Optional[str] = Field(None, description="诊断来源（llm_api/rule_based_fallback/basic_fallback）")
+    llm_time_ms: Optional[int] = Field(None, description="LLM 推理时间（毫秒）")
 
 
 class DiagnosisResponse(APIResponse):
