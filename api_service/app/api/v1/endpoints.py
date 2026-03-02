@@ -601,12 +601,49 @@ async def diagnosis_tongue(
 
         if request.enable_llm_diagnosis:
             llm_start = time.time()
+            logger.info("=== Starting LLM diagnosis ===")
 
             try:
-                # TODO: Implement LLM diagnosis (will be added in future tasks)
-                # For now, use rule-based fallback directly
+                # Import LLM diagnosis engine
+                from api_service.core.llm_diagnosis import create_llm_diagnosis_engine
+                
+                llm_engine = create_llm_diagnosis_engine()
+                logger.info(f"LLM engine created: {llm_engine}")
+                
+                # Convert classification to format expected by LLM engine
+                llm_input = {
+                    "tongue_color": classification.get("tongue_color", []),
+                    "coating_color": classification.get("coating_color", []),
+                    "tongue_shape": classification.get("tongue_shape", []),
+                    "coating_quality": classification.get("coating_quality", []),
+                    "special_features": classification.get("special_features", []),
+                    "health_status": classification.get("health_status", "健康舌")
+                }
+                
+                logger.info(f"LLM input: {llm_input}")
+                
+                # Call LLM diagnosis
+                llm_result = await llm_engine.diagnose(
+                    image_base64="",
+                    classification_result=llm_input,
+                    user_info=request.user_info.dict() if request.user_info else None
+                )
+                
+                logger.info(f"=== LLM SUCCESS === Result: {llm_result}")
+                
+                if llm_result and llm_result.get("success"):
+                    logger.info(f"=== LLM health_recommendations: {llm_result.get('health_recommendations')} ===")
+                    # Use LLM result
+                    diagnosis = llm_result
+                    used_fallback = False
+                else:
+                    logger.warning("LLM returned empty result, using fallback")
+                    raise Exception("LLM returned empty result")
+                    
+            except Exception as e:
+                logger.warning(f"LLM diagnosis failed: {e}")
+                # Fallback to rule-based
                 if request.enable_rule_fallback:
-                    # Use rule-based diagnosis as fallback
                     rule_result = diagnose_from_classification(classification)
 
                     # Convert rule result to diagnosis format

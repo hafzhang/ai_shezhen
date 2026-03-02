@@ -206,7 +206,7 @@ export const useDiagnosisStore = defineStore('diagnosis', () => {
         method: 'POST',
         data: {
           image: imageBase64,
-          enable_llm_diagnosis: false,
+          enable_llm_diagnosis: true,
           enable_rule_fallback: true
         }
       })
